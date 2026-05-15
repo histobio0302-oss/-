@@ -2096,30 +2096,6 @@ kbd {
 </div>
 
 
-    <input type="file" id="aumFile" accept=".xlsx,.xls" style="display:none" onchange="onAumFileSelect(this)">
-
-    <div class="aum-row">
-      <div class="aum-field">
-        <label class="aum-label">적용일자 (고시 기준일)</label>
-        <input type="date" class="aum-input" id="aumDate">
-      </div>
-      <div class="aum-field" style="max-width:160px">
-        <label class="aum-label">메모 (선택)</label>
-        <input type="text" class="aum-input" id="aumLabel" placeholder="예: 2026.5.1 고시">
-      </div>
-    </div>
-
-    <div class="aum-progress" id="aumProgress">
-      <div class="aum-progress-bar" id="aumProgressBar"></div>
-    </div>
-    <div class="aum-result" id="aumResult"></div>
-
-    <div class="aum-btns">
-      <button onclick="closeAdminUpload()" style="padding:8px 18px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--surface);font-size:13px;font-family:inherit;cursor:pointer;color:var(--text2)">취소</button>
-      <button id="aumSubmitBtn" onclick="submitPriceSnap()" style="padding:8px 20px;border:none;border-radius:var(--r);background:var(--primary);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer" disabled>저장</button>
-    </div>
-  </div>
-</div>
 
 <!-- 상세보기 모달 -->
 <div class="overlay" id="detailModal" onclick="if(event.target===this)closeDetailModal()">
