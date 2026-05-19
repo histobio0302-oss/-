@@ -200,7 +200,7 @@ header {
 }
 .btn-sm { padding: 7px 14px; font-size: 12px; }
 
-/* ─── Result Top Bar (총 N개 검색됨 + 뷰 토글) ── */
+/* ─── Result Top Bar ─────────────────────────── */
 .result-topbar {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 10px; flex-wrap: wrap; gap: 10px;
@@ -209,124 +209,48 @@ header {
   font-size: 14px; font-weight: 700; color: var(--text);
 }
 .result-topbar-right { display: flex; align-items: center; gap: 8px; }
-
-/* 카드/목록 뷰 토글 버튼 */
-.view-toggle-group {
-  display: flex; border: 1.5px solid var(--border);
-  border-radius: var(--r-sm); overflow: hidden; background: var(--surface);
-}
-.view-toggle-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 34px; height: 32px; border: none; cursor: pointer;
-  background: transparent; color: var(--text3);
-  transition: all .15s; font-size: 14px;
-}
-.view-toggle-btn:first-child { border-right: 1px solid var(--border); }
-.view-toggle-btn.active { background: var(--primary); color: #fff; }
-.view-toggle-btn:hover:not(.active) { background: var(--hover); color: var(--text); }
-
-/* 엑셀 내보내기 버튼 */
 .excel-export-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 14px; border: 1.5px solid var(--border);
   border-radius: var(--r-sm); background: var(--surface);
   font-family: inherit; font-size: 12px; font-weight: 600;
-  color: var(--text2); cursor: pointer; transition: all .15s;
-  white-space: nowrap;
+  color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap;
 }
 .excel-export-btn:hover { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
-
-/* 검색결과 N건 라벨 */
 .result-count-label {
   font-size: 12px; color: var(--text3); margin-bottom: 12px;
 }
 .result-count-label strong { color: var(--text); font-weight: 600; }
 
-/* ─── Result Cards Grid ───────────────────────── */
+/* ─── Result Cards Grid (PC: 1열 풀너비) ─────── */
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   margin-top: 4px;
 }
-/* 목록 뷰 */
-.result-grid.list-view {
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-/* ── 카드 공통 ── */
 .result-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
   display: flex; flex-direction: column;
-  transition: box-shadow .18s, transform .18s;
+  transition: box-shadow .18s;
   animation: cardIn .22s ease;
 }
-.result-card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,.10);
-  transform: translateY(-2px);
-}
-@keyframes cardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.result-card:hover { box-shadow: 0 2px 16px rgba(0,0,0,.09); }
+@keyframes cardIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
-/* 카드뷰: 좌측 컬러 보더 */
+/* 좌측 타입 컬러 보더 */
 .result-card.type-self     { border-left: 4px solid var(--self); }
 .result-card.type-contract { border-left: 4px solid var(--contract); }
 .result-card.type-unknown  { border-left: 4px solid var(--unk); }
 
-/* 목록뷰 카드 레이아웃 */
-.result-grid.list-view .result-card {
-  flex-direction: row;
-  align-items: stretch;
-  border-left: none;
-  border-radius: var(--r-lg);
-}
-.result-grid.list-view .result-card.type-self     { border-left: 4px solid var(--self); border-radius: var(--r-lg); }
-.result-grid.list-view .result-card.type-contract { border-left: 4px solid var(--contract); border-radius: var(--r-lg); }
-.result-grid.list-view .result-card.type-unknown  { border-left: 4px solid var(--unk); border-radius: var(--r-lg); }
-.result-grid.list-view .result-card:hover { transform: none; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-
-/* 목록뷰 내부 구조 */
-.result-grid.list-view .result-top {
-  flex-direction: column; justify-content: center;
-  min-width: 220px; max-width: 260px; flex-shrink: 0;
-  border-right: 1px solid var(--border); border-bottom: none;
-}
-.result-grid.list-view .card-meta {
-  border-top: none; border-bottom: none;
-  border-right: 1px solid var(--border);
-  flex-shrink: 0; min-width: 240px;
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-}
-.result-grid.list-view .card-meta .meta-item {
-  border-right: 1px solid var(--border);
-  padding: 10px 12px;
-}
-.result-grid.list-view .card-meta .meta-item:last-child { border-right: none; }
-.result-grid.list-view .card-ingr {
-  border-bottom: none; border-right: 1px solid var(--border);
-  flex: 1; min-width: 160px; display: flex; flex-direction: column; justify-content: center;
-}
-.result-grid.list-view .card-actions {
-  flex-direction: column; justify-content: center; flex-shrink: 0;
-  padding: 12px 14px; gap: 6px; width: 190px;
-  border-top: none; margin-top: 0;
-}
-.result-grid.list-view .card-actions .btn-row1,
-.result-grid.list-view .card-actions .btn-row2 {
-  display: flex; gap: 5px; width: 100%;
-}
-.result-grid.list-view .card-actions .btn-row1 .detail-btn,
-.result-grid.list-view .card-actions .btn-row1 .generic-btn { flex: 1; }
-
 /* 카드 헤더 */
 .card-top, .result-top {
-  padding: 16px 18px 12px;
+  padding: 16px 20px 12px;
   display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 12px;
+  justify-content: space-between; gap: 16px;
 }
 .drug-info { flex: 1; min-width: 0; }
 .drug-name {
@@ -335,17 +259,14 @@ header {
   line-height: 1.4; margin-bottom: 4px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.drug-company {
-  font-size: 12px; color: var(--text2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.drug-company { font-size: 12px; color: var(--text2); }
 
 /* 뱃지 */
-.badges { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; padding-top: 2px; }
+.badges { display: flex; gap: 6px; flex-wrap: nowrap; flex-shrink: 0; align-items: flex-start; padding-top: 2px; }
 .badge {
   display: inline-flex; align-items: center;
-  padding: 3px 8px; border-radius: 50px;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.1px;
+  padding: 4px 10px; border-radius: 50px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1px;
   border: 1px solid; white-space: nowrap;
 }
 .badge-self     { background:var(--self-bg);     color:var(--self);     border-color:var(--self-border); }
@@ -354,29 +275,23 @@ header {
 .badge-unk      { background:var(--unk-bg);      color:var(--unk);      border-color:var(--unk-border); }
 .badge-nobio    { background:var(--surface2);    color:var(--text3);    border-color:var(--border); font-weight:400; }
 
-/* 카드 핵심 정보 (3칸 그리드) */
+/* 카드 메타 3칸 */
 .card-meta {
   display: grid; grid-template-columns: 1fr 1fr 1fr;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-.meta-item {
-  padding: 10px 14px;
-  border-right: 1px solid var(--border);
-}
+.meta-item { padding: 10px 20px; border-right: 1px solid var(--border); }
 .meta-item:last-child { border-right: none; }
 .meta-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.7px;
   text-transform: uppercase; color: var(--text3); margin-bottom: 4px;
 }
-.meta-value {
-  font-size: 12px; font-weight: 600; color: var(--text);
-  line-height: 1.4; word-break: break-all;
-}
+.meta-value { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
 
-/* 주성분 영역 */
+/* 주성분 */
 .card-ingr {
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--surface2);
 }
@@ -386,11 +301,86 @@ header {
 }
 .card-ingr-value {
   font-size: 12px; color: var(--text2); line-height: 1.5;
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* 가격 뱃지 */
+/* ── 카드 액션 버튼 (단일 행) ─────────────── */
+.card-actions {
+  padding: 10px 16px;
+  display: flex; flex-direction: row;
+  align-items: center; gap: 7px;
+  flex-wrap: nowrap; margin-top: auto;
+}
+
+/* 상세보기 */
+.detail-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 18px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--r); color: var(--text);
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0;
+}
+.detail-btn:hover { background: var(--hover); border-color: var(--border-md); }
+
+/* 즐겨찾기 */
+.fav-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 14px; border-radius: var(--r);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
+  color: var(--text2); font-family: inherit; white-space: nowrap; flex-shrink: 0;
+}
+.fav-btn:hover { border-color: #f59e0b; background: #fff7ed; color: #b45309; }
+.fav-btn.faved { background: #fff7ed; border-color: #f59e0b; color: #b45309; font-weight: 600; }
+
+/* 비교 */
+.cmp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 14px; border-radius: var(--r);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
+  color: var(--text2); font-family: inherit; white-space: nowrap; flex-shrink: 0;
+}
+.cmp-btn:hover  { border-color: #8b5cf6; background: #f5f3ff; color: #6d28d9; }
+.cmp-btn.cmped  { background: #f5f3ff; border-color: #8b5cf6; color: #6d28d9; font-weight: 600; }
+.cmp-btn.cmp-full { border-color: var(--border); background: var(--surface2); color: var(--text3); cursor: not-allowed; }
+
+/* 공유 (파란 채운 버튼) */
+.share-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 14px; border-radius: var(--r);
+  background: var(--primary); border: 1.5px solid var(--primary);
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+  color: #fff; font-family: inherit; white-space: nowrap; flex-shrink: 0;
+}
+.share-btn:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+/* +목록추가 (초록 아웃라인) */
+.add-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 14px;
+  background: var(--self-bg); border: 1.5px solid var(--self-border);
+  border-radius: var(--r); color: var(--self);
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0;
+}
+.add-btn:hover { background: var(--self); color: #fff; border-color: var(--self); }
+.add-btn.added { background: var(--surface2); color: var(--text3); border-color: var(--border); cursor: default; }
+
+/* 안전나라 (오른쪽 밀기) */
+.link-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 7px 14px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--r); color: var(--text2);
+  font-size: 12px; font-weight: 500; text-decoration: none;
+  transition: all .15s; white-space: nowrap; flex-shrink: 0;
+  margin-left: auto;
+}
+.link-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* 가격 뱃지 (하위 호환) */
 .price-badge {
   display: inline-flex; align-items: center;
   background: #ecfdf5; color: #065f46;
@@ -398,93 +388,6 @@ header {
   border-radius: 50px; padding: 3px 10px;
   font-size: 11px; font-weight: 600;
 }
-
-/* ── 카드 액션 버튼 (2열 구조) ── */
-.card-actions {
-  padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 6px;
-  margin-top: auto;
-}
-.btn-row1, .btn-row2 {
-  display: flex; gap: 6px; width: 100%;
-}
-/* 상세보기 / 제네릭 버튼 (row1 - 동등 크기) */
-.detail-btn {
-  flex: 1; min-width: 0;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 8px 12px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r); color: var(--text);
-  font-size: 12px; font-weight: 500;
-  font-family: inherit; cursor: pointer; transition: all .15s;
-}
-.detail-btn:hover { background: var(--hover); border-color: var(--border-md); }
-.generic-btn {
-  flex: 1; min-width: 0;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 8px 12px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r); color: var(--text);
-  font-size: 12px; font-weight: 500;
-  font-family: inherit; cursor: pointer; transition: all .15s;
-}
-.generic-btn:hover { background: var(--hover); border-color: var(--border-md); }
-
-/* row2 소형 버튼들 */
-.fav-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 9px; border-radius: var(--r);
-  background: var(--surface2); border: 1.5px solid var(--border);
-  font-size: 11px; font-weight: 500; cursor: pointer; transition: all .15s;
-  color: var(--text2); font-family: inherit; white-space: nowrap;
-}
-.fav-btn:hover { border-color: #f59e0b; background: #fff7ed; color: #b45309; }
-.fav-btn.faved { background: #fff7ed; border-color: #f59e0b; color: #b45309; font-weight: 600; }
-
-.cmp-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 9px; border-radius: var(--r);
-  background: var(--surface2); border: 1.5px solid var(--border);
-  font-size: 11px; font-weight: 500; cursor: pointer; transition: all .15s;
-  color: var(--text2); font-family: inherit; white-space: nowrap;
-}
-.cmp-btn:hover  { border-color: #8b5cf6; background: #f5f3ff; color: #6d28d9; }
-.cmp-btn.cmped  { background: #f5f3ff; border-color: #8b5cf6; color: #6d28d9; font-weight: 600; }
-.cmp-btn.cmp-full { border-color: var(--border); background: var(--surface2); color: var(--text3); cursor: not-allowed; }
-
-.share-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 9px; border-radius: var(--r);
-  background: var(--primary); border: 1.5px solid var(--primary);
-  font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s;
-  color: #fff; font-family: inherit; white-space: nowrap;
-}
-.share-btn:hover { background: #1d4ed8; border-color: #1d4ed8; }
-
-.add-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 9px;
-  background: var(--self-bg);
-  border: 1.5px solid var(--self-border);
-  border-radius: var(--r); color: var(--self);
-  font-size: 11px; font-weight: 500;
-  font-family: inherit; cursor: pointer; transition: all .15s; white-space: nowrap;
-}
-.add-btn:hover { background: var(--self); color: #fff; border-color: var(--self); }
-.add-btn.added { background: var(--surface2); color: var(--text3); border-color: var(--border); cursor: default; }
-
-.link-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-  padding: 6px 9px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r); color: var(--text2);
-  font-size: 11px; font-weight: 500; text-decoration: none;
-  transition: all .15s; white-space: nowrap;
-}
-.link-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
 /* ─── Fields Grid (상세 모달용 유지) ─────────── */
 .fields {
@@ -1001,7 +904,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 
   /* 헤더 우측: 로그아웃·토글 버튼만 간소화 */
   #authUserName { display: none !important; }
-  #viewToggleBtn { display: none !important; }
   button[onclick="doLogout()"] {
     font-size: 11px !important;
     padding: 4px 10px !important;
@@ -1025,14 +927,9 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 
   /* 카드 그리드 → 1열 */
   .result-grid { grid-template-columns: 1fr; gap: 10px; }
-  .result-grid.list-view { grid-template-columns: 1fr; }
-  .result-grid.list-view .result-card { flex-direction: column; border-left: none; }
-  .result-grid.list-view .result-top { min-width: unset; max-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
-  .result-grid.list-view .card-meta { border-right: none; min-width: unset; }
-  .result-grid.list-view .card-ingr { border-right: none; }
-  .result-grid.list-view .card-actions { width: auto; flex-direction: column; }
-  .result-grid.list-view .card-actions .btn-row1,
-  .result-grid.list-view .card-actions .btn-row2 { flex-wrap: wrap; }
+  /* 모바일: 버튼 행 줄바꿈 허용 */
+  .card-actions { flex-wrap: wrap; padding: 8px 12px; gap: 6px; }
+  .link-btn { margin-left: 0; }
   .result-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
   .result-topbar-right { width: 100%; justify-content: flex-end; }
 
@@ -1374,11 +1271,6 @@ body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !imp
     <span class="header-sep"></span>
     <span class="header-sub">식약처&#183;심평원 공공데이터 통합 조회</span>
     <div class="header-right" style="display:flex;align-items:center;gap:8px">
-      <button id="viewToggleBtn" onclick="toggleViewMode()"
-        style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap">
-        <span id="viewToggleIcon">&#128241;</span>
-        <span id="viewToggleLabel">모바일뷰</span>
-      </button>
       <button class="list-trigger" id="floatBtn" onclick="openModal()">
         📋 내 목록 <span class="list-count" id="floatBadge">0</span>
       </button>
@@ -2114,31 +2006,8 @@ function initViewMode() {
   updateViewToggleBtn();
 }
 
-function updateViewToggleBtn() {
-  var btn=document.getElementById('viewToggleBtn');
-  var icon=document.getElementById('viewToggleIcon');
-  var label=document.getElementById('viewToggleLabel');
-  if(!btn) return;
-  if(document.body.classList.contains('mobile-forced')){
-    icon.innerHTML='&#128241;'; btn.style.borderColor='var(--primary)'; btn.style.color='var(--primary)'; label.textContent='모바일뷰';
-  } else if(document.body.classList.contains('pc-forced')){
-    icon.innerHTML='&#128421;'; btn.style.borderColor='#059669'; btn.style.color='#059669'; label.textContent='PC뷰';
-  } else {
-    icon.innerHTML='&#128257;'; btn.style.borderColor='var(--border)'; btn.style.color='var(--text2)'; label.textContent='자동';
-  }
-}
-
-function toggleViewMode() {
-  var body=document.body;
-  if(body.classList.contains('mobile-forced')){
-    body.classList.remove('mobile-forced'); body.classList.add('pc-forced'); localStorage.setItem('drugapp_view_mode','pc');
-  } else if(body.classList.contains('pc-forced')){
-    body.classList.remove('pc-forced'); localStorage.removeItem('drugapp_view_mode');
-  } else {
-    body.classList.add('mobile-forced'); localStorage.setItem('drugapp_view_mode','mobile');
-  }
-  updateViewToggleBtn();
-}
+function updateViewToggleBtn() { /* 뷰 토글 제거됨 */ }
+function toggleViewMode()      { /* 뷰 토글 제거됨 */ }
 
 function checkHiramap(iframe) {
   var loading=document.getElementById('hiramapLoading');
@@ -2360,29 +2229,8 @@ function go() {
 
       var html = '';
 
-      // ── 상단바: 총 N개 검색됨 + 뷰 토글 + 엑셀 내보내기
-      html += '<div class="result-topbar">'
-        + '<span class="result-total-label">총 <strong>' + listItems.length + '개</strong> 검색됨</span>'
-        + '<div class="result-topbar-right">'
-        +   '<div class="view-toggle-group">'
-        +     '<button class="view-toggle-btn active" id="viewBtnCard" onclick="setResultView(\'card\')" title="카드형">'
-        +       '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="6" height="6" rx="1"/><rect x="8" y="0" width="6" height="6" rx="1"/><rect x="0" y="8" width="6" height="6" rx="1"/><rect x="8" y="8" width="6" height="6" rx="1"/></svg>'
-        +     '</button>'
-        +     '<button class="view-toggle-btn" id="viewBtnList" onclick="setResultView(\'list\')" title="목록형">'
-        +       '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="14" height="2.5" rx="1"/><rect x="0" y="5.5" width="14" height="2.5" rx="1"/><rect x="0" y="11" width="14" height="2.5" rx="1"/></svg>'
-        +     '</button>'
-        +   '</div>'
-        +   '<button class="excel-export-btn" onclick="exportResultsToExcel()">'
-        +     '<svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="12" y2="13"/><line x1="10" y1="11" x2="10" y2="15"/></svg>'
-        +     '엑셀 내보내기'
-        +   '</button>'
-        + '</div>'
-        + '</div>';
-
-      // ── 검색결과 N건
+      // ── 검색 결과 N건 라벨
       html += '<div class="result-count-label">검색 결과 <strong>' + listItems.length + '건</strong></div>';
-
-      // ── 카드 그리드 (id 부여 → 뷰 전환 시 class 변경)
       html += '<div class="result-grid" id="resultGrid">';
 
       for (var i=0; i<listItems.length; i++) {
@@ -2412,18 +2260,17 @@ function go() {
         if (!bioItem && bioByName[itemNm.toLowerCase()]) bioItem = bioByName[itemNm.toLowerCase()];
         var isBio = !!bioItem;
 
-        // 보험상한가
         var pi = lookupPrice(itemSeq, itemNm);
-        var ingrShort = ingr.length > 60 ? ingr.substring(0, 60) + '…' : ingr;
+        var ingrShort = ingr.length > 80 ? ingr.substring(0, 80) + '…' : ingr;
 
-        // 공통 콜백 파라미터 문자열
-        var favParams = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\'';
-        var cmpParams  = favParams + ',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
-        var dtlParams  = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
+        // 콜백 파라미터
+        var favP = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\'';
+        var cmpP  = favP + ',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
+        var dtlP  = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
 
         html += '<div class="result-card type-' + mfgType + '">'
 
-          // ── 헤더: 약품명 + 제조사 + 뱃지
+          // ── 헤더
           + '<div class="result-top">'
           +   '<div class="drug-info">'
           +     '<div class="drug-name" title="' + esc(itemNm) + '">' + esc(itemNm) + '</div>'
@@ -2435,20 +2282,11 @@ function go() {
           +   '</div>'
           + '</div>'
 
-          // ── 핵심 메타 3칸 (제형 | 허가일 | 보험상한가)
+          // ── 메타 3칸
           + '<div class="card-meta">'
-          +   '<div class="meta-item">'
-          +     '<div class="meta-label">제형</div>'
-          +     '<div class="meta-value">' + esc(formCode === '-' ? (packUnit.length < 20 ? packUnit : '-') : formCode) + '</div>'
-          +   '</div>'
-          +   '<div class="meta-item">'
-          +     '<div class="meta-label">허가일</div>'
-          +     '<div class="meta-value">' + (apprDate || '-') + '</div>'
-          +   '</div>'
-          +   '<div class="meta-item">'
-          +     '<div class="meta-label">보험상한가</div>'
-          +     '<div class="meta-value">' + (pi ? pi[0].toLocaleString('ko-KR') + '원' : '-') + '</div>'
-          +   '</div>'
+          +   '<div class="meta-item"><div class="meta-label">제형</div><div class="meta-value">' + esc(formCode === '-' ? (packUnit.length < 20 ? packUnit : '-') : formCode) + '</div></div>'
+          +   '<div class="meta-item"><div class="meta-label">허가일</div><div class="meta-value">' + (apprDate || '-') + '</div></div>'
+          +   '<div class="meta-item"><div class="meta-label">보험상한가</div><div class="meta-value">' + (pi ? pi[0].toLocaleString('ko-KR') + '원' : '-') + '</div></div>'
           + '</div>'
 
           // ── 주성분
@@ -2457,31 +2295,24 @@ function go() {
           +   '<div class="card-ingr-value" title="' + esc(ingr) + '">' + esc(ingrShort) + '</div>'
           + '</div>'
 
-          // ── 액션 버튼 (2행)
+          // ── 단일 행 버튼: 상세보기 | 즐겨찾기 | 비교 | 공유 | +목록추가 | [auto] | 안전나라
           + '<div class="card-actions">'
-          // row1: 상세보기 | 제네릭
-          +   '<div class="btn-row1">'
-          +     '<button class="detail-btn" onclick="openDetailModal(' + dtlParams + ')">📄 상세보기</button>'
-          +     '<button class="generic-btn" onclick="openGenericModal(\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\')" title="동일성분 제네릭 조회">👥 제네릭</button>'
-          +   '</div>'
-          // row2: 즐겨찾기 | 비교 | 공유 | 목록추가 | 안전나라
-          +   '<div class="btn-row2">'
-          +     '<button class="fav-btn" id="favbtn_' + esc(itemSeq) + '" onclick="toggleFavorite(this,' + favParams + ')" title="즐겨찾기">⭐ 즐겨찾기</button>'
-          +     '<button class="cmp-btn" id="cmpbtn_' + esc(itemSeq) + '" onclick="toggleCompare(this,' + cmpParams + ')" title="비교">⚖️ 비교</button>'
-          +     '<button class="share-btn" onclick="shareItem(\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\')" title="공유">🔗 공유</button>'
-          +     '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
-          +       ' data-seq="' + esc(itemSeq) + '" data-name="' + esc(itemNm) + '"'
-          +       ' data-seller="' + esc(sellerNm) + '" data-maker="' + esc(makerNm) + '"'
-          +       ' data-pack="' + esc(packUnit) + '" data-mfgtype="' + mfgType + '"'
-          +       ' data-mfglabel="' + mfgLabel + '" data-bio="' + (isBio?'1':'0') + '"'
-          +       ' onclick="addItem(this)">＋ 목록추가</button>'
-          +     (itemSeq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" title="의약품안전나라">🔗 안전나라</a>' : '')
-          +   '</div>'
+          +   '<button class="detail-btn" onclick="openDetailModal(' + dtlP + ')">📄 상세보기</button>'
+          +   '<button class="fav-btn" id="favbtn_' + esc(itemSeq) + '" onclick="toggleFavorite(this,' + favP + ')">⭐ 즐겨찾기</button>'
+          +   '<button class="cmp-btn" id="cmpbtn_' + esc(itemSeq) + '" onclick="toggleCompare(this,' + cmpP + ')">⚖️ 비교</button>'
+          +   '<button class="share-btn" onclick="shareItem(\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\')">🔗 공유</button>'
+          +   '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
+          +     ' data-seq="' + esc(itemSeq) + '" data-name="' + esc(itemNm) + '"'
+          +     ' data-seller="' + esc(sellerNm) + '" data-maker="' + esc(makerNm) + '"'
+          +     ' data-pack="' + esc(packUnit) + '" data-mfgtype="' + mfgType + '"'
+          +     ' data-mfglabel="' + mfgLabel + '" data-bio="' + (isBio?'1':'0') + '"'
+          +     ' onclick="addItem(this)">＋ 목록추가</button>'
+          +   (itemSeq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" title="의약품안전나라">🔗 안전나라</a>' : '')
           + '</div>'
 
           + '</div>';
       }
-      html += '</div>';  // .result-grid 닫기
+      html += '</div>';
 
       document.getElementById('result').innerHTML = html;
       applyFavButtons();
