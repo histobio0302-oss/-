@@ -200,13 +200,47 @@ header {
 }
 .btn-sm { padding: 7px 14px; font-size: 12px; }
 
-/* ─── Result Count ───────────────────────────── */
-.result-meta {
-  font-size: 12px; color: var(--text3);
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
+/* ─── Result Top Bar (총 N개 검색됨 + 뷰 토글) ── */
+.result-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; flex-wrap: wrap; gap: 10px;
 }
-.result-meta strong { color: var(--text); font-weight: 600; }
+.result-total-label {
+  font-size: 14px; font-weight: 700; color: var(--text);
+}
+.result-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+/* 카드/목록 뷰 토글 버튼 */
+.view-toggle-group {
+  display: flex; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); overflow: hidden; background: var(--surface);
+}
+.view-toggle-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 32px; border: none; cursor: pointer;
+  background: transparent; color: var(--text3);
+  transition: all .15s; font-size: 14px;
+}
+.view-toggle-btn:first-child { border-right: 1px solid var(--border); }
+.view-toggle-btn.active { background: var(--primary); color: #fff; }
+.view-toggle-btn:hover:not(.active) { background: var(--hover); color: var(--text); }
+
+/* 엑셀 내보내기 버튼 */
+.excel-export-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); background: var(--surface);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  color: var(--text2); cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.excel-export-btn:hover { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+
+/* 검색결과 N건 라벨 */
+.result-count-label {
+  font-size: 12px; color: var(--text3); margin-bottom: 12px;
+}
+.result-count-label strong { color: var(--text); font-weight: 600; }
 
 /* ─── Result Cards Grid ───────────────────────── */
 .result-grid {
@@ -215,6 +249,13 @@ header {
   gap: 14px;
   margin-top: 4px;
 }
+/* 목록 뷰 */
+.result-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* ── 카드 공통 ── */
 .result-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -230,10 +271,56 @@ header {
 }
 @keyframes cardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-/* 상단 타입 스트라이프 */
-.result-card.type-self     { border-top: 3px solid var(--self); }
-.result-card.type-contract { border-top: 3px solid var(--contract); }
-.result-card.type-unknown  { border-top: 3px solid var(--unk); }
+/* 카드뷰: 좌측 컬러 보더 */
+.result-card.type-self     { border-left: 4px solid var(--self); }
+.result-card.type-contract { border-left: 4px solid var(--contract); }
+.result-card.type-unknown  { border-left: 4px solid var(--unk); }
+
+/* 목록뷰 카드 레이아웃 */
+.result-grid.list-view .result-card {
+  flex-direction: row;
+  align-items: stretch;
+  border-left: none;
+  border-radius: var(--r-lg);
+}
+.result-grid.list-view .result-card.type-self     { border-left: 4px solid var(--self); border-radius: var(--r-lg); }
+.result-grid.list-view .result-card.type-contract { border-left: 4px solid var(--contract); border-radius: var(--r-lg); }
+.result-grid.list-view .result-card.type-unknown  { border-left: 4px solid var(--unk); border-radius: var(--r-lg); }
+.result-grid.list-view .result-card:hover { transform: none; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+
+/* 목록뷰 내부 구조 */
+.result-grid.list-view .result-top {
+  flex-direction: column; justify-content: center;
+  min-width: 220px; max-width: 260px; flex-shrink: 0;
+  border-right: 1px solid var(--border); border-bottom: none;
+}
+.result-grid.list-view .card-meta {
+  border-top: none; border-bottom: none;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0; min-width: 240px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+.result-grid.list-view .card-meta .meta-item {
+  border-right: 1px solid var(--border);
+  padding: 10px 12px;
+}
+.result-grid.list-view .card-meta .meta-item:last-child { border-right: none; }
+.result-grid.list-view .card-ingr {
+  border-bottom: none; border-right: 1px solid var(--border);
+  flex: 1; min-width: 160px; display: flex; flex-direction: column; justify-content: center;
+}
+.result-grid.list-view .card-actions {
+  flex-direction: column; justify-content: center; flex-shrink: 0;
+  padding: 12px 14px; gap: 6px; width: 190px;
+  border-top: none; margin-top: 0;
+}
+.result-grid.list-view .card-actions .btn-row1,
+.result-grid.list-view .card-actions .btn-row2 {
+  display: flex; gap: 5px; width: 100%;
+}
+.result-grid.list-view .card-actions .btn-row1 .detail-btn,
+.result-grid.list-view .card-actions .btn-row1 .generic-btn { flex: 1; }
 
 /* 카드 헤더 */
 .card-top, .result-top {
@@ -311,52 +398,93 @@ header {
   border-radius: 50px; padding: 3px 10px;
   font-size: 11px; font-weight: 600;
 }
-@media (prefers-color-scheme: dark) {
-  .price-badge { background:#022c22; color:#6ee7b7; border-color:#065f46; }
-}
 
-/* 카드 액션 버튼 */
+/* ── 카드 액션 버튼 (2열 구조) ── */
 .card-actions {
-  padding: 12px 14px;
-  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
   margin-top: auto;
 }
-.link-btn {
+.btn-row1, .btn-row2 {
+  display: flex; gap: 6px; width: 100%;
+}
+/* 상세보기 / 제네릭 버튼 (row1 - 동등 크기) */
+.detail-btn {
   flex: 1; min-width: 0;
   display: flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 9px 12px;
-  background: var(--primary-lt);
-  border: 1.5px solid var(--primary-md);
-  border-radius: var(--r); color: var(--primary);
-  font-size: 12px; font-weight: 500; text-decoration: none;
-  transition: all .15s; white-space: nowrap;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); color: var(--text);
+  font-size: 12px; font-weight: 500;
+  font-family: inherit; cursor: pointer; transition: all .15s;
 }
-.link-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
-.add-btn {
+.detail-btn:hover { background: var(--hover); border-color: var(--border-md); }
+.generic-btn {
   flex: 1; min-width: 0;
-  display: flex; align-items: center; justify-content: center;
-  padding: 9px 12px;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); color: var(--text);
+  font-size: 12px; font-weight: 500;
+  font-family: inherit; cursor: pointer; transition: all .15s;
+}
+.generic-btn:hover { background: var(--hover); border-color: var(--border-md); }
+
+/* row2 소형 버튼들 */
+.fav-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 6px 9px; border-radius: var(--r);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  font-size: 11px; font-weight: 500; cursor: pointer; transition: all .15s;
+  color: var(--text2); font-family: inherit; white-space: nowrap;
+}
+.fav-btn:hover { border-color: #f59e0b; background: #fff7ed; color: #b45309; }
+.fav-btn.faved { background: #fff7ed; border-color: #f59e0b; color: #b45309; font-weight: 600; }
+
+.cmp-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 6px 9px; border-radius: var(--r);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  font-size: 11px; font-weight: 500; cursor: pointer; transition: all .15s;
+  color: var(--text2); font-family: inherit; white-space: nowrap;
+}
+.cmp-btn:hover  { border-color: #8b5cf6; background: #f5f3ff; color: #6d28d9; }
+.cmp-btn.cmped  { background: #f5f3ff; border-color: #8b5cf6; color: #6d28d9; font-weight: 600; }
+.cmp-btn.cmp-full { border-color: var(--border); background: var(--surface2); color: var(--text3); cursor: not-allowed; }
+
+.share-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 6px 9px; border-radius: var(--r);
+  background: var(--primary); border: 1.5px solid var(--primary);
+  font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s;
+  color: #fff; font-family: inherit; white-space: nowrap;
+}
+.share-btn:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+.add-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 6px 9px;
   background: var(--self-bg);
   border: 1.5px solid var(--self-border);
   border-radius: var(--r); color: var(--self);
-  font-size: 12px; font-weight: 500;
+  font-size: 11px; font-weight: 500;
   font-family: inherit; cursor: pointer; transition: all .15s; white-space: nowrap;
 }
 .add-btn:hover { background: var(--self); color: #fff; border-color: var(--self); }
 .add-btn.added { background: var(--surface2); color: var(--text3); border-color: var(--border); cursor: default; }
 
-/* 상세보기 버튼 (카드 전용) */
-.detail-btn {
-  flex: 1; min-width: 0;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 9px 12px;
+.link-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 6px 9px;
   background: var(--surface2);
   border: 1.5px solid var(--border);
-  border-radius: var(--r); color: var(--text);
-  font-size: 12px; font-weight: 500;
-  font-family: inherit; cursor: pointer; transition: all .15s; white-space: nowrap;
+  border-radius: var(--r); color: var(--text2);
+  font-size: 11px; font-weight: 500; text-decoration: none;
+  transition: all .15s; white-space: nowrap;
 }
-.detail-btn:hover { background: var(--border); }
+.link-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
 /* ─── Fields Grid (상세 모달용 유지) ─────────── */
 .fields {
@@ -897,6 +1025,16 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 
   /* 카드 그리드 → 1열 */
   .result-grid { grid-template-columns: 1fr; gap: 10px; }
+  .result-grid.list-view { grid-template-columns: 1fr; }
+  .result-grid.list-view .result-card { flex-direction: column; border-left: none; }
+  .result-grid.list-view .result-top { min-width: unset; max-width: unset; border-right: none; border-bottom: 1px solid var(--border); }
+  .result-grid.list-view .card-meta { border-right: none; min-width: unset; }
+  .result-grid.list-view .card-ingr { border-right: none; }
+  .result-grid.list-view .card-actions { width: auto; flex-direction: column; }
+  .result-grid.list-view .card-actions .btn-row1,
+  .result-grid.list-view .card-actions .btn-row2 { flex-wrap: wrap; }
+  .result-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .result-topbar-right { width: 100%; justify-content: flex-end; }
 
   /* 결과 카드 */
   .result-card { border-radius: 12px; }
@@ -1782,6 +1920,77 @@ function closeMobileMore() {
   if (panel)   panel.classList.remove('open');
   if (overlay) overlay.classList.remove('open');
 }
+
+/* ── 카드/목록 뷰 전환 ─────────────────────── */
+var _resultView = 'card'; // 'card' | 'list'
+function setResultView(mode) {
+  _resultView = mode;
+  var grid = document.getElementById('resultGrid');
+  if (!grid) return;
+  if (mode === 'list') {
+    grid.classList.add('list-view');
+  } else {
+    grid.classList.remove('list-view');
+  }
+  var btnCard = document.getElementById('viewBtnCard');
+  var btnList = document.getElementById('viewBtnList');
+  if (btnCard) btnCard.classList.toggle('active', mode === 'card');
+  if (btnList) btnList.classList.toggle('active', mode === 'list');
+}
+
+/* ── 공유 기능 ───────────────────────────────── */
+function shareItem(seq, name) {
+  var url = seq
+    ? 'https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + seq
+    : location.href;
+  var shareData = { title: name, text: name + ' — 의약품 상세정보', url: url };
+  if (navigator.share) {
+    navigator.share(shareData).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('🔗 링크가 클립보드에 복사되었습니다.');
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('🔗 링크가 클립보드에 복사되었습니다.');
+  }
+}
+
+/* ── 제네릭(동일성분) 모달 ────────────────── */
+function openGenericModal(seq, name) {
+  // 동일성분 검색 탭으로 이동하여 자동 검색
+  setTab('search');
+  // 동일성분 검색이 있다면 활용, 없으면 안전나라로 이동
+  var url = 'https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + encodeURIComponent(seq);
+  window.open(url, '_blank');
+}
+
+/* ── 검색 결과 엑셀 내보내기 ─────────────── */
+function exportResultsToExcel() {
+  var cards = document.querySelectorAll('#resultGrid .result-card');
+  if (!cards.length) { showToast('내보낼 데이터가 없습니다.'); return; }
+  var rows = [['제품명', '제조사', '제형', '허가일', '보험상한가', '주성분']];
+  cards.forEach(function(card) {
+    var name   = (card.querySelector('.drug-name')   || {}).textContent || '';
+    var comp   = (card.querySelector('.drug-company') || {}).textContent || '';
+    var metas  = card.querySelectorAll('.meta-value');
+    var form   = metas[0] ? metas[0].textContent : '';
+    var date   = metas[1] ? metas[1].textContent : '';
+    var price  = metas[2] ? metas[2].textContent : '';
+    var ingr   = (card.querySelector('.card-ingr-value') || {}).textContent || '';
+    rows.push([name, comp, form, date, price, ingr]);
+  });
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, '검색결과');
+  XLSX.writeFile(wb, '의약품검색결과.xlsx');
+  showToast('✅ 엑셀 파일이 다운로드되었습니다.');
+}
 function applyFavButtons() {
   var favs = loadFavorites(), seqSet = {};
   for (var i=0; i<favs.length; i++) seqSet[favs[i].seq] = true;
@@ -2149,8 +2358,32 @@ function go() {
         if (bi.ITEM_NAME) bioByName[bi.ITEM_NAME.toLowerCase()] = bi;
       }
 
-      var html = '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">검색 결과 <strong>' + listItems.length + '건</strong></div>';
-      html += '<div class="result-grid">';
+      var html = '';
+
+      // ── 상단바: 총 N개 검색됨 + 뷰 토글 + 엑셀 내보내기
+      html += '<div class="result-topbar">'
+        + '<span class="result-total-label">총 <strong>' + listItems.length + '개</strong> 검색됨</span>'
+        + '<div class="result-topbar-right">'
+        +   '<div class="view-toggle-group">'
+        +     '<button class="view-toggle-btn active" id="viewBtnCard" onclick="setResultView(\'card\')" title="카드형">'
+        +       '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="6" height="6" rx="1"/><rect x="8" y="0" width="6" height="6" rx="1"/><rect x="0" y="8" width="6" height="6" rx="1"/><rect x="8" y="8" width="6" height="6" rx="1"/></svg>'
+        +     '</button>'
+        +     '<button class="view-toggle-btn" id="viewBtnList" onclick="setResultView(\'list\')" title="목록형">'
+        +       '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="14" height="2.5" rx="1"/><rect x="0" y="5.5" width="14" height="2.5" rx="1"/><rect x="0" y="11" width="14" height="2.5" rx="1"/></svg>'
+        +     '</button>'
+        +   '</div>'
+        +   '<button class="excel-export-btn" onclick="exportResultsToExcel()">'
+        +     '<svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="12" y2="13"/><line x1="10" y1="11" x2="10" y2="15"/></svg>'
+        +     '엑셀 내보내기'
+        +   '</button>'
+        + '</div>'
+        + '</div>';
+
+      // ── 검색결과 N건
+      html += '<div class="result-count-label">검색 결과 <strong>' + listItems.length + '건</strong></div>';
+
+      // ── 카드 그리드 (id 부여 → 뷰 전환 시 class 변경)
+      html += '<div class="result-grid" id="resultGrid">';
 
       for (var i=0; i<listItems.length; i++) {
         var li  = listItems[i];
@@ -2180,14 +2413,13 @@ function go() {
         var isBio = !!bioItem;
 
         // 보험상한가
-        var priceHtml = '';
         var pi = lookupPrice(itemSeq, itemNm);
-        if (pi) {
-          priceHtml = '<span class="price-badge">₩ ' + pi[0].toLocaleString('ko-KR') + '원</span>';
-        }
-
-        // 주성분 요약 (너무 길면 자름)
         var ingrShort = ingr.length > 60 ? ingr.substring(0, 60) + '…' : ingr;
+
+        // 공통 콜백 파라미터 문자열
+        var favParams = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\'';
+        var cmpParams  = favParams + ',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
+        var dtlParams  = '\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\'';
 
         html += '<div class="result-card type-' + mfgType + '">'
 
@@ -2203,7 +2435,7 @@ function go() {
           +   '</div>'
           + '</div>'
 
-          // ── 핵심 메타 3칸 (제형 | 포장 | 허가일)
+          // ── 핵심 메타 3칸 (제형 | 허가일 | 보험상한가)
           + '<div class="card-meta">'
           +   '<div class="meta-item">'
           +     '<div class="meta-label">제형</div>'
@@ -2225,32 +2457,28 @@ function go() {
           +   '<div class="card-ingr-value" title="' + esc(ingr) + '">' + esc(ingrShort) + '</div>'
           + '</div>'
 
-          // ── 액션 버튼 (모두 동일 스타일)
+          // ── 액션 버튼 (2행)
           + '<div class="card-actions">'
-          +   '<button class="fav-btn" id="favbtn_' + esc(itemSeq) + '"'
-          +   ' onclick="toggleFavorite(this,\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\')">⭐<span class="btn-label"> 즐겨찾기</span></button>'
-          +   '<button class="cmp-btn" id="cmpbtn_' + esc(itemSeq) + '"'
-          +   ' onclick="toggleCompare(this,\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\')">⚖️<span class="btn-label"> 비교</span></button>'
-          +   '<button class="detail-btn" onclick="openDetailModal(\''
-          +     esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\''
-          +     esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
-          +     (isBio ? '생동성인정품목' : '생동성 미해당') + '\')">📄 상세보기</button>'
-          +   '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
-          +     ' data-seq="' + esc(itemSeq) + '"'
-          +     ' data-name="' + esc(itemNm) + '"'
-          +     ' data-seller="' + esc(sellerNm) + '"'
-          +     ' data-maker="' + esc(makerNm) + '"'
-          +     ' data-pack="' + esc(packUnit) + '"'
-          +     ' data-mfgtype="' + mfgType + '"'
-          +     ' data-mfglabel="' + mfgLabel + '"'
-          +     ' data-bio="' + (isBio ? '1' : '0') + '"'
-          +     ' onclick="addItem(this)">＋ 목록추가</button>'
-          + (itemSeq
-              ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" style="flex:0 0 auto;" title="의약품안전나라">🔗<span class="btn-label"> 안전나라</span></a>'
-              : '')
+          // row1: 상세보기 | 제네릭
+          +   '<div class="btn-row1">'
+          +     '<button class="detail-btn" onclick="openDetailModal(' + dtlParams + ')">📄 상세보기</button>'
+          +     '<button class="generic-btn" onclick="openGenericModal(\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\')" title="동일성분 제네릭 조회">👥 제네릭</button>'
+          +   '</div>'
+          // row2: 즐겨찾기 | 비교 | 공유 | 목록추가 | 안전나라
+          +   '<div class="btn-row2">'
+          +     '<button class="fav-btn" id="favbtn_' + esc(itemSeq) + '" onclick="toggleFavorite(this,' + favParams + ')" title="즐겨찾기">⭐ 즐겨찾기</button>'
+          +     '<button class="cmp-btn" id="cmpbtn_' + esc(itemSeq) + '" onclick="toggleCompare(this,' + cmpParams + ')" title="비교">⚖️ 비교</button>'
+          +     '<button class="share-btn" onclick="shareItem(\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\')" title="공유">🔗 공유</button>'
+          +     '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
+          +       ' data-seq="' + esc(itemSeq) + '" data-name="' + esc(itemNm) + '"'
+          +       ' data-seller="' + esc(sellerNm) + '" data-maker="' + esc(makerNm) + '"'
+          +       ' data-pack="' + esc(packUnit) + '" data-mfgtype="' + mfgType + '"'
+          +       ' data-mfglabel="' + mfgLabel + '" data-bio="' + (isBio?'1':'0') + '"'
+          +       ' onclick="addItem(this)">＋ 목록추가</button>'
+          +     (itemSeq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" title="의약품안전나라">🔗 안전나라</a>' : '')
+          +   '</div>'
           + '</div>'
+
           + '</div>';
       }
       html += '</div>';  // .result-grid 닫기
