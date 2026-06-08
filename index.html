@@ -4639,20 +4639,6 @@ var FIREBASE_CONFIG = {
 firebase.initializeApp(FIREBASE_CONFIG);
 var db   = firebase.firestore();
 
-    }
-    var data = doc.data();
-    if (data.status === 'approved') {
-      showApp(user);
-    } else if (data.status === 'rejected') {
-      showAuthMsg('계정이 거부되었습니다. 관리자에게 문의하세요.', 'error');
-      auth.signOut();
-    } else {
-      showPending(user.email);
-    }
-  }).catch(function(e) {
-    showAuthMsg('오류: ' + e.message, 'error');
-  });
-});
 
 
 /* ══════════════════════════════════════════════
