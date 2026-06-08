@@ -1,6 +1,6 @@
 {
+  "buildCommand": "npm install && npm run build",
   "rewrites": [
-    { "source": "/api/hira/:path*", "destination": "https://apis.data.go.kr/B551182/nonPaymentDamtInfoService/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
