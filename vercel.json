@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "npm install && npm run build && mkdir -p public && ([ -f public/index.html ] || cp index.html public/index.html)",
   "outputDirectory": "public",
   "routes": [
     { "src": "/api/gov/(.*)", "dest": "/api/gov-proxy?_path=$1" },
