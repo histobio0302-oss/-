@@ -23,6 +23,8 @@ const result = html.replace(
   function(match, scriptContent) {
     const trimmed = scriptContent.trim();
     if (!trimmed) return match;
+    // data-noobfuscate 속성이 있는 블록은 건너뜀
+    if (match.includes('data-noobfuscate')) { return match; }
     try {
       const obfuscated = JavaScriptObfuscator.obfuscate(trimmed, {
         compact: true,

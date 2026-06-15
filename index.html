@@ -487,6 +487,7 @@ header {
 }
 .cmp-drug-head {
   padding: 16px 18px; border-left: 1px solid var(--border);
+  min-width: 0; overflow: hidden;
 }
 .cmp-drug-head:first-child { border-left: none; background: var(--surface2); }
 .cmp-drug-badge {
@@ -494,7 +495,7 @@ header {
   font-size: 10px; font-weight: 700; padding: 2px 8px;
   border-radius: 50px; margin-bottom: 6px;
 }
-.cmp-drug-nm { font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
+.cmp-drug-nm { font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; word-break: break-word; overflow-wrap: anywhere; }
 .cmp-drug-co { font-size: 12px; color: var(--text3); }
 .cmp-row {
   display: grid; grid-template-columns: 140px 1fr 1fr;
@@ -594,69 +595,6 @@ header {
   vertical-align: middle; margin-right: 8px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ─── Excel Upload ───────────────────────────── */
-.excel-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-sm);
-}
-.drop-zone {
-  border: 2px dashed var(--border-md);
-  border-radius: var(--r-lg); padding: 36px;
-  text-align: center; cursor: pointer;
-  transition: all .2s; position: relative;
-  background: var(--bg);
-}
-.drop-zone:hover, .drop-zone.over {
-  border-color: var(--primary);
-  background: var(--primary-lt);
-}
-.drop-zone input {
-  position: absolute; inset: 0; opacity: 0;
-  cursor: pointer; width: 100%; height: 100%;
-}
-.drop-icon { font-size: 36px; margin-bottom: 10px; opacity: .5; }
-.drop-text { font-size: 14px; color: var(--text2); font-weight: 500; }
-.drop-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
-.excel-controls {
-  display: none; gap: 12px; align-items: center;
-  margin-top: 16px; flex-wrap: wrap;
-}
-.col-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; font-weight: 600; letter-spacing: .5px; text-transform:uppercase; }
-.col-sel {
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: var(--r); padding: 9px 14px;
-  color: var(--text); font-family: inherit;
-  font-size: 13px; outline: none; cursor: pointer;
-}
-.col-sel:focus { border-color: var(--primary); }
-
-/* ─── Progress ───────────────────────────────── */
-.prog-wrap {
-  display: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 16px 20px; margin-bottom: 16px;
-  box-shadow: var(--shadow-sm);
-}
-.prog-meta {
-  display: flex; justify-content: space-between;
-  font-size: 12px; color: var(--text2);
-  margin-bottom: 8px; font-weight: 500;
-}
-.prog-bar {
-  height: 5px; background: var(--border);
-  border-radius: 9999px; overflow: hidden;
-}
-.prog-fill {
-  height: 100%; background: var(--primary);
-  border-radius: 9999px; transition: width .3s ease;
-}
 
 /* ─── Table ──────────────────────────────────── */
 .tbl-wrap-outer {
@@ -1013,19 +951,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 .recent-title { font-size: 13px; font-weight: 600; color: var(--text2); }
 .recent-sub { font-size: 11px; color: var(--text3); }
 
-/* 일괄 확인 결과 */
-.bulk-recall-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.bulk-recall-table th {
-  background: var(--surface2); padding: 10px 14px;
-  text-align: left; font-size: 10px; font-weight: 700;
-  letter-spacing: .8px; text-transform: uppercase;
-  color: var(--text3); border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-.bulk-recall-table td { padding: 11px 14px; border-bottom: 1px solid rgba(226,232,240,.7); vertical-align: middle; }
-.bulk-recall-table tr:hover td { background: var(--hover); }
-.safe-row td:first-child { border-left: 3px solid var(--self); }
-.recall-row td:first-child { border-left: 3px solid var(--danger); }
 
 
 /* ─── 모바일 반응형 ────────────────────────────── */
@@ -1038,7 +963,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   z-index: 850;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   height: 58px;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
@@ -1054,7 +979,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 .mnav-btn.on { color: var(--primary); }
 .mnav-btn:active { opacity: .7; }
 .mnav-icon { font-size: 20px; line-height: 1; }
-.mnav-label { font-size: 10px; font-weight: 500; letter-spacing: .1px; }
+.mnav-label { font-size: 9px; font-weight: 500; letter-spacing: .1px; }
 
 /* 더보기 패널 */
 #mobileMorePanel {
@@ -1067,6 +992,65 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   animation: slideUp .2s ease;
 }
 #mobileMorePanel.open { display: block; }
+
+/* ── 카카오 로그인 버튼 ── */
+.kakao-login-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: none; border-radius: 20px;
+  background: #FEE500; color: #191919;
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  transition: background .15s;
+}
+.kakao-login-btn:hover { background: #f0d800; }
+.kakao-login-btn svg { flex-shrink: 0; }
+.kakao-signup-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1.5px solid #FEE500; border-radius: 20px;
+  background: var(--surface); color: #191919;
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  transition: background .15s;
+}
+.kakao-signup-btn:hover { background: #fffbea; }
+.kakao-signup-btn svg { flex-shrink: 0; }
+
+.kakao-user-wrap {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--border); border-radius: 20px;
+  background: var(--surface); cursor: default;
+}
+.kakao-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  object-fit: cover; background: #FEE500;
+}
+.kakao-avatar-fallback {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #FEE500; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.kakao-nickname {
+  font-size: 12px; font-weight: 600; color: var(--text);
+  max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kakao-logout-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; color: var(--text3); padding: 0 2px;
+  font-family: inherit; line-height: 1;
+}
+.kakao-logout-btn:hover { color: var(--danger); }
+
+/* ── 헤더 뷰 토글 라벨: 모바일에서 숨김 ── */
+@media (max-width: 480px) {
+  .view-toggle-label { display: none !important; }
+  #viewToggleBtn { padding: 6px 8px !important; }
+  .guide-link-btn { display: none !important; }
+  .talk-inquiry-btn { display: none !important; }
+  .kakao-login-btn, .kakao-signup-btn { padding: 5px 8px !important; font-size: 11px !important; gap: 4px !important; }
+  .kakao-login-btn svg, .kakao-signup-btn svg { width: 13px !important; height: 13px !important; }
+  .kakao-nickname { display: none !important; }
+}
 .mmore-header {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 12px; padding-bottom: 12px;
@@ -1093,10 +1077,16 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   #inlineCompareBar > div { flex-direction: column !important; gap: 8px !important; }
   #inlineCompareBar > div > div { max-width: 100% !important; }
   #compareModal { padding: 0; align-items: flex-end; }
-  .cmp-modal-box { border-radius: 16px 16px 0 0; max-height: 90vh; overflow-y: auto; }
-  .cmp-drug-heads, .cmp-row { grid-template-columns: 90px 1fr 1fr; }
-  .cmp-label { font-size: 10px; padding: 10px 10px; }
-  .cmp-val   { font-size: 12px; padding: 10px 10px; }
+  .cmp-modal-box { border-radius: 16px 16px 0 0; max-height: 90vh; overflow-y: auto; width: 100%; }
+  .cmp-drug-heads, .cmp-row { grid-template-columns: 72px 1fr 1fr; }
+  .cmp-label { font-size: 10px; padding: 10px 8px; }
+  .cmp-val   { font-size: 12px; padding: 10px 8px; word-break: break-word; }
+  /* 비교 헤더: 약품명 세로글씨 방지 — min-width:0이 핵심 (grid auto-min-size 해제) */
+  .cmp-drug-head { padding: 12px 8px; min-width: 0; overflow: hidden; }
+  .cmp-drug-nm { font-size: 12px; line-height: 1.4; word-break: break-word; overflow-wrap: anywhere; }
+  .cmp-drug-co { font-size: 11px; }
+  .cmp-drug-badge { font-size: 9px; padding: 2px 6px; }
+  .cmp-drug-heads > div, .cmp-row > div { min-width: 0; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1125,15 +1115,14 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
 
   /* ── 하단 네비 표시 ── */
   #mobileNav { display: grid !important; }
-}
 
   /* 필터 바 */
   #filterGrid { grid-template-columns: 1fr !important; gap: 8px !important; }
   #filterBar  { padding: 12px 14px; }
 
   /* 검색창 */
-  .search-card { padding: 12px 0; border-radius: 0; border-left: none; border-right: none; }
-  .sinput { font-size: 15px; padding: 11px 14px; }
+  .search-card { padding: 14px; border-radius: 12px; }
+  .sinput { font-size: 16px; padding: 12px 14px; } /* 16px prevents iOS zoom */
   .btn-primary { padding: 11px 16px; font-size: 14px; }
 
   /* 카드 그리드 → 1열 */
@@ -1275,10 +1264,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   #recallPagination { gap: 4px; flex-wrap: wrap; }
   #recallPagination button { padding: 5px 9px; font-size: 12px; }
 
-  /* 드롭존 */
-  .drop-zone { padding: 22px 14px; }
-  .excel-controls { flex-wrap: wrap; }
-
   /* 즐겨찾기 모바일 카드 */
   .fav-count-bar { margin-bottom: 10px; }
 }
@@ -1351,12 +1336,40 @@ body.pc-forced .sub-tab { font-size: 13px !important; padding: 8px 18px !importa
 body.pc-forced .wrap { padding: 24px 16px 80px !important; }
 body.pc-forced .search-card { padding: 18px 20px !important; border-radius: var(--r-lg) !important; border-left: 1px solid var(--border) !important; border-right: 1px solid var(--border) !important; }
 
+/* ── PC 강제: 하단 네비 숨김 ── */
+body.pc-forced #mobileNav {
+  display: none !important;
+}
+
+/* ── PC 강제: 카드 2행 버튼 너비 보정 (목록추가 등 텍스트 짤림 방지) ── */
+body.pc-forced .card-actions .fav-btn,
+body.pc-forced .card-actions .cmp-btn,
+body.pc-forced .card-actions .share-btn,
+body.pc-forced .card-actions .add-btn,
+body.pc-forced .card-actions .link-btn {
+  flex: 1 1 auto;
+  min-width: max-content;
+}
+
 /* ── 모바일 강제: 모바일 CSS 항상 적용 ── */
 body.mobile-forced .tab-row {
   display: none !important;
 }
 body.mobile-forced #mobileNav {
   display: grid !important;
+}
+
+/* ── PC뷰 on 모바일: tab-row 가로 스크롤 (세로 카드 버그 방지) ── */
+@media (max-width: 768px) {
+  body.pc-forced .tab-row {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    scrollbar-width: none;
+  }
+  body.pc-forced .tab-row::-webkit-scrollbar { display: none; }
+  body.pc-forced .tab-btn { flex-shrink: 0; }
 }
 body.mobile-forced .tab-btn {
   flex-direction: column !important;
@@ -1368,9 +1381,11 @@ body.mobile-forced .tab-btn {
   line-height: 1.3 !important;
 }
 body.mobile-forced .tab-btn .tab-icon { font-size: 16px !important; }
-body.mobile-forced .wrap { padding: 14px 2px 60px !important; }
+body.mobile-forced .wrap { padding: 12px 12px 80px !important; }
 body.mobile-forced .header-sep,
 body.mobile-forced .header-sub { display: none !important; }
+body.mobile-forced .guide-link-btn,
+body.mobile-forced .talk-inquiry-btn { display: none !important; }
 body.mobile-forced .header-title { font-size: 13px !important; }
 body.mobile-forced #licTable thead,
 body.mobile-forced #adminTable thead { display: none !important; }
@@ -1390,7 +1405,7 @@ body.mobile-forced #adminTable td:nth-child(2) { color: var(--primary) !importan
 body.mobile-forced #adminTable td:nth-child(3) { color: #dc2626 !important; font-weight: 600 !important; }
 body.mobile-forced #adminTable td:nth-child(4),
 body.mobile-forced #adminTable td:nth-child(5) { font-size: 11px !important; color: var(--text3) !important; }
-body.mobile-forced .search-card { padding: 12px 14px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+body.mobile-forced .search-card { padding: 14px !important; border-radius: 12px !important; border: 1px solid var(--border) !important; margin: 0 0 12px !important; }
 body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !important; }
 
 
@@ -1435,9 +1450,6 @@ body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !imp
 .np-page-info { margin-left:8px; font-size:0.78rem; color:var(--text3); }
 
 .np-tip { font-size:0.75rem; color:var(--text3); margin-top:8px; text-align:center; }
-.np-stat-btns { display:flex; gap:8px; margin-bottom:16px; }
-.np-stat-btn { flex:1; padding:10px; border:1.5px solid var(--primary); border-radius:var(--r); background:var(--surface); color:var(--primary); font-weight:600; cursor:pointer; font-size:0.82rem; transition:all .15s; font-family:inherit; }
-.np-stat-btn:hover { background:var(--primary); color:#fff; }
 .np-subtitle { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:12px; }
 
 /* ════════════════════════════════════════════════
@@ -1544,6 +1556,12 @@ body.dark {
 body.dark input, body.dark select { color-scheme: dark; }
 body.dark .result-card, body.dark .list-card { box-shadow: 0 1px 4px rgba(0,0,0,.4); }
 
+/* ── 다크 모드 로고: 흰 배경 제거 (invert+hue-rotate로 보라색 유지, screen 블렌드로 검정배경 투명화) ── */
+body.dark .logo img {
+  filter: invert(1) hue-rotate(180deg);
+  mix-blend-mode: screen;
+}
+
 #darkToggleBtn {
   display: flex; align-items: center; gap: 5px;
   padding: 6px 12px;
@@ -1622,6 +1640,63 @@ body.dark .result-card, body.dark .list-card { box-shadow: 0 1px 4px rgba(0,0,0,
   border-top:none; border-left:1px solid var(--border); min-width:110px;
 }
 .result-grid.list-view .card-actions > * { width:100%; justify-content:center; flex:unset; }
+
+/* ── 모바일 list-view: 버튼 세로→가로 전환, 카드 전면 재설계 ── */
+body.mobile-forced .result-grid.list-view .result-card {
+  display: block !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+body.mobile-forced .result-grid.list-view .result-card:last-child { border-bottom: none !important; }
+body.mobile-forced .result-grid.list-view .card-top,
+body.mobile-forced .result-grid.list-view .result-top {
+  grid-column: unset !important; grid-row: unset !important;
+  padding: 10px 12px 6px !important;
+}
+body.mobile-forced .result-grid.list-view .card-meta {
+  grid-column: unset !important; grid-row: unset !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  justify-content: unset !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  border-top: 1px solid var(--border) !important;
+}
+body.mobile-forced .result-grid.list-view .meta-item {
+  padding: 6px 8px !important;
+}
+body.mobile-forced .result-grid.list-view .meta-label { font-size: 9px !important; }
+body.mobile-forced .result-grid.list-view .meta-value { font-size: 11px !important; }
+/* 액션 버튼: 세로 컬럼 → 가로 스크롤 행 */
+body.mobile-forced .result-grid.list-view .card-actions {
+  grid-column: unset !important; grid-row: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  min-width: unset !important;
+  border-left: none !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 7px 10px !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-wrap: nowrap !important;
+}
+body.mobile-forced .result-grid.list-view .card-actions::-webkit-scrollbar { display: none; }
+body.mobile-forced .result-grid.list-view .card-actions > * {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  justify-content: center !important;
+  padding: 7px 10px !important;
+  font-size: 11px !important;
+  flex-direction: row !important;
+  gap: 3px !important;
+  white-space: nowrap !important;
+  min-width: unset !important;
+}
 
 /* ══════════════════════════════════════════════
    PC 상세 사이드패널
@@ -1943,8 +2018,19 @@ kbd {
       <button id="viewToggleBtn" onclick="toggleViewMode()"
         style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap">
         <span id="viewToggleIcon">&#128241;</span>
-        <span id="viewToggleLabel">모바일뷰</span>
+        <span id="viewToggleLabel" class="view-toggle-label">모바일뷰</span>
       </button>
+      <a href="/guide.html" target="_blank" class="guide-link-btn"
+        style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #d1fae5;border-radius:20px;background:#ecfdf5;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:#065f46;white-space:nowrap;text-decoration:none">
+        📖 이용가이드
+      </a>
+      <a href="http://pf.kakao.com/_CWlun/chat" target="_blank" class="talk-inquiry-btn"
+        style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:#FEE500;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:#191919;white-space:nowrap;text-decoration:none;border:none">
+        <img src="https://developers.kakao.com/assets/img/about/logos/channel/question_small_yellow_mobile.png" alt="" style="width:18px;height:18px;object-fit:contain" onerror="this.style.display='none'">
+        톡문의
+      </a>
+      <!-- 카카오 로그인/프로필 -->
+      <div id="kakaoAuthArea" style="display:none"></div>
       <button class="list-trigger" id="floatBtn" onclick="openModal()">
         📋 내 목록 <span class="list-count" id="floatBadge">0</span>
       </button>
@@ -2258,38 +2344,6 @@ kbd {
       <div id="recallDetail" style="display:none;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)"></div>
     </div>
 
-    <hr style="border:none;border-top:1px solid var(--border);margin:32px 0">
-
-    <!-- 엑셀 일괄 확인 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div class="recent-title">📂 엑셀 일괄 회수 여부 확인</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px">제품명 목록을 올리면 회수·판매중지 해당 여부를 한번에 확인합니다</div>
-      </div>
-    </div>
-    <div class="excel-card">
-      <div class="drop-zone" id="recallDropZone">
-        <input type="file" id="recallFileInput" accept=".xlsx,.xls,.csv" onchange="onRecallFile(event)">
-        <div class="drop-icon">📄</div>
-        <div class="drop-text">엑셀 파일을 드래그하거나 클릭해서 업로드</div>
-        <div class="drop-sub">.xlsx / .xls / .csv — 1행 헤더, 2행부터 제품명</div>
-      </div>
-      <div class="excel-controls" id="recallExCtrl">
-        <div>
-          <div class="col-label">제품명 열 선택</div>
-          <select class="col-sel" id="recallColSel"></select>
-        </div>
-        <button class="btn btn-primary" onclick="runRecallBulk()">일괄 확인 시작</button>
-        <button class="btn btn-ghost" onclick="recallStopFlag=true">⏹ 중지</button>
-      </div>
-    </div>
-    <div class="prog-wrap" id="recallProgWrap">
-      <div class="prog-meta"><span id="recallProgText">처리 중...</span><span id="recallProgCount">0 / 0</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="recallProgFill" style="width:0%"></div></div>
-    </div>
-    <div id="recallBulkResult"></div>
-
-  
     </div>
     <div class="sub-content" data-parent="safety" data-sub="admin" style="display:none">
     <div class="recall-notice">
@@ -2368,7 +2422,6 @@ kbd {
       <button class="np-subtab-btn on" id="npBtn-hosp" onclick="npTab('hosp',this)">🏥 병원명 검색</button>
       <button class="np-subtab-btn" id="npBtn-region" onclick="npTab('region',this)">📍 지역별 비교</button>
       <button class="np-subtab-btn" id="npBtn-code" onclick="npTab('code',this)">📋 항목코드 조회</button>
-      <button class="np-subtab-btn" id="npBtn-stat" onclick="npTab('stat',this)">📊 종별/지역별 통계</button>
     </div>
 
     <!-- 서브탭 1: 병원명 검색 -->
@@ -2419,66 +2472,48 @@ kbd {
       <div id="np-code-result" class="np-result"><p class="np-empty">검색어 입력 후 조회하거나 빈칸으로 전체 조회하세요.</p></div>
     </div>
 
-    <!-- 서브탭 4: 통계 -->
-    <div id="np-stat" class="np-subtab-content">
-      <div class="np-stat-btns">
-        <button class="np-stat-btn" onclick="npLoadClcd()">🏥 종별 현황 조회</button>
-        <button class="np-stat-btn" onclick="npLoadSido()">📍 지역별 현황 조회</button>
-      </div>
-      <div id="np-stat-result" class="np-result"><p class="np-empty">버튼을 눌러 현황을 조회하세요.</p></div>
-    </div>
   </div>
   </div><!-- /tab-nonpay -->
 
 </div><!-- /wrap -->
 
 <!-- ═══ 모바일 하단 네비게이션 ═══ -->
+<footer style="text-align:center;padding:20px 16px 8px;border-top:1px solid var(--border);margin-top:32px">
+  <a href="/privacy.html" target="_blank"
+    style="display:inline-flex;align-items:center;gap:5px;padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text3);text-decoration:none;font-weight:500">
+    🔒 개인정보 처리방침
+  </a>
+  <p style="margin-top:10px;font-size:11px;color:var(--text3)">© 2026 히스토바이오 · 의약품 안전정보 포털</p>
+</footer>
+
 <nav id="mobileNav" aria-label="하단 탭 메뉴">
-  <button class="mnav-btn on" id="mnav-search" onclick="setTab('search');closeMobileMore()">
+  <button class="mnav-btn on" id="mnav-search" onclick="setTab('search')">
     <span class="mnav-icon">🔍</span>
     <span class="mnav-label">검색</span>
   </button>
-  <button class="mnav-btn" id="mnav-safety" onclick="setTab('safety');closeMobileMore()">
+  <button class="mnav-btn" id="mnav-safety" onclick="setTab('safety')">
     <span class="mnav-icon">⚠️</span>
     <span class="mnav-label">안전정보</span>
   </button>
-  <button class="mnav-btn" id="mnav-medical" onclick="setTab('medical');closeMobileMore()">
+  <button class="mnav-btn" id="mnav-medical" onclick="setTab('medical')">
     <span class="mnav-icon">🏥</span>
     <span class="mnav-label">의료기관</span>
   </button>
-  <button class="mnav-btn" id="mnav-favorites" onclick="setTab('favorites');closeMobileMore()">
+  <button class="mnav-btn" id="mnav-info" onclick="setTab('info')">
+    <span class="mnav-icon">📋</span>
+    <span class="mnav-label">의약품정보</span>
+  </button>
+  <button class="mnav-btn" id="mnav-nonpay" onclick="setTab('nonpay')">
+    <span class="mnav-icon">💊</span>
+    <span class="mnav-label">비급여진료비</span>
+  </button>
+  <button class="mnav-btn" id="mnav-favorites" onclick="setTab('favorites')">
     <span class="mnav-icon">⭐</span>
     <span class="mnav-label">즐겨찾기</span>
     <span id="mnavFavBadge" style="display:none;position:absolute;top:6px;right:50%;transform:translateX(14px);background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:50px;line-height:1.4;"></span>
   </button>
-  <button class="mnav-btn" id="mnav-more" onclick="toggleMobileMore()">
-    <span class="mnav-icon">☰</span>
-    <span class="mnav-label">더보기</span>
-  </button>
 </nav>
 
-<!-- 더보기 패널 -->
-<div id="mobileMorePanel">
-  <div class="mmore-header">
-    <span style="font-size:13px;font-weight:600;color:var(--text)">더보기</span>
-    <button onclick="closeMobileMore()" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:4px;">✕</button>
-  </div>
-  <button class="mmore-item" id="mmore-info" onclick="setTab('info');closeMobileMore()">
-    <span style="font-size:20px;">📋</span>
-    <div>
-      <div style="font-size:14px;font-weight:600;">의약품 정보</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;">허가정보 · 행정처분 · DUR</div>
-    </div>
-  </button>
-  <button class="mmore-item" id="mmore-nonpay" onclick="setTab('nonpay');closeMobileMore()">
-    <span style="font-size:20px;">💊</span>
-    <div>
-      <div style="font-size:14px;font-weight:600;">비급여진료비</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;">병원별 · 지역별 비교</div>
-    </div>
-  </button>
-</div>
-<div id="mobileMoreOverlay" onclick="closeMobileMore()"></div>
 
 <!-- PC 상세 사이드패널 -->
 <div id="pcDetailSidebar">
@@ -2626,16 +2661,9 @@ function updateFavBadge() {
    모바일 하단 네비게이션 JS
 ══════════════════════════════════════════════ */
 function updateMobileNav(t) {
-  var map = { search:'search', safety:'safety', medical:'medical', favorites:'favorites', info:'more', nonpay:'more' };
-  var active = map[t] || 'search';
-  ['search','safety','medical','favorites','more'].forEach(function(k) {
+  ['search','safety','medical','info','nonpay','favorites'].forEach(function(k) {
     var el = document.getElementById('mnav-' + k);
-    if (el) el.classList.toggle('on', k === active);
-  });
-  // 더보기 패널 내 항목 활성화
-  ['info','nonpay'].forEach(function(k) {
-    var el = document.getElementById('mmore-' + k);
-    if (el) el.classList.toggle('on', t === k);
+    if (el) el.classList.toggle('on', k === t);
   });
 }
 
@@ -2844,9 +2872,26 @@ function setSubTab(parent, sub) {
 }
 
 function initViewMode() {
+  // v2 migration: 구버전에서 pc-forced가 잘못 저장된 경우 재감지
+  if (!localStorage.getItem('drugapp_view_mode_v2')) {
+    localStorage.removeItem('drugapp_view_mode');
+    localStorage.setItem('drugapp_view_mode_v2', '1');
+  }
   var saved = localStorage.getItem('drugapp_view_mode');
-  if (saved === 'mobile') document.body.classList.add('mobile-forced');
-  else { document.body.classList.add('pc-forced'); localStorage.setItem('drugapp_view_mode','pc'); }
+  if (saved === 'mobile') {
+    document.body.classList.add('mobile-forced');
+  } else if (saved === 'pc') {
+    document.body.classList.add('pc-forced');
+  } else {
+    // 첫 방문: 화면 너비 기준 자동 감지 (768px 이하 = 모바일)
+    if (window.innerWidth <= 768) {
+      document.body.classList.add('mobile-forced');
+      localStorage.setItem('drugapp_view_mode','mobile');
+    } else {
+      document.body.classList.add('pc-forced');
+      localStorage.setItem('drugapp_view_mode','pc');
+    }
+  }
   updateViewToggleBtn();
 }
 
@@ -3979,6 +4024,7 @@ function checkDurContraindications() {
 ══════════════════════════════════════════════ */
 function setupDrop() {
   var dz = document.getElementById('dropZone');
+  if (!dz) return; // dropZone element may not exist on all pages
   dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.style.borderColor='var(--primary)'; dz.classList.add('over'); });
   dz.addEventListener('dragleave', function(){ dz.style.borderColor=''; dz.classList.remove('over'); });
   dz.addEventListener('drop', function(e){ e.preventDefault(); dz.style.borderColor=''; dz.classList.remove('over'); if(e.dataTransfer.files[0]) procFile(e.dataTransfer.files[0]); });
@@ -4137,7 +4183,6 @@ function exportBulk() {
 var EP_RECALL_LIST = '/api/gov/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03';
 
 var recallRecentLoaded = false;
-var recallBulkData = [], recallBulkCols = [], recallStopFlag = false;
 var recallAllItems  = [];   /* 전체 데이터 캐시 */
 var recallPage      = 1;    /* 현재 페이지 */
 var RECALL_PER_PAGE = 10;   /* 페이지당 건수 */
@@ -4436,122 +4481,6 @@ function clearRecallResult() {
   recallAllItems = [];
 }
 
-/* ── 엑셀 일괄 확인 ── */
-function onRecallFile(e) { if (e.target.files[0]) procRecallFile(e.target.files[0]); }
-function procRecallFile(file) {
-  var r = new FileReader();
-  r.onload = function(ev) {
-    try {
-      var wb   = XLSX.read(ev.target.result, { type: file.name.endsWith('.csv') ? 'string' : 'array' });
-      var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
-      if (!data || data.length < 2) { alert('데이터가 없습니다.'); return; }
-      recallBulkCols = data[0].map(function(col, i) { return { idx: i, name: col || ('열' + (i+1)) }; });
-      recallBulkData = data.slice(1).filter(function(row) { return row.some(function(c) { return c; }); });
-      var sel = document.getElementById('recallColSel');
-      sel.innerHTML = recallBulkCols.map(function(col) {
-        return '<option value="' + col.idx + '">' + esc(col.name) + '</option>';
-      }).join('');
-      document.getElementById('recallExCtrl').style.display = 'flex';
-      document.querySelector('#recallDropZone .drop-text').textContent =
-        '✅ ' + file.name + ' (' + recallBulkData.length + '행)';
-    } catch (ex) { alert('파일 읽기 실패: ' + ex.message); }
-  };
-  if (file.name.endsWith('.csv')) r.readAsText(file, 'UTF-8');
-  else r.readAsArrayBuffer(file);
-}
-
-function runRecallBulk() {
-  if (!recallBulkData.length) { alert('파일을 먼저 업로드하세요.'); return; }
-  var colIdx = parseInt(document.getElementById('recallColSel').value);
-  var seen = {}, names = [];
-  for (var i = 0; i < recallBulkData.length; i++) {
-    var n = String(recallBulkData[i][colIdx] || '').trim();
-    if (n && !seen[n]) { seen[n] = true; names.push(n); }
-  }
-  if (!names.length) { alert('선택한 열에 데이터가 없습니다.'); return; }
-  recallStopFlag = false;
-  document.getElementById('recallProgWrap').style.display = 'block';
-  document.getElementById('recallBulkResult').innerHTML = '';
-  var results = [], idx = 0;
-
-  function nextItem() {
-    if (idx >= names.length || recallStopFlag) {
-      document.getElementById('recallProgText').textContent = recallStopFlag ? '⏹ 중지됨' : '✅ 완료';
-      document.getElementById('recallProgFill').style.width = '100%';
-      return;
-    }
-    var name = names[idx];
-    document.getElementById('recallProgText').textContent = name;
-    document.getElementById('recallProgCount').textContent = (idx+1) + ' / ' + names.length;
-    document.getElementById('recallProgFill').style.width = ((idx+1)/names.length*100) + '%';
-
-    fetchRecall({ Prduct: name }, 5).then(function(result) {
-      var items     = result.items || [];
-      var hasRecall = items.length > 0;
-      var first     = hasRecall ? unwrapItem(items[0]) : {};
-      results.push({
-        name:      name,
-        hasRecall: hasRecall,
-        count:     items.length,
-        cmdDate:   fmtDate(first.RTRVL_CMND_DT || first.RECALL_COMMAND_DATE || ''),
-        reason:    first.RTRVL_RESN || '-',
-        enfrc:     first.ENFRC_YN === 'Y' ? '강제회수' : (first.ENFRC_YN === 'N' ? '자진회수' : '-')
-      });
-      renderRecallBulk(results);
-    }).catch(function() {
-      results.push({ name:name, hasRecall:false, count:0, cmdDate:'-', reason:'조회오류', enfrc:'-' });
-      renderRecallBulk(results);
-    }).then(function() { idx++; setTimeout(nextItem, 400); });
-  }
-  nextItem();
-}
-
-function renderRecallBulk(results) {
-  var recalled = 0;
-  for (var i = 0; i < results.length; i++) { if (results[i].hasRecall) recalled++; }
-  var rows = '';
-  for (var i = 0; i < results.length; i++) {
-    var r = results[i];
-    var st = r.hasRecall
-      ? '<span class="badge badge-grade-2">' + esc(r.enfrc) + ' (' + r.count + '건)</span>'
-      : '<span style="color:var(--self);font-weight:600">✓ 이상없음</span>';
-    rows += '<tr class="' + (r.hasRecall ? 'recall-row' : 'safe-row') + '">'
-      + '<td class="mono">' + (i+1) + '</td>'
-      + '<td style="font-weight:500">' + esc(r.name) + '</td>'
-      + '<td>' + st + '</td>'
-      + '<td class="mono">' + esc(r.cmdDate) + '</td>'
-      + '<td style="font-size:12px;color:#9a3412">'
-      + (r.hasRecall ? esc(r.reason.substring(0,60)) + (r.reason.length>60?'…':'') : '-')
-      + '</td></tr>';
-  }
-  document.getElementById('recallBulkResult').innerHTML =
-    '<div class="tbl-wrap-outer"><div class="tbl-head">'
-    + '<span class="tbl-title">일괄 확인 결과 (' + results.length + '건)'
-    + ' <span style="font-size:12px;color:var(--danger);font-weight:500">· 회수해당 ' + recalled + '건</span>'
-    + ' <span style="font-size:12px;color:var(--self)">· 이상없음 ' + (results.length-recalled) + '건</span></span>'
-    + '<button class="btn btn-ghost btn-sm" onclick="exportRecallBulk()">⬇ 엑셀 다운로드</button></div>'
-    + '<div class="tbl-scroll"><table class="bulk-recall-table"><thead><tr>'
-    + '<th>#</th><th>제품명</th><th>회수 여부</th><th>회수명령일</th><th>회수사유</th>'
-    + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
-}
-
-function exportRecallBulk() {
-  var t = document.querySelector('#recallBulkResult table');
-  if (!t) return;
-  XLSX.writeFile(XLSX.utils.table_to_book(t), '회수판매중지_일괄확인_' + new Date().toISOString().slice(0,10) + '.xlsx');
-}
-
-function setupRecallDrop() {
-  var dz = document.getElementById('recallDropZone');
-  if (!dz) return;
-  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='var(--primary)'; dz.classList.add('over'); });
-  dz.addEventListener('dragleave', function() { dz.style.borderColor=''; dz.classList.remove('over'); });
-  dz.addEventListener('drop', function(e) {
-    e.preventDefault(); dz.style.borderColor=''; dz.classList.remove('over');
-    if (e.dataTransfer.files[0]) procRecallFile(e.dataTransfer.files[0]);
-  });
-}
-
 /* ── 공통 파싱 유틸 ── */
 function parse1471JSON(j){var body=j&&j.body?j.body:{};var total=parseInt(body.totalCount||0);var raw=null;if(Array.isArray(body.items))raw=body.items.map(function(w){return w&&w.item&&typeof w.item==='object'?w.item:w;});else if(body.items&&body.items.item!==undefined){var r2=body.items.item;raw=Array.isArray(r2)?r2:[r2];}else raw=[];return{items:raw,total:total};}
 function parseGenXML(txt){var parser=new DOMParser(),xml=parser.parseFromString(txt,'application/xml');var nodes=xml.getElementsByTagName('item'),items=[];for(var i=0;i<nodes.length;i++){var obj={},ch=nodes[i].childNodes;for(var j=0;j<ch.length;j++)if(ch[j].nodeType===1)obj[ch[j].tagName]=ch[j].textContent.trim();items.push(obj);}var tc=xml.getElementsByTagName('totalCount')[0];return{items:items,total:tc?parseInt(tc.textContent):items.length};}
@@ -4606,17 +4535,7 @@ function renderDurSection(catKey,result){var cat=DUR_CATS[catKey],items=result.i
 function searchDur(){var q=document.getElementById('durQ').value.trim(),type=document.getElementById('durType').value;if(!q){alert('품목명을 입력해주세요.');return;}var btn=document.getElementById('durBtn');btn.disabled=true;btn.textContent='조회 중...';document.getElementById('durMsg').style.display='none';document.getElementById('durResultWrap').style.display='block';document.getElementById('durResultTitle').textContent='"'+esc(q)+'" DUR 안전정보';document.getElementById('durResultSub').textContent='조회 중...';document.getElementById('durSections').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';var cats=type==='all'?Object.keys(DUR_CATS):[type];var promises=cats.map(function(k){return fetchDurAPI(DUR_CATS[k].ep,q).then(function(r){return{key:k,result:r};});});Promise.all(promises).then(function(results){var totalItems=results.reduce(function(sum,r){return sum+(r.result.total||0);},0);document.getElementById('durResultSub').textContent='총 '+totalItems+'건 - '+results.length+'개 카테고리';var html='',hasAny=false;for(var i=0;i<results.length;i++){if(results[i].result.items.length>0)hasAny=true;html+=renderDurSection(results[i].key,results[i].result);}if(!hasAny)html='<div style="text-align:center;padding:48px;color:var(--text3)"><div style="font-size:36px;margin-bottom:12px">&#10003;</div><div style="font-size:14px;font-weight:600">"'+esc(q)+'"에 대한 DUR 정보가 없습니다.</div></div>';document.getElementById('durSections').innerHTML=html;btn.disabled=false;btn.textContent='검색';});}
 function clearDurResult(){document.getElementById('durResultWrap').style.display='none';document.getElementById('durMsg').style.display='none';document.getElementById('durQ').value='';document.getElementById('durSections').innerHTML='';}
 
-window.onload = function() {
-  initViewMode();
-  setupDrop();
-  setupRecallDrop();
-  updateFloat();
-  updateFavBadge();
-  setSubTab('search',  'single');
-  setSubTab('safety',  'recall');
-  setSubTab('medical', 'map');
-  setSubTab('info',    'license');
-};
+// Initialization moved to separate unobfuscated script below
 </script>
 
 <script>
@@ -4843,73 +4762,6 @@ var db   = firebase.firestore();
     setTimeout(function(){el.textContent=orig;},1200);
   };
 
-  /* ══ 탭4: 종별 현황
-     실제 필드: npayCd, npayKorNm,
-               prcMinAll/prcMaxAll/prcAvgAll (전체)
-               prcMinUsgh/prcMaxUsgh (상급종합)
-               prcMinGnhp/prcMaxGnhp (종합병원)
-  ══ */
-  window.npLoadClcd=async function(){
-    loading('np-stat-result');
-    try{
-      var doc=await callHira('getNonPaymentItemClcdList',{numOfRows:20});
-      var items=getItems(doc);
-      if(items.length)logFields('종별통계',items[0]);
-      if(!items.length){document.getElementById('np-stat-result').innerHTML='<p class="np-empty">데이터가 없습니다.</p>';return;}
-      var html='<p class="np-subtitle">🏥 종별 비급여진료비 현황 (전체 통계)</p>'
-        +'<div class="np-table-wrap"><table class="np-table"><thead><tr>'
-        +'<th>비급여항목명</th><th>전체 최소</th><th>전체 최대</th><th>전체 평균</th><th>상급종합 최소</th><th>상급종합 최대</th><th>종합병원 최소</th><th>종합병원 최대</th>'
-        +'</tr></thead><tbody>';
-      items.forEach(function(item){
-        html+='<tr>'
-          +'<td>'+gfa(item,['npayKorNm','divCd2Nm'])+'</td>'
-          +'<td>'+fmt(gf(item,'prcMinAll'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcMaxAll'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcAvgAll'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcMinUsgh'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcMaxUsgh'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcMinGnhp'))+'</td>'
-          +'<td>'+fmt(gf(item,'prcMaxGnhp'))+'</td>'
-          +'</tr>';
-      });
-      html+='</tbody></table></div>';
-      document.getElementById('np-stat-result').innerHTML=html;
-    }catch(e){showError('np-stat-result',e.message);}
-  };
-
-  /* ══ 탭4: 지역별 현황 ══ */
-  window.npLoadSido=async function(){
-    loading('np-stat-result');
-    try{
-      var doc=await callHira('getNonPaymentItemSidoCdList',{numOfRows:30});
-      var items=getItems(doc);
-      if(items.length)logFields('지역별통계',items[0]);
-      if(!items.length){document.getElementById('np-stat-result').innerHTML='<p class="np-empty">데이터가 없습니다.</p>';return;}
-      var html='<p class="np-subtitle">📍 지역별 비급여진료비 현황</p>'
-        +'<div class="np-table-wrap"><table class="np-table"><thead><tr>'
-        +'<th>지역</th><th>비급여항목명</th><th>최소비용</th><th>최대비용</th><th>평균비용</th>'
-        +'</tr></thead><tbody>';
-      items.forEach(function(item){
-        // 지역: sidoCdNm, sido, sidoNm 시도
-        var sido=gfa(item,['sidoCdNm','sido','sidoNm','sidoNmCd']);
-        var nm=gfa(item,['npayKorNm','divCd2Nm']);
-        // 비용: prcMin/prcMax/prcAvg 또는 All 접미사
-        var pMin=gfa(item,['prcMin','prcMinAll','minAmt']);
-        var pMax=gfa(item,['prcMax','prcMaxAll','maxAmt']);
-        var pAvg=gfa(item,['prcAvg','prcAvgAll','avgAmt','middAvgAll']);
-        html+='<tr>'
-          +'<td>'+sido+'</td>'
-          +'<td>'+nm+'</td>'
-          +'<td>'+fmt(pMin)+'</td>'
-          +'<td>'+fmt(pMax)+'</td>'
-          +'<td>'+fmt(pAvg)+'</td>'
-          +'</tr>';
-      });
-      html+='</tbody></table></div>';
-      document.getElementById('np-stat-result').innerHTML=html;
-    }catch(e){showError('np-stat-result',e.message);}
-  };
-
   document.addEventListener('DOMContentLoaded',initSelects);
 })();
 
@@ -4930,7 +4782,7 @@ function fetchDrugImage() {
   var el = document.getElementById('detailImageResult');
   el.innerHTML = '<div class="state"><span class="spinner"></span>이미지 불러오는 중...</div>';
 
-  // 낱알식별 API (bio 엔드포인트 = MdcinGrnIdntfcInfoService01)
+  // 낱알식별 API (bio 엔드포인트 = MdcinGrnIdntfcInfoService03)
   apiGetProxy('bio', {
     item_name: currentDetailDrug.name,
     numOfRows: 5,
@@ -6182,6 +6034,91 @@ function _injectPriceStats(history) {
   }
 }
 
+</script>
+
+
+<!-- App initialization - separate from obfuscated block to ensure correct string literals -->
+<script data-noobfuscate>
+initViewMode();
+setupDrop();
+updateFloat();
+updateFavBadge();
+setSubTab('search','single');
+setSubTab('safety','recall');
+setSubTab('medical','map');
+setSubTab('info','license');
+</script>
+
+<!-- ═══ 카카오 로그인 UI ═══ -->
+<script data-noobfuscate>
+(function() {
+  var REST_KEY     = '07891a1c45f988f6c45c1693d3a2a273';
+  var REDIRECT_URI = 'https://snowy-nine-21.vercel.app/api/kakao-callback';
+  var STORAGE_KEY  = 'kakao_user_v1';
+  var KAKAO_ICON   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#191919"><path d="M12 3C6.477 3 2 6.582 2 11c0 2.861 1.73 5.38 4.35 6.927-.16.582-.58 2.11-.665 2.437-.1.393.144.388.303.282.125-.085 1.98-1.34 2.782-1.882.393.055.795.083 1.23.083 5.523 0 10-3.582 10-8S17.523 3 12 3z"/></svg>';
+
+  /* 로그인: Kakao OAuth 리다이렉트 → 서버 콜백 → /?kakao=ok */
+  window.kakaoLogin = function() {
+    location.href = 'https://kauth.kakao.com/oauth/authorize?' + new URLSearchParams({
+      client_id:     REST_KEY,
+      redirect_uri:  REDIRECT_URI,
+      response_type: 'code',
+      scope:         'profile_nickname',
+    }).toString();
+  };
+
+  window.kakaoLogout = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    renderKakaoArea();
+  };
+
+  function handleCallback() {
+    var sp = new URLSearchParams(location.search);
+    if (!sp.get('kakao')) return;
+    history.replaceState({}, '', location.pathname);
+    if (sp.get('kakao') === 'ok') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        kn: sp.get('kn') || '',
+        ka: sp.get('ka') || '',
+        ki: sp.get('ki') || '',
+      }));
+    } else if (sp.get('kakao') === 'error') {
+      var reason = sp.get('reason') || '';
+      var desc = sp.get('desc') || '';
+      alert('카카오 로그인 오류\n\n사유: ' + reason + (desc ? '\n설명: ' + desc : ''));
+    }
+  }
+
+  function renderKakaoArea() {
+    var area = document.getElementById('kakaoAuthArea');
+    if (!area) return;
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+
+    if (user && user.kn) {
+      var avatarHtml = user.ka
+        ? '<img class="kakao-avatar" src="' + user.ka + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+          + '<span class="kakao-avatar-fallback" style="display:none">🐱</span>'
+        : '<span class="kakao-avatar-fallback">🐱</span>';
+      area.innerHTML =
+        '<div class="kakao-user-wrap" title="' + user.kn + '">'
+        + avatarHtml
+        + '<span class="kakao-nickname">' + user.kn + '</span>'
+        + '<button class="kakao-logout-btn" onclick="kakaoLogout()" title="로그아웃">✕</button>'
+        + '</div>';
+    } else {
+      area.innerHTML =
+        '<button class="kakao-login-btn" onclick="kakaoLogin()">'
+        + KAKAO_ICON + '로그인'
+        + '</button>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    handleCallback();
+    renderKakaoArea();
+  });
+})();
 </script>
 
 </body>

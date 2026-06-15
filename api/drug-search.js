@@ -23,7 +23,8 @@ export default async function handler(req, res) {
   }
 
   // API 키 (환경변수 또는 하드코딩)
-  const API_KEY = process.env.DRUG_API_KEY || '9ae1336587e873e0ff6a0524e0b0cc0333868f67f9fb4180c0be654fb7794615';
+  const API_KEY = process.env.DRUG_API_KEY;
+  if (!API_KEY) return res.status(500).json({ error: 'DRUG_API_KEY 환경변수가 설정되지 않았습니다.' });
   const BASE_URL = 'https://apis.data.go.kr';
 
   // 엔드포인트 매핑
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
     'list': '/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07',
     'detail': '/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06',
     'dur': '/1471000/DURPrdlstInfoService03/getDURPrdlstInfoList03',
-    'bio': '/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01',
+    'bio': '/1471000/MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03',
     'ingredient': '/1471000/DURIrdntInfoService03/getDrugPrdtMcpnInq03',  // 성분정보
     'mcpn': '/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtMcpnDtlInq07',  // 주성분 상세
     'bundle': '/1471000/DrBundleInfoService02/getDrBundleList02'  // 묶음의약품(제네릭)
