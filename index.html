@@ -2601,6 +2601,7 @@ function fmtDate(s) {
   return d.length===8 ? d.slice(0,4)+'.'+d.slice(4,6)+'.'+d.slice(6,8) : s;
 }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function jsArg(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/[\r\n]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 function sleep(ms) { return new Promise(function(r){setTimeout(r,ms);}); }
 
 /* ═══════════════════════════════════════════════
@@ -2733,7 +2734,7 @@ function renderFavorites() {
       + '<div class="card-ingr"><div class="card-ingr-label">주성분</div>'
       +   '<div class="card-ingr-value" title="'+esc(f.ingr||'-')+'">'+esc(ingrShort)+'</div></div>'
       + '<div class="card-actions">'
-      +   '<button class="detail-btn" style="flex:1" onclick="openDetailModal(\''+esc(f.seq)+'\',\''+esc(f.name||'').replace(/'/g,"\\'")+'\',\''+esc(f.seller||'').replace(/'/g,"\\'")+'\',\''+esc(f.maker||'').replace(/'/g,"\\'")+'\',\''+esc(f.pack||'').replace(/'/g,"\\'")+'\',\''+esc(f.ingr||'').replace(/'/g,"\\'")+'\',\'\',\''+esc(f.date||'')+'\',\'-\',\'-\')">📄 상세보기</button>'
+      +   '<button class="detail-btn" style="flex:1" onclick="openDetailModal(\''+esc(f.seq)+'\',\''+jsArg(f.name||'')+'\',\''+jsArg(f.seller||'')+'\',\''+jsArg(f.maker||'')+'\',\''+jsArg(f.pack||'')+'\',\''+jsArg(f.ingr||'')+'\',\'\',\''+esc(f.date||'')+'\',\'-\',\'-\')">📄 상세보기</button>'
       + (f.seq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(f.seq)+'" target="_blank" class="link-btn" style="flex:0 0 auto;padding:9px 12px;" title="의약품안전나라">🔗</a>' : '')
       + '</div></div>';
   }
@@ -3411,20 +3412,20 @@ function go() {
           // ── 액션 버튼 (모두 동일 스타일)
           + '<div class="card-actions">'
           +   '<button class="fav-btn" id="favbtn_' + esc(itemSeq) + '"'
-          +   ' onclick="toggleFavorite(this,\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\')">⭐<span class="btn-label"> 즐겨찾기</span></button>'
+          +   ' onclick="toggleFavorite(this,\'' + esc(itemSeq) + '\',\'' + jsArg(itemNm) + '\',\'' + jsArg(sellerNm) + '\',\'' + jsArg(makerNm) + '\',\'' + jsArg(packUnit) + '\',\'' + jsArg(ingr) + '\',\'' + jsArg(formCode) + '\',\'' + apprDate + '\')">⭐<span class="btn-label"> 즐겨찾기</span></button>'
           +   '<button class="cmp-btn" id="cmpbtn_' + esc(itemSeq) + '"'
-          +   ' onclick="toggleCompare(this,\'' + esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\'' + esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\'' + esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\'' + esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\')">⚖️<span class="btn-label"> 비교</span></button>'
+          +   ' onclick="toggleCompare(this,\'' + esc(itemSeq) + '\',\'' + jsArg(itemNm) + '\',\'' + jsArg(sellerNm) + '\',\'' + jsArg(makerNm) + '\',\'' + jsArg(packUnit) + '\',\'' + jsArg(ingr) + '\',\'' + jsArg(formCode) + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\'' + (isBio?'생동성인정품목':'생동성 미해당') + '\')">⚖️<span class="btn-label"> 비교</span></button>'
           +   '<button class="share-btn" onclick="shareDrug(\''
-          +     esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\''
-          +     esc(formCode).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
+          +     esc(itemSeq) + '\',\'' + jsArg(itemNm) + '\',\''
+          +     jsArg(sellerNm) + '\',\'' + jsArg(makerNm) + '\',\''
+          +     jsArg(packUnit) + '\',\'' + jsArg(ingr) + '\',\''
+          +     jsArg(formCode) + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
           +     (isBio ? '생동성인정품목' : '생동성 미해당') + '\')">📤<span class="btn-label"> 공유</span></button>'
           +   '<button class="detail-btn" onclick="openDetailModal(\''
-          +     esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(sellerNm).replace(/'/g,"\\'") + '\',\'' + esc(makerNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\''
-          +     esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
+          +     esc(itemSeq) + '\',\'' + jsArg(itemNm) + '\',\''
+          +     jsArg(sellerNm) + '\',\'' + jsArg(makerNm) + '\',\''
+          +     jsArg(packUnit) + '\',\'' + jsArg(ingr) + '\',\''
+          +     jsArg(chartNm) + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
           +     (isBio ? '생동성인정품목' : '생동성 미해당') + '\')">📄 상세보기</button>'
           +   '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
           +     ' data-seq="' + esc(itemSeq) + '"'
@@ -3601,6 +3602,33 @@ function exportSearchResults() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), '검색결과');
   var keyword = (currentSearchKeyword || '검색결과').replace(/[\\/:*?"<>|]/g, '_').slice(0, 20);
   XLSX.writeFile(wb, '의약품_검색결과_' + keyword + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
+}
+
+// 동일성분 의약품 엑셀 내보내기
+function exportSameIngredients() {
+  var tagged = window._siTagged || [];
+  var group  = window._siGroup || 'all';
+  var list = (group === 'all') ? tagged : tagged.filter(function(t){ return t.group === group; });
+  if (!list.length) { alert('내보낼 동일성분 의약품이 없습니다.'); return; }
+
+  var rows = [['제품명','제조사','제형','포장규격','보험상한가','품목기준코드']];
+  list.forEach(function(t) {
+    var it = t.item || {};
+    var price = getHiraPrice(it.ITEM_SEQ);
+    rows.push([
+      it.ITEM_NAME || '',
+      it.ENTP_NAME || '',
+      (typeof groupLabel !== 'undefined' ? (groupLabel[t.group] || '기타') : ''),
+      it.PACK_UNIT || '',
+      (price !== null && price !== undefined) ? price : '',
+      it.ITEM_SEQ || ''
+    ]);
+  });
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), '동일성분');
+  var base = (currentDetailDrug && currentDetailDrug.name ? currentDetailDrug.name : '동일성분').replace(/[\\/:*?"<>|]/g, '_').slice(0, 20);
+  XLSX.writeFile(wb, '동일성분_' + base + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
 }
 
 /* ══════════════════════════════════════════════
@@ -5466,6 +5494,7 @@ function renderSameIngredients(items, mainIngr, defaultGroup) {
     + '<div>'
     +   '<span style="font-size:13px;color:var(--text2)">주성분 <strong style="color:var(--primary)">' + esc(mainIngr) + '</strong></span>'
     +   '<span style="font-size:12px;color:var(--text3);margin-left:10px">총 <strong>' + items.length + '건</strong></span>'
+    +   '<button onclick="exportSameIngredients()" title="엑셀 내보내기" style="margin-left:12px;padding:4px 11px;border-radius:50px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #10b981;background:#10b981;color:#fff;white-space:nowrap;">📥 엑셀</button>'
     + '</div>'
     + '<div style="display:flex;gap:5px;align-items:center;">'
     +   '<span style="font-size:11px;color:var(--text3);margin-right:2px;">정렬</span>'
