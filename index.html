@@ -5458,7 +5458,8 @@ function switchDetailTab(tabName) {
 }
 
 /* ══════════════════════════════════════════════
-   보험가 변동 차트 (Firestore 기반)
+   보험가 변동 차트 — 심평원 약가기준정보 API + Firestore 보조
+   (mdsCd = 식약처 ITEM_SEQ 와 동일, chgBfMdsCd 체인 추적으로 timeline 재구성)
 ══════════════════════════════════════════════ */
 var _priceChart = null;
 
@@ -5467,15 +5468,84 @@ function normDrugName(n) {
   return (n || '').replace(/_\(.*/, '').replace(/\s+/g, ' ').trim();
 }
 
-/* Firestore drugPriceSnaps 컬렉션에서 이 약품의 가격 이력 조회
-   식약처 ITEM_SEQ ≠ 심평원 HIRA코드이므로, 이름 매핑으로 HIRA코드를 먼저 조회 */
+/* ── 심평원 약가기준 API 단건 호출 ─────────
+   gov-proxy 경유로 mdsCd 단건 조회 → 1개 row(현재 또는 과거 코드의 적용 시점) */
+function fetchDgamtByMdsCd(mdsCd) {
+  if (!mdsCd) return Promise.resolve(null);
+  var url = '/api/gov/B551182/dgamtCrtrInfoService1.2/getDgamtList?numOfRows=10&pageNo=1&mdsCd=' + encodeURIComponent(mdsCd);
+  return fetch(url).then(function(r){ return r.text(); }).then(function(txt){
+    var doc = (new DOMParser()).parseFromString(txt, 'application/xml');
+    var nodes = doc.getElementsByTagName('item');
+    if (!nodes.length) return null;
+    // 같은 mdsCd 로 여러 row 가 오는 경우 거의 없지만, 가장 최신(adtStaDd 큰 것) 선택
+    var rows = [];
+    for (var i=0;i<nodes.length;i++){
+      var obj = {};
+      var ch = nodes[i].childNodes;
+      for (var j=0;j<ch.length;j++) if (ch[j].nodeType===1) obj[ch[j].tagName] = (ch[j].textContent||'').trim();
+      rows.push(obj);
+    }
+    rows.sort(function(a,b){ return (b.adtStaDd||'').localeCompare(a.adtStaDd||''); });
+    return rows[0];
+  }).catch(function(){ return null; });
+}
+
+/* ── chgBfMdsCd 체인을 따라 timeline 재구성 ──
+   현재 코드 → 이전 코드 → 그 이전 코드 ... 최대 12단계 */
+function buildPriceTimelineByChain(startMdsCd) {
+  var MAX_HOPS = 12;
+  var visited = {};
+  var collected = [];
+  function hop(code){
+    if (!code || visited[code]) return Promise.resolve();
+    if (collected.length >= MAX_HOPS) return Promise.resolve();
+    visited[code] = 1;
+    return fetchDgamtByMdsCd(code).then(function(row){
+      if (!row) return;
+      collected.push(row);
+      var prev = row.chgBfMdsCd;
+      if (prev && prev !== code && !visited[prev]) return hop(prev);
+    });
+  }
+  return hop(startMdsCd).then(function(){ return collected; });
+}
+
+/* ── 로컬 PRICE_DB(현재가만) + 체인 API row → history 배열 ── */
+function composeHistory(rows, curVal) {
+  // rows = [{adtStaDd, mxCprc, mdsCd, itmNm, chgBfMdsCd, ...}, ...]
+  // 정렬: adtStaDd 오름차순 (오래된 → 최신)
+  var sorted = rows.slice().sort(function(a,b){ return (a.adtStaDd||'').localeCompare(b.adtStaDd||''); });
+  var hist = [];
+  var lastPrice = null;
+  sorted.forEach(function(r){
+    var raw = r.mxCprc;
+    var p = raw ? parseInt(raw,10) : null;
+    if (!p && lastPrice) p = lastPrice;            // 가격 없는 row(삭제 등)는 직전 가격 유지
+    if (p == null) return;
+    var d = r.adtStaDd || '';
+    if (d.length === 8) d = d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8);
+    hist.push({ date: d, price: p, label: d });
+    lastPrice = p;
+  });
+  // 마지막 row 의 가격이 PRICE_DB 현재가와 다르면 "오늘" 점 하나 추가
+  if (curVal && hist.length && hist[hist.length-1].price !== curVal) {
+    var t = new Date();
+    var iso = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
+    hist.push({ date: iso, price: curVal, label: iso + ' (현재)' });
+  } else if (!hist.length && curVal) {
+    var t2 = new Date();
+    var iso2 = t2.getFullYear() + '-' + String(t2.getMonth()+1).padStart(2,'0') + '-' + String(t2.getDate()).padStart(2,'0');
+    hist.push({ date: iso2, price: curVal, label: iso2 + ' (현재)' });
+  }
+  return hist;
+}
+
 function loadPriceChart() {
   if (!currentDetailDrug) return;
   currentDetailDrug.priceChartLoaded = true;
 
   var mfdsSeq = String(currentDetailDrug.seq || '').trim();
   var name    = currentDetailDrug.name || '';
-  var normN   = normDrugName(name);
 
   var curPr  = lookupPrice(mfdsSeq, name);
   var curVal = curPr ? curPr[0] : null;
@@ -5492,62 +5562,100 @@ function loadPriceChart() {
     + '<div class="pstat-sub">내장 약제급여목록 기준</div>'
     + '</div>'
     + '<div class="pstat-card">'
-    + '<div class="pstat-label">최초 등재일</div>'
+    + '<div class="pstat-label" id="pcFirstLabel">현재가 적용일</div>'
     + '<div class="pstat-value" id="pcFirstDate" style="font-size:14px">-</div>'
-    + '<div class="pstat-sub">업로드 스냅샷 기준</div>'
+    + '<div class="pstat-sub" id="pcFirstSub">심평원 adtStaDd</div>'
     + '</div>'
     + '<div class="pstat-card">'
     + '<div class="pstat-label">변동 횟수</div>'
     + '<div class="pstat-value" id="pcChangeCount" style="font-size:14px">-</div>'
-    + '<div class="pstat-sub">가격 변동 건수</div>'
+    + '<div class="pstat-sub">코드 변경 기준</div>'
     + '</div>';
 
   loadingEl.style.display = 'block';
-  loadingEl.innerHTML = '<span class="spinner"></span>&nbsp;약가 이력 조회 중…';
+  loadingEl.innerHTML = '<span class="spinner"></span>&nbsp;심평원 약가기준정보 조회 중…';
   canvasEl.style.display = 'none';
   noteEl.textContent = '';
 
-  /* 1단계: 이름 매핑에서 HIRA코드 조회 (nameIndex_1, nameIndex_2 병렬) */
-  Promise.all([
-    db.collection('drugMapping').doc('nameIndex_1').get(),
-    db.collection('drugMapping').doc('nameIndex_2').get()
-  ]).then(function(results) {
-    var hiraSeq = mfdsSeq; // fallback: 식약처코드 그대로
-    var nameMap = {};
-    results.forEach(function(docSnap) {
-      if (docSnap.exists) {
-        var d = docSnap.data();
-        if (d.namesJson) Object.assign(nameMap, JSON.parse(d.namesJson));
-      }
+  if (!mfdsSeq) {
+    loadingEl.innerHTML = '⚠️ 품목기준코드 없음 — 약가 이력을 조회할 수 없습니다.';
+    return;
+  }
+
+  /* 1단계: API로 chgBfMdsCd 체인 추적 */
+  buildPriceTimelineByChain(mfdsSeq).then(function(rows){
+    var history = composeHistory(rows, curVal);
+
+    /* 2단계: legacy Firestore 스냅샷 보조 (이름 매핑으로 G-code 조회) */
+    if (typeof db === 'undefined' || !db.collection) {
+      finishRender(history, rows, []);
+      return;
+    }
+    Promise.all([
+      db.collection('drugMapping').doc('nameIndex_1').get(),
+      db.collection('drugMapping').doc('nameIndex_2').get()
+    ]).then(function(results) {
+      var nameMap = {};
+      results.forEach(function(docSnap) {
+        if (docSnap.exists) {
+          var d = docSnap.data();
+          if (d.namesJson) Object.assign(nameMap, JSON.parse(d.namesJson));
+        }
+      });
+      var normN = normDrugName(name);
+      var hiraSeq = nameMap[normN] || nameMap[name] || null;
+      if (!hiraSeq) { finishRender(history, rows, []); return; }
+      return db.collection('drugPriceSnaps').orderBy('date', 'asc').get()
+        .then(function(snap) {
+          var legacy = [];
+          snap.forEach(function(docSnap) {
+            var d = docSnap.data();
+            var prices = d.pricesJson ? JSON.parse(d.pricesJson) : (d.prices || {});
+            var price = prices[hiraSeq];
+            if (price) legacy.push({ date: d.date, price: price, label: d.label || d.date });
+          });
+          finishRender(history, rows, legacy);
+        });
+    }).catch(function(){ finishRender(history, rows, []); });
+  }).catch(function(e){
+    loadingEl.innerHTML = '❌ 조회 오류: ' + (e && e.message ? e.message : '알 수 없음');
+  });
+
+  function finishRender(history, apiRows, legacy) {
+    /* legacy + API 병합 (날짜순 sort, 중복 제거) */
+    var merged = legacy.concat(history).filter(function(h){ return h && h.date && h.price; });
+    merged.sort(function(a,b){ return a.date.localeCompare(b.date); });
+    var seen = {}; var unique = [];
+    merged.forEach(function(h){
+      var key = h.date + '|' + h.price;
+      if (!seen[key]) { seen[key]=1; unique.push(h); }
     });
 
-    /* 이름으로 HIRA코드 조회: 정규화명 → 원본명 순서 */
-    if (nameMap[normN])  hiraSeq = nameMap[normN];
-    else if (nameMap[name]) hiraSeq = nameMap[name];
+    /* 요약 카드: 현재가 적용일 = 가장 최신 API row 의 adtStaDd */
+    var latest = apiRows.slice().sort(function(a,b){ return (b.adtStaDd||'').localeCompare(a.adtStaDd||''); })[0];
+    if (latest) {
+      var ad = latest.adtStaDd || '';
+      var fmt = ad.length===8 ? ad.slice(0,4)+'.'+ad.slice(4,6)+'.'+ad.slice(6,8) : ad;
+      var fdEl = document.getElementById('pcFirstDate'); if (fdEl) fdEl.textContent = fmt || '-';
+    }
+    var cntEl = document.getElementById('pcChangeCount');
+    if (cntEl) {
+      var cnt = Math.max(0, apiRows.length - 1) + (legacy.length>0?1:0);
+      cntEl.textContent = unique.length<=1 ? '단일' : (cnt + '회 (코드/약가 변경)');
+    }
 
-    /* 2단계: 모든 스냅샷에서 HIRA코드로 가격 조회 */
-    return db.collection('drugPriceSnaps').orderBy('date', 'asc').get()
-      .then(function(snap) {
-        if (snap.empty) {
-          loadingEl.textContent = '📭 업로드된 약가 이력이 없습니다. 관리자가 Excel을 업로드하면 표시됩니다.';
-          return;
-        }
-        var history = [];
-        snap.forEach(function(docSnap) {
-          var d = docSnap.data();
-          var prices = d.pricesJson ? JSON.parse(d.pricesJson) : (d.prices || {});
-          var price = prices[hiraSeq];
-          if (price) history.push({ date: d.date, price: price, label: d.label || d.date });
-        });
-        if (history.length === 0) {
-          loadingEl.textContent = '⚠️ 이 품목의 이력 데이터가 없습니다. (보험 미등재이거나 코드 불일치)';
-          return;
-        }
-        renderPriceChartCanvas(history);
-      });
-  }).catch(function(e) {
-    loadingEl.textContent = '❌ 조회 오류: ' + e.message;
-  });
+    if (!unique.length) {
+      loadingEl.innerHTML = '⚠️ 이 품목은 심평원 약가기준정보에 등록되어 있지 않습니다. (비급여/한약재/사전심사 등)';
+      return;
+    }
+    if (unique.length === 1) {
+      loadingEl.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">📍 단일 데이터 — 약가 변동 기록 없음</div><div style="font-size:12px;color:var(--text3)">'+unique[0].label+' · '+unique[0].price.toLocaleString('ko-KR')+'원</div></div>';
+      return;
+    }
+    renderPriceChartCanvas(unique);
+    var src = (apiRows.length?'심평원 약가기준 API '+apiRows.length+'점':'') + (legacy.length?(apiRows.length?' + ':'')+'레거시 스냅샷 '+legacy.length+'점':'');
+    noteEl.textContent = '출처: ' + src;
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -6698,9 +6806,10 @@ setSubTab('info','license');
 </div>
 <script>
 (function(){
-  var UPDATE_VERSION = '2026-06-16f';
+  var UPDATE_VERSION = '2026-06-16g';
   // 이용가이드 '수정된 사항' 섹션 미러 (가이드 #sec-updates 와 동기 유지)
   var UPDATES = [
+    {d:'2026.06.16', i:'📈', t:'약가 변동 — 심평원 약가기준정보 API 연동', s:'약품 상세의 📈 약가 변동 탭에서 심평원 약가기준정보(약가목록조회)를 실시간 조회합니다. 현재 상한가·적용시작일자를 모든 등재 품목에 표시하고, 제품코드 변경 이력(chgBfMdsCd 체인)을 자동 추적해 과거 가격 변동 점을 차트에 함께 표시합니다.'},
     {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
     {d:'2026.06.16', i:'🛠️', t:"제형 분류 오류 수정 — 브랜드명 중간 '주'가 주사제로 잘못 분류되던 문제", s:"동일성분 필터의 '주사제/정제' 등 제형 분류가 브랜드명 중간의 '주' 글자(예: 아주스타정·아주리정)를 주사제로 잘못 분류하던 문제를 수정했습니다. 이제 제품명 끝의 형태명(정·캡슐·시럽·주사제·연고·점안액·좌제·질정 등)만으로 정확히 분류하며, 함량·포장 표기는 무시합니다."},
     {d:'2026.06.16', i:'🎯', t:'동일성분 — 심평원 주성분코드 기준으로 정밀화', s:'동일성분 의약품을 심평원 주성분코드(약학정보원과 동일 기준)로 묶습니다. 성분뿐 아니라 함량·제형·배합비까지 같은 제품만 정확히 표시합니다. 예: 아목클라네오시럽(14:1) → 14:1 제품만, 7:1 제외.'},
