@@ -1,1 +1,20 @@
 .vercel
+node_modules/
+package-lock.json
+
+# 빌드 산출물 (Vercel이 build.js로 재생성)
+public/index.html
+
+# 시크릿
+serviceAccount.json
+.env
+.env.*
+
+# firebase 백업/헬퍼 (배포 불필요)
+firebase-backup/
+firebase-export.mjs
+firebase-restore.mjs
+firebase-restore-rest.mjs
+firebase-restore-guide.html
+firestore-rules-publish.mjs
+verify-migration.mjs

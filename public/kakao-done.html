@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>카카오 로그인</title>
+<style>
+  body { margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh;
+         font-family: -apple-system, sans-serif; background: #FEE500; }
+  .msg { font-size: 15px; color: #191919; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="msg">잠시만요...</div>
+<script>
+(function() {
+  var p = new URLSearchParams(location.search);
+  var result = p.get('result');
+
+  if (result === 'cancel' || result === 'error') {
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'KAKAO_AUTH', error: result }, location.origin);
+      }
+    } catch(e) {}
+    setTimeout(function() { window.close(); }, 300);
+    return;
+  }
+
+  var user = {
+    kn: p.get('kn') || '카카오 사용자',
+    ka: p.get('ka') || '',
+    ki: p.get('ki') || ''
+  };
+
+  try {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage({ type: 'KAKAO_AUTH', user: user }, location.origin);
+    } else {
+      // 팝업이 아닌 경우(직접 접근) → 메인으로
+      location.href = '/';
+    }
+  } catch(e) {
+    location.href = '/';
+  }
+
+  setTimeout(function() { window.close(); }, 300);
+})();
+</script>
+</body>
+</html>
