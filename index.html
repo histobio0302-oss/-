@@ -2419,6 +2419,7 @@ kbd {
     <div class="sub-tab-bar">
       <button class="sub-tab" data-parent="info" data-sub="license" onclick="setSubTab('info','license')">&#128196; 허가정보</button>
       <button class="sub-tab" data-parent="info" data-sub="dur" onclick="setSubTab('info','dur')">&#9877;&#65039; DUR 안전정보</button>
+      <button class="sub-tab" data-parent="info" data-sub="durcheck" onclick="setSubTab('info','durcheck')">&#129722; DUR 점검기</button>
       <button class="sub-tab" data-parent="info" data-sub="insu" onclick="setSubTab('info','insu')">&#128195; 보험인정기준</button>
       <button class="sub-tab" data-parent="info" data-sub="druglist" onclick="setSubTab('info','druglist')">&#128137; 약제기준목록표</button>
       </div>
@@ -2437,6 +2438,68 @@ kbd {
     <div id="durMsg" style="display:none;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px"></div>
     <div id="durResultWrap" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div><div class="recent-title" id="durResultTitle">결과</div><div style="font-size:11px;color:var(--text3);margin-top:2px" id="durResultSub"></div></div><button class="btn btn-ghost btn-sm" onclick="clearDurResult()">&#8592; 검색창으로</button></div><div id="durSections"></div></div>
     </div>
+
+    <!-- ═══ DUR 점검기 (다중약품 + 환자 컨텍스트) ═══ -->
+    <div class="sub-content" data-parent="info" data-sub="durcheck" style="display:none">
+      <div class="recall-notice" style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af">
+        🩺 <span><strong>DUR 점검기</strong> — 최대 10개 약품을 한 번에 입력하면 <strong>병용금기·임부금기·노인주의·특정연령대금기·효능군중복</strong> 5종을 모두 검사합니다. (식약처 DUR 공공데이터 기준)</span>
+      </div>
+      <div style="margin-bottom:16px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">DUR 다중점검</div><div style="font-size:12px;color:var(--text3)">약품 입력 → 환자 정보(선택) → 검사 실행</div></div>
+
+      <!-- 1단계: 약품 입력 -->
+      <div class="search-card" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700">1</span>
+          약품 추가 <span style="color:var(--text3);font-weight:500">(최대 10개)</span>
+        </div>
+        <div style="position:relative">
+          <input class="sinput" id="dcInput" placeholder="약품명을 입력하세요 (예: 와파린, 아스피린)" autocomplete="off"
+            oninput="dcSuggest(this.value)" onkeydown="dcInputKey(event)"
+            style="height:42px;width:100%">
+          <div id="dcSuggestBox" style="display:none;position:absolute;left:0;right:0;top:46px;z-index:50;max-height:280px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15)"></div>
+        </div>
+        <div id="dcChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:24px"></div>
+        <div id="dcChipsHint" style="font-size:11.5px;color:var(--text3);margin-top:6px">2개 이상 추가하면 약품 간 병용금기·효능군중복도 함께 검사합니다.</div>
+      </div>
+
+      <!-- 2단계: 환자 컨텍스트 -->
+      <div class="search-card" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700">2</span>
+          환자 정보 <span style="color:var(--text3);font-weight:500">(선택 — 입력 시 해당 카테고리만 강조됨)</span>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+          <div style="display:flex;align-items:center;gap:8px">
+            <label for="dcAge" style="font-size:12px;color:var(--text2);font-weight:600">나이</label>
+            <input id="dcAge" type="number" min="0" max="120" placeholder="-" style="width:70px;height:36px;padding:0 8px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;background:var(--surface);color:var(--text)">
+            <span style="font-size:12px;color:var(--text3)">세</span>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+            <input id="dcPreg" type="checkbox" style="accent-color:#9333ea">
+            <span>🤰 임신중</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+            <input id="dcElder" type="checkbox" style="accent-color:#d97706">
+            <span>👴 65세 이상</span>
+          </label>
+          <button class="btn btn-primary" onclick="dcRunCheck()" id="dcRunBtn" style="height:38px;padding:0 22px;margin-left:auto">🩺 검사 실행</button>
+        </div>
+      </div>
+
+      <!-- 3단계: 결과 -->
+      <div id="dcResultWrap" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="recent-title">점검 결과</div>
+            <div id="dcResultSub" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="dcClear()">↺ 처음으로</button>
+        </div>
+        <div id="dcSummaryBar" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+        <div id="dcSections"></div>
+      </div>
+    </div>
+
     <div class="sub-content" data-parent="info" data-sub="insu" style="display:none">
     <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">&#128195; 보험인정기준</div></div><a href="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">&#128279; 새 탭에서 열기</a></div>
     <div style="position:relative;width:100%;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--surface)"><iframe id="insuframe" src="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" style="width:100%;height:720px;border:none;display:block" title="심평원 보험인정기준" onload="checkInsuFrame(this)" onerror="showInsuFallback()"></iframe><div id="insuLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);gap:16px;pointer-events:none"><span class="spinner"></span><div style="font-size:13px;color:var(--text3)">보험인정기준 로딩 중...</div></div><div id="insuFallback" style="display:none;height:420px;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px;text-align:center"><div style="font-size:48px">&#128195;</div><a href="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--primary);color:#fff;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none">&#128195; 보험인정기준 바로가기</a></div></div>
@@ -4594,6 +4657,405 @@ function renderDurSection(catKey,result){var cat=DUR_CATS[catKey],items=result.i
 function searchDur(){var q=document.getElementById('durQ').value.trim(),type=document.getElementById('durType').value;if(!q){alert('품목명을 입력해주세요.');return;}var btn=document.getElementById('durBtn');btn.disabled=true;btn.textContent='조회 중...';document.getElementById('durMsg').style.display='none';document.getElementById('durResultWrap').style.display='block';document.getElementById('durResultTitle').textContent='"'+esc(q)+'" DUR 안전정보';document.getElementById('durResultSub').textContent='조회 중...';document.getElementById('durSections').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';var cats=type==='all'?Object.keys(DUR_CATS):[type];var promises=cats.map(function(k){return fetchDurAPI(DUR_CATS[k].ep,q).then(function(r){return{key:k,result:r};});});Promise.all(promises).then(function(results){var totalItems=results.reduce(function(sum,r){return sum+(r.result.total||0);},0);document.getElementById('durResultSub').textContent='총 '+totalItems+'건 - '+results.length+'개 카테고리';var html='',hasAny=false;for(var i=0;i<results.length;i++){if(results[i].result.items.length>0)hasAny=true;html+=renderDurSection(results[i].key,results[i].result);}if(!hasAny)html='<div style="text-align:center;padding:48px;color:var(--text3)"><div style="font-size:36px;margin-bottom:12px">&#10003;</div><div style="font-size:14px;font-weight:600">"'+esc(q)+'"에 대한 DUR 정보가 없습니다.</div></div>';document.getElementById('durSections').innerHTML=html;btn.disabled=false;btn.textContent='검색';});}
 function clearDurResult(){document.getElementById('durResultWrap').style.display='none';document.getElementById('durMsg').style.display='none';document.getElementById('durQ').value='';document.getElementById('durSections').innerHTML='';}
 
+/* ═══ DUR 다중점검기 (durcheck 서브탭) ═══ */
+var DC_MAX = 10;
+var dcDrugs = [];       // [{name, maker}]
+var dcSugTimer = null;
+var dcLastQuery = '';
+
+function dcEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function dcRenderChips(){
+  var box = document.getElementById('dcChips');
+  if(!box) return;
+  box.innerHTML = dcDrugs.map(function(d,i){
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:5px 5px 5px 12px;background:var(--primary-lt,#eff6ff);color:var(--primary,#2563eb);border-radius:16px;font-size:13px;font-weight:600">'
+      + dcEsc(d.name)
+      + '<button onclick="dcRemove('+i+')" title="제거" style="background:var(--primary,#2563eb);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0">&times;</button>'
+      + '</span>';
+  }).join('');
+  var hint = document.getElementById('dcChipsHint');
+  if(hint){
+    if(dcDrugs.length===0) hint.textContent='2개 이상 추가하면 약품 간 병용금기·효능군중복도 함께 검사합니다.';
+    else if(dcDrugs.length===1) hint.textContent='약품 1개 — 단일 약품 DUR 정보만 검사됩니다.';
+    else hint.textContent=dcDrugs.length+'개 약품 — 5종 카테고리 + 약품 간 페어 검사 실행 가능';
+  }
+}
+
+function dcRemove(idx){ dcDrugs.splice(idx,1); dcRenderChips(); }
+
+function dcAdd(name){
+  name = (name||'').trim();
+  if(!name) return;
+  if(dcDrugs.length>=DC_MAX){ alert('최대 '+DC_MAX+'개까지 추가할 수 있습니다.'); return; }
+  if(dcDrugs.some(function(d){return d.name===name;})){ /* 중복 무시 */ return; }
+  dcDrugs.push({name:name});
+  dcRenderChips();
+  var inp = document.getElementById('dcInput');
+  if(inp){ inp.value=''; inp.focus(); }
+  dcHideSuggest();
+}
+
+function dcHideSuggest(){ var b=document.getElementById('dcSuggestBox'); if(b){ b.style.display='none'; b.innerHTML=''; } }
+
+function dcSuggest(q){
+  q = (q||'').trim();
+  dcLastQuery = q;
+  if(dcSugTimer){ clearTimeout(dcSugTimer); }
+  if(q.length<2){ dcHideSuggest(); return; }
+  dcSugTimer = setTimeout(function(){
+    if(q!==dcLastQuery) return;
+    // 식약처 허가정보 API로 자동완성 (fetchLic 재사용)
+    if(typeof fetchLic!=='function'){ dcHideSuggest(); return; }
+    fetchLic({item_name:q}).then(function(r){
+      if(q!==dcLastQuery) return;
+      var items = (r&&r.items)||[];
+      var box = document.getElementById('dcSuggestBox');
+      if(!box) return;
+      if(!items.length){
+        box.innerHTML='<div style="padding:14px;font-size:12px;color:var(--text3);text-align:center">검색 결과 없음 — 입력값 그대로 추가하려면 Enter를 누르세요.</div>';
+        box.style.display='block';
+        return;
+      }
+      // 최대 15개만 표시 + 제품명 중복 정리
+      var seen={}, list=[];
+      for(var i=0;i<items.length && list.length<15;i++){
+        var nm = items[i].ITEM_NAME||'';
+        if(!nm || seen[nm]) continue;
+        seen[nm]=1;
+        list.push({name:nm, maker:items[i].ENTP_NAME||''});
+      }
+      box.innerHTML = list.map(function(it){
+        return '<div onclick="dcAdd('+JSON.stringify(it.name).replace(/"/g,'&quot;')+')" '
+          + 'style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;gap:8px;align-items:center"'
+          + ' onmouseover="this.style.background=\'var(--hover)\'" onmouseout="this.style.background=\'\'">'
+          + '<span style="font-weight:600;color:var(--text)">'+dcEsc(it.name)+'</span>'
+          + '<span style="font-size:11px;color:var(--text3)">'+dcEsc(it.maker)+'</span>'
+          + '</div>';
+      }).join('');
+      box.style.display='block';
+    }).catch(function(){ dcHideSuggest(); });
+  }, 240);
+}
+
+function dcInputKey(e){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    var v = (e.target.value||'').trim();
+    if(v) dcAdd(v);
+  } else if(e.key==='Escape'){
+    dcHideSuggest();
+  } else if(e.key==='Backspace' && !e.target.value && dcDrugs.length){
+    dcRemove(dcDrugs.length-1);
+  }
+}
+
+/* 검사 실행 */
+function dcRunCheck(){
+  if(!dcDrugs.length){ alert('약품을 1개 이상 추가하세요.'); return; }
+  var btn = document.getElementById('dcRunBtn');
+  if(btn){ btn.disabled=true; btn.textContent='검사 중...'; }
+  var age = parseInt(document.getElementById('dcAge').value||'',10);
+  var preg = !!document.getElementById('dcPreg').checked;
+  var elder = !!document.getElementById('dcElder').checked;
+  if(!isNaN(age) && age>=65) elder = true;
+  var wrap = document.getElementById('dcResultWrap');
+  var sub = document.getElementById('dcResultSub');
+  var sec = document.getElementById('dcSections');
+  var bar = document.getElementById('dcSummaryBar');
+  wrap.style.display='block';
+  sub.textContent = dcDrugs.length+'개 약품 · '+(isNaN(age)?'나이 -':age+'세')+(preg?' · 임신':'')+(elder?' · 65세+':'');
+  sec.innerHTML='<div style="text-align:center;padding:40px"><span class="spinner"></span><div style="margin-top:10px;font-size:12px;color:var(--text3)">DUR 공공데이터 조회 중...</div></div>';
+  bar.innerHTML='';
+
+  // 각 약품에 대해 5종 카테고리 API 호출
+  var cats = ['usjnt','pwnm','odsn','age','efcy'];
+  var jobs = [];
+  dcDrugs.forEach(function(d){
+    cats.forEach(function(k){
+      jobs.push(fetchDurAPI(DUR_CATS[k].ep, d.name).then(function(r){
+        return {drug:d.name, cat:k, items:(r&&r.items)||[]};
+      }, function(){ return {drug:d.name, cat:k, items:[]}; }));
+    });
+  });
+
+  Promise.all(jobs).then(function(rows){
+    dcRenderResults(rows, {age:age, preg:preg, elder:elder});
+    if(btn){ btn.disabled=false; btn.textContent='🩺 검사 실행'; }
+  }).catch(function(){
+    sec.innerHTML='<div class="dur-err-box">⚠️ DUR API 조회 중 오류가 발생했습니다.</div>';
+    if(btn){ btn.disabled=false; btn.textContent='🩺 검사 실행'; }
+  });
+}
+
+/* 결과 렌더링 — 카테고리별 그룹화 + 페어 매칭 강조 */
+function dcRenderResults(rows, ctx){
+  // 카테고리별 묶기: { catKey: [{drug, items:[]}] }
+  var byCat = {usjnt:[], pwnm:[], odsn:[], age:[], efcy:[]};
+  rows.forEach(function(row){ byCat[row.cat].push({drug:row.drug, items:row.items}); });
+
+  // 우리가 가진 약품 이름 집합 (페어 매칭용, 대소문자/공백 무시)
+  var nameSet = {};
+  dcDrugs.forEach(function(d){ nameSet[dcNormName(d.name)] = d.name; });
+
+  var sections = '';
+  var summary = []; // [{label, count, color}]
+
+  // ── 1) 병용금기 — 페어 매칭 우선
+  (function(){
+    var hits = []; // {drug, mateName, content}
+    byCat.usjnt.forEach(function(g){
+      g.items.forEach(function(it){
+        var mate = it.MIXTURE_ITEM_NAME || '';
+        var matched = dcFindMatch(mate, nameSet);
+        if(matched){
+          hits.push({drug:g.drug, mateName:matched, raw:mate, content:it.PROHBT_CONTENT||'-'});
+        }
+      });
+    });
+    if(hits.length){
+      summary.push({label:'⚠️ 병용금기 페어', count:hits.length, color:'#dc2626'});
+      sections += '<div style="margin-bottom:18px;border:2px solid #dc2626;border-radius:var(--r);overflow:hidden;background:#fef2f2">'
+        + '<div style="padding:12px 16px;background:#fef2f2;border-bottom:1px solid #fecaca"><span style="font-size:14px;font-weight:800;color:#dc2626">⚠️ 병용금기 — 입력한 약품 간 충돌 '+hits.length+'건</span></div>'
+        + '<div style="padding:6px 0;background:var(--surface)">'
+        + hits.map(function(h){
+          return '<div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'
+            + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-weight:700">'
+            + '<span style="background:var(--primary-lt,#eff6ff);color:var(--primary,#2563eb);padding:2px 8px;border-radius:10px;font-size:12px">'+dcEsc(h.drug)+'</span>'
+            + '<span style="color:#dc2626">✕</span>'
+            + '<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;font-size:12px">'+dcEsc(h.mateName)+'</span>'
+            + '</div>'
+            + '<div style="font-size:12px;color:var(--text2);line-height:1.55">'+dcEsc(h.content)+'</div>'
+            + '</div>';
+        }).join('')
+        + '</div></div>';
+    }
+    // 비-페어(단일 약품 입장의 병용금기 전체 목록은 부가)
+    var nonPairCount = 0;
+    byCat.usjnt.forEach(function(g){
+      g.items.forEach(function(it){
+        var mate = it.MIXTURE_ITEM_NAME || '';
+        if(!dcFindMatch(mate, nameSet)) nonPairCount++;
+      });
+    });
+    if(nonPairCount>0){
+      sections += '<details style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)">'
+        + '<summary style="padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text2)">▸ 참고: 입력 약품과 충돌 없는 병용금기 목록 ('+nonPairCount+'건)</summary>'
+        + '<div style="padding:4px 0;border-top:1px solid var(--border)">'
+        + byCat.usjnt.map(function(g){
+          var rest = g.items.filter(function(it){ return !dcFindMatch(it.MIXTURE_ITEM_NAME||'', nameSet); });
+          if(!rest.length) return '';
+          return '<div style="padding:8px 14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">'+dcEsc(g.drug)+'</div>'
+            + rest.slice(0,6).map(function(it){
+              return '<div style="font-size:11.5px;color:var(--text2);padding:3px 0;line-height:1.5">• '+dcEsc(it.MIXTURE_ITEM_NAME||'-')+' — '+dcEsc((it.PROHBT_CONTENT||'').slice(0,80))+'</div>';
+            }).join('')
+            + (rest.length>6?'<div style="font-size:11px;color:var(--text3);margin-top:3px">… 외 '+(rest.length-6)+'건</div>':'')
+            + '</div>';
+        }).join('')
+        + '</div></details>';
+    }
+  })();
+
+  // ── 2) 효능군중복 — 약품 간 교차
+  (function(){
+    var groupsByDrug = {}; // drug → Set of "g1||g2"
+    byCat.efcy.forEach(function(g){
+      var s = {};
+      g.items.forEach(function(it){
+        var k = (it.EFY_GROUP1_NM||'')+'||'+(it.EFY_GROUP2_NM||'');
+        if(k!=='||') s[k]=1;
+      });
+      groupsByDrug[g.drug] = s;
+    });
+    var overlaps = []; // {a,b,groups:[]}
+    var keys = Object.keys(groupsByDrug);
+    for(var i=0;i<keys.length;i++){
+      for(var j=i+1;j<keys.length;j++){
+        var a=keys[i], b=keys[j];
+        var shared = Object.keys(groupsByDrug[a]).filter(function(k){ return groupsByDrug[b][k]; });
+        if(shared.length){
+          overlaps.push({a:a, b:b, groups:shared.map(function(k){ var p=k.split('||'); return p[0]+' / '+p[1]; })});
+        }
+      }
+    }
+    if(overlaps.length){
+      summary.push({label:'💊 효능군중복 페어', count:overlaps.length, color:'#0891b2'});
+      sections += '<div style="margin-bottom:18px;border:2px solid #0891b2;border-radius:var(--r);overflow:hidden;background:#ecfeff">'
+        + '<div style="padding:12px 16px;background:#ecfeff;border-bottom:1px solid #a5f3fc"><span style="font-size:14px;font-weight:800;color:#0891b2">💊 효능군중복 — 입력 약품 간 동일 효능군 '+overlaps.length+'건</span></div>'
+        + '<div style="padding:6px 0;background:var(--surface)">'
+        + overlaps.map(function(o){
+          return '<div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">'
+            + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-weight:700">'
+            + '<span style="background:var(--primary-lt,#eff6ff);color:var(--primary,#2563eb);padding:2px 8px;border-radius:10px;font-size:12px">'+dcEsc(o.a)+'</span>'
+            + '<span style="color:#0891b2">↔</span>'
+            + '<span style="background:var(--primary-lt,#eff6ff);color:var(--primary,#2563eb);padding:2px 8px;border-radius:10px;font-size:12px">'+dcEsc(o.b)+'</span>'
+            + '</div>'
+            + o.groups.map(function(g){ return '<div style="font-size:12px;color:var(--text2)">• '+dcEsc(g)+'</div>'; }).join('')
+            + '</div>';
+        }).join('')
+        + '</div></div>';
+    }
+  })();
+
+  // ── 3) 임부금기 (preg 일 때 강조)
+  (function(){
+    var hits = []; // {drug, grade, content}
+    byCat.pwnm.forEach(function(g){
+      g.items.forEach(function(it){
+        hits.push({drug:g.drug, grade:it.GRADE_NAME||'-', content:it.PROHBT_CONTENT||'-'});
+      });
+    });
+    if(hits.length){
+      var emph = ctx.preg;
+      if(emph) summary.push({label:'🤰 임부금기 해당', count:hits.length, color:'#9333ea'});
+      sections += '<div style="margin-bottom:18px;border:'+(emph?'2px solid #9333ea':'1px solid var(--border)')+';border-radius:var(--r);overflow:hidden;background:'+(emph?'#faf5ff':'var(--surface)')+'">'
+        + '<div style="padding:12px 16px;background:'+(emph?'#faf5ff':'var(--surface2)')+';border-bottom:1px solid '+(emph?'#e9d5ff':'var(--border)')+'">'
+        + '<span style="font-size:14px;font-weight:'+(emph?800:700)+';color:#9333ea">🤰 임부금기 '+(emph?'— 임신 상태에 해당':'(참고)')+' '+hits.length+'건</span></div>'
+        + '<div style="padding:6px 0">'
+        + hits.map(function(h){
+          return '<div style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px">'
+            + '<div style="font-weight:700;margin-bottom:3px">'+dcEsc(h.drug)+' <span style="background:#f3e8ff;color:#9333ea;padding:1px 7px;border-radius:10px;font-size:11px;margin-left:4px">'+dcEsc(h.grade)+'</span></div>'
+            + '<div style="font-size:12px;color:var(--text2);line-height:1.55">'+dcEsc(h.content)+'</div>'
+            + '</div>';
+        }).join('')
+        + '</div></div>';
+    }
+  })();
+
+  // ── 4) 특정연령대금기 (age 입력 시 매칭)
+  (function(){
+    var hits = []; // {drug, grade, content, applies}
+    byCat.age.forEach(function(g){
+      g.items.forEach(function(it){
+        var grade = it.GRADE_NAME||'';
+        var applies = !isNaN(ctx.age) && dcAgeMatch(grade, ctx.age);
+        hits.push({drug:g.drug, grade:grade||'-', content:it.PROHBT_CONTENT||'-', applies:applies});
+      });
+    });
+    if(hits.length){
+      var anyApplies = hits.some(function(h){return h.applies;});
+      if(anyApplies) summary.push({label:'👶 연령대금기 해당', count:hits.filter(function(h){return h.applies;}).length, color:'#ea580c'});
+      sections += '<div style="margin-bottom:18px;border:'+(anyApplies?'2px solid #ea580c':'1px solid var(--border)')+';border-radius:var(--r);overflow:hidden;background:'+(anyApplies?'#fff7ed':'var(--surface)')+'">'
+        + '<div style="padding:12px 16px;background:'+(anyApplies?'#fff7ed':'var(--surface2)')+';border-bottom:1px solid '+(anyApplies?'#fed7aa':'var(--border)')+'">'
+        + '<span style="font-size:14px;font-weight:'+(anyApplies?800:700)+';color:#ea580c">👶 특정연령대금기 '+(anyApplies?'— 나이 '+ctx.age+'세 해당':'(참고)')+' '+hits.length+'건</span></div>'
+        + '<div style="padding:6px 0">'
+        + hits.map(function(h){
+          return '<div style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;'+(h.applies?'background:#fff7ed':'')+'">'
+            + '<div style="font-weight:700;margin-bottom:3px">'+dcEsc(h.drug)+' <span style="background:'+(h.applies?'#fed7aa':'#fef3c7')+';color:#ea580c;padding:1px 7px;border-radius:10px;font-size:11px;margin-left:4px">'+dcEsc(h.grade)+'</span>'+(h.applies?' <span style="font-size:11px;color:#ea580c;font-weight:600">← 입력 나이 해당</span>':'')+'</div>'
+            + '<div style="font-size:12px;color:var(--text2);line-height:1.55">'+dcEsc(h.content)+'</div>'
+            + '</div>';
+        }).join('')
+        + '</div></div>';
+    }
+  })();
+
+  // ── 5) 노인주의 (elder 일 때 강조)
+  (function(){
+    var hits = [];
+    byCat.odsn.forEach(function(g){
+      g.items.forEach(function(it){
+        hits.push({drug:g.drug, content:it.ATENT_CONTENT||'-'});
+      });
+    });
+    if(hits.length){
+      var emph = ctx.elder;
+      if(emph) summary.push({label:'👴 노인주의 해당', count:hits.length, color:'#d97706'});
+      sections += '<div style="margin-bottom:18px;border:'+(emph?'2px solid #d97706':'1px solid var(--border)')+';border-radius:var(--r);overflow:hidden;background:'+(emph?'#fffbeb':'var(--surface)')+'">'
+        + '<div style="padding:12px 16px;background:'+(emph?'#fffbeb':'var(--surface2)')+';border-bottom:1px solid '+(emph?'#fde68a':'var(--border)')+'">'
+        + '<span style="font-size:14px;font-weight:'+(emph?800:700)+';color:#d97706">👴 노인주의 '+(emph?'— 65세 이상 해당':'(참고)')+' '+hits.length+'건</span></div>'
+        + '<div style="padding:6px 0">'
+        + hits.map(function(h){
+          return '<div style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px">'
+            + '<div style="font-weight:700;margin-bottom:3px">'+dcEsc(h.drug)+'</div>'
+            + '<div style="font-size:12px;color:var(--text2);line-height:1.55">'+dcEsc(h.content)+'</div>'
+            + '</div>';
+        }).join('')
+        + '</div></div>';
+    }
+  })();
+
+  // 결과 비어있는 경우
+  if(!sections){
+    sections = '<div style="text-align:center;padding:48px;color:var(--text3);background:#ecfdf5;border:1px solid #bbf7d0;border-radius:var(--r)"><div style="font-size:38px;margin-bottom:10px">✅</div><div style="font-size:15px;font-weight:700;color:#065f46;margin-bottom:5px">DUR 해당사항 없음</div><div style="font-size:12px">입력하신 약품 조합에서 공공데이터 기준 DUR 경고가 발견되지 않았습니다.</div></div>';
+  }
+
+  // 요약 바
+  var bar = document.getElementById('dcSummaryBar');
+  if(summary.length){
+    bar.innerHTML = summary.map(function(s){
+      return '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:'+s.color+'15;color:'+s.color+';border:1px solid '+s.color+'40;border-radius:20px;font-size:12px;font-weight:700">'
+        + dcEsc(s.label) + ' <strong>'+s.count+'</strong></span>';
+    }).join('');
+  } else {
+    bar.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#ecfdf5;color:#065f46;border:1px solid #bbf7d0;border-radius:20px;font-size:12px;font-weight:700">✅ 환자 컨텍스트 기준 해당사항 없음</span>';
+  }
+
+  document.getElementById('dcSections').innerHTML = sections;
+}
+
+/* 이름 정규화 (괄호/공백/특수문자 제거 후 비교) */
+function dcNormName(s){
+  return String(s||'').replace(/\([^)]*\)/g,'').replace(/\[[^\]]*\]/g,'').replace(/\s+/g,'').toLowerCase();
+}
+
+/* mate 약품명이 nameSet 의 어느 이름과 매칭되는지 — 부분 일치 */
+function dcFindMatch(mate, nameSet){
+  var nm = dcNormName(mate);
+  if(!nm) return null;
+  var keys = Object.keys(nameSet);
+  // 1) 완전 일치
+  for(var i=0;i<keys.length;i++){ if(nm===keys[i]) return nameSet[keys[i]]; }
+  // 2) 부분 일치 (원문이 입력 약품을 포함하거나 그 반대)
+  for(var i=0;i<keys.length;i++){
+    var k = keys[i];
+    if(k.length>=2 && (nm.indexOf(k)>=0 || k.indexOf(nm)>=0)) return nameSet[k];
+  }
+  return null;
+}
+
+/* "GRADE_NAME" 텍스트에서 나이 범위를 추출해 해당 여부 판단 */
+function dcAgeMatch(grade, age){
+  if(!grade || isNaN(age)) return false;
+  var g = String(grade);
+  // "12개월" 식 → 0세
+  if(/개월/.test(g)) return age===0;
+  // "X세 이상" / "X세 이하" / "X세 미만" / "X세~Y세" 패턴
+  var m;
+  if((m=g.match(/(\d+)\s*세\s*이상/))){ return age>=parseInt(m[1],10); }
+  if((m=g.match(/(\d+)\s*세\s*이하/))){ return age<=parseInt(m[1],10); }
+  if((m=g.match(/(\d+)\s*세\s*미만/))){ return age<parseInt(m[1],10); }
+  if((m=g.match(/(\d+)\s*세\s*[~\-]\s*(\d+)\s*세/))){
+    return age>=parseInt(m[1],10) && age<=parseInt(m[2],10);
+  }
+  // "소아" — 18세 미만 가정
+  if(/소아/.test(g)) return age<18;
+  if(/신생아/.test(g)) return age<1;
+  if(/영아/.test(g)) return age<2;
+  if(/유아/.test(g)) return age<6;
+  return false;
+}
+
+function dcClear(){
+  dcDrugs=[];
+  dcRenderChips();
+  document.getElementById('dcInput').value='';
+  document.getElementById('dcAge').value='';
+  document.getElementById('dcPreg').checked=false;
+  document.getElementById('dcElder').checked=false;
+  document.getElementById('dcResultWrap').style.display='none';
+  document.getElementById('dcSections').innerHTML='';
+  document.getElementById('dcSummaryBar').innerHTML='';
+  dcHideSuggest();
+}
+
+/* 입력창 밖 클릭 시 suggest 닫기 */
+document.addEventListener('click', function(e){
+  var inp = document.getElementById('dcInput');
+  var box = document.getElementById('dcSuggestBox');
+  if(!inp||!box) return;
+  if(e.target!==inp && !box.contains(e.target)) dcHideSuggest();
+});
+
 // Initialization moved to separate unobfuscated script below
 </script>
 
@@ -6236,9 +6698,10 @@ setSubTab('info','license');
 </div>
 <script>
 (function(){
-  var UPDATE_VERSION = '2026-06-16e';
+  var UPDATE_VERSION = '2026-06-16f';
   // 이용가이드 '수정된 사항' 섹션 미러 (가이드 #sec-updates 와 동기 유지)
   var UPDATES = [
+    {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
     {d:'2026.06.16', i:'🛠️', t:"제형 분류 오류 수정 — 브랜드명 중간 '주'가 주사제로 잘못 분류되던 문제", s:"동일성분 필터의 '주사제/정제' 등 제형 분류가 브랜드명 중간의 '주' 글자(예: 아주스타정·아주리정)를 주사제로 잘못 분류하던 문제를 수정했습니다. 이제 제품명 끝의 형태명(정·캡슐·시럽·주사제·연고·점안액·좌제·질정 등)만으로 정확히 분류하며, 함량·포장 표기는 무시합니다."},
     {d:'2026.06.16', i:'🎯', t:'동일성분 — 심평원 주성분코드 기준으로 정밀화', s:'동일성분 의약품을 심평원 주성분코드(약학정보원과 동일 기준)로 묶습니다. 성분뿐 아니라 함량·제형·배합비까지 같은 제품만 정확히 표시합니다. 예: 아목클라네오시럽(14:1) → 14:1 제품만, 7:1 제외.'},
     {d:'2026.06.16', i:'🧬', t:'동일성분 매칭 — 성분 색인 기반으로 전면 개선', s:'제품명에 성분이 적혀 있지 않은 브랜드명 제품(예: 듀얼살탄·하이퍼스타)도 성분이 같으면 정확히 묶입니다. 식약처 주성분 데이터 4만여 제품을 성분세트로 색인화해, 표기(파우더·염) 차이와 무관하게 동일성분을 찾습니다.'},
