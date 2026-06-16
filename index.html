@@ -5468,6 +5468,52 @@ function normDrugName(n) {
   return (n || '').replace(/_\(.*/, '').replace(/\s+/g, ' ').trim();
 }
 
+/* ── 배치 시드 JSON 캐시 (선택) ───────────
+   public/price-timeline.json (seed-price-history.mjs 산출) 가 있으면
+   그걸 우선 사용. 한 번 로드 후 _priceTimelineCache 에 보관 */
+var _priceTimelineCache = null;       // 로드 완료 후 {timeline:{...}} 또는 'NONE'
+var _priceTimelinePending = null;     // 로딩 중 Promise
+function loadPriceTimelineOnce() {
+  if (_priceTimelineCache !== null) return Promise.resolve(_priceTimelineCache);
+  if (_priceTimelinePending) return _priceTimelinePending;
+  _priceTimelinePending = fetch('/price-timeline.json', {cache:'force-cache'})
+    .then(function(r){ if (!r.ok) throw new Error('no batch'); return r.json(); })
+    .then(function(j){ _priceTimelineCache = j; return j; })
+    .catch(function(){ _priceTimelineCache = 'NONE'; return 'NONE'; });
+  return _priceTimelinePending;
+}
+function lookupBatchTimeline(mdsCd) {
+  if (!mdsCd || !_priceTimelineCache || _priceTimelineCache === 'NONE') return [];
+  var arr = _priceTimelineCache.timeline && _priceTimelineCache.timeline[mdsCd];
+  return arr || [];
+}
+/* 배치 데이터로 chgBfMdsCd 체인 추적 — API 호출 없이 즉시 */
+function collectBatchRowsWithChain(startMdsCd) {
+  if (!_priceTimelineCache || _priceTimelineCache === 'NONE') return [];
+  var visited = {}, collected = [], queue = [startMdsCd];
+  while (queue.length && collected.length < 60) {
+    var c = queue.shift();
+    if (!c || visited[c]) continue;
+    visited[c] = 1;
+    var arr = lookupBatchTimeline(c);
+    arr.forEach(function(r){
+      // 배치 row 의 date 는 'YYYY-MM-DD' 형식이므로 adtStaDd 로 변환
+      var ad = (r.date||'').replace(/-/g,'');
+      collected.push({
+        adtStaDd: ad,
+        mxCprc: r.price != null ? String(r.price) : '',
+        mdsCd: c,
+        itmNm: r.itmNm || '',
+        gnlNmCd: r.gnlNmCd || '',
+        mnfEntpNm: r.mnfEntpNm || '',
+        chgBfMdsCd: r.chgBfMdsCd || ''
+      });
+      if (r.chgBfMdsCd && !visited[r.chgBfMdsCd]) queue.push(r.chgBfMdsCd);
+    });
+  }
+  return collected;
+}
+
 /* ── 심평원 약가기준 API 단건 호출 ─────────
    gov-proxy 경유로 mdsCd 단건 조회 → 1개 row(현재 또는 과거 코드의 적용 시점) */
 function fetchDgamtByMdsCd(mdsCd) {
@@ -5582,8 +5628,25 @@ function loadPriceChart() {
     return;
   }
 
-  /* 1단계: API로 chgBfMdsCd 체인 추적 */
-  buildPriceTimelineByChain(mfdsSeq).then(function(rows){
+  /* 1단계: 배치 시드 JSON 우선 시도 → 없으면 API 체인 ─────── */
+  loadPriceTimelineOnce().then(function(){
+    // 배치 데이터에서 현재 mdsCd + 변경전 코드들의 history 합치기
+    var batchRows = collectBatchRowsWithChain(mfdsSeq);
+    if (batchRows.length >= 2) {
+      // 배치 데이터가 충분하면 API 호출 생략
+      return Promise.resolve(batchRows);
+    }
+    // 부족하면 API 호출로 보강
+    return buildPriceTimelineByChain(mfdsSeq).then(function(apiRows){
+      // 배치 + API 병합 (중복 제거: mdsCd+adtStaDd 기준)
+      var seen = {}; var merged = [];
+      batchRows.concat(apiRows).forEach(function(r){
+        var k = (r.mdsCd||'')+'|'+(r.adtStaDd||'');
+        if (!seen[k]) { seen[k]=1; merged.push(r); }
+      });
+      return merged;
+    });
+  }).then(function(rows){
     var history = composeHistory(rows, curVal);
 
     /* 2단계: legacy Firestore 스냅샷 보조 (이름 매핑으로 G-code 조회) */
