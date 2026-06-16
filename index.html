@@ -5392,30 +5392,30 @@ function isSameIngrSet(itemName, srcIngrs, srcKey) {
 }
 
 
-// 성분 색인 로드 (mcpn 기반: 정규화 성분세트 → 제품). 최초 호출 시 1회 fetch
-var _ingrIndex = null, _ingrByGroup = null, _ingrLoading = null;
-function loadIngrIndex() {
-  if (_ingrIndex) return Promise.resolve(_ingrIndex);
-  if (_ingrLoading) return _ingrLoading;
-  _ingrLoading = fetch('/ingr-index.json').then(function(r){ if(!r.ok) throw new Error('index ' + r.status); return r.json(); }).then(function(j){
-    _ingrIndex = j; _ingrByGroup = {};
-    for (var seq in j.s) { var gi = j.s[seq][0]; (_ingrByGroup[gi] = _ingrByGroup[gi] || []).push(seq); }
+// 주성분코드 색인 로드 (심평원 약가마스터 의약품표준코드: 품목기준코드→주성분코드). 최초 1회 fetch
+var _gnlIndex = null, _gnlByGroup = null, _gnlLoading = null;
+function loadGnlIndex() {
+  if (_gnlIndex) return Promise.resolve(_gnlIndex);
+  if (_gnlLoading) return _gnlLoading;
+  _gnlLoading = fetch('/gnl-index.json').then(function(r){ if(!r.ok) throw new Error('index ' + r.status); return r.json(); }).then(function(j){
+    _gnlIndex = j; _gnlByGroup = {};
+    for (var seq in j.s) { var gi = j.s[seq][0]; (_gnlByGroup[gi] = _gnlByGroup[gi] || []).push(seq); }
     return j;
   });
-  return _ingrLoading;
+  return _gnlLoading;
 }
 
-// 동일성분 의약품 조회 (성분 색인 기반 — 제품명에 성분이 없어도 매칭. 미수록 시 이름검색 폴백)
+// 동일성분 의약품 조회 (심평원 주성분코드 기준 — 약학정보원과 동일. 미수록 시 이름검색 폴백)
 function fetchSameIngredients() {
   if (!currentDetailDrug) return;
   document.getElementById('sameIngredientsResult').innerHTML = '<div class="state"><span class="spinner"></span>동일성분 의약품 검색 중...</div>';
   var sourceSeq = currentDetailDrug.seq;
-  loadIngrIndex().then(function(idx) {
+  loadGnlIndex().then(function(idx) {
     var rec = idx.s[sourceSeq];
     if (!rec) { fetchSameIngredientsByName(); return; }
     var gi = rec[0];
-    var ingrLabel = (idx.k[gi] || '').replace(/\|/g, ' + ');
-    var seqs = _ingrByGroup[gi] || [];
+    var ingrLabel = (extractBaseIngredients(currentDetailDrug.ingr || '').join(' + ')) || (idx.k[gi] || '');
+    var seqs = _gnlByGroup[gi] || [];
     var items = [];
     seqs.forEach(function(seq){
       if (seq === sourceSeq) return;
@@ -5429,7 +5429,7 @@ function fetchSameIngredients() {
     renderSameIngredients(items, ingrLabel, getFormGroup(currentDetailDrug.name || ''));
     currentDetailDrug.sameIngredientsLoaded = true;
   }).catch(function(e){
-    console.error('성분 색인 로드 실패, 이름검색 폴백:', e);
+    console.error('주성분코드 색인 로드 실패, 이름검색 폴백:', e);
     fetchSameIngredientsByName();
   });
 }
