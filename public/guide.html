@@ -310,6 +310,13 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg
     <div class="sidebar-title">목차</div>
 
     <div class="sidebar-section">
+      <a class="sidebar-link" href="#sec-header">
+        <span class="sidebar-dot" style="background:var(--text3)"></span>
+        화면 구성 &amp; 버튼
+      </a>
+    </div>
+
+    <div class="sidebar-section">
       <a class="sidebar-link active" href="#sec-search">
         <span class="sidebar-dot" style="background:var(--c1)"></span>
         의약품 검색
@@ -383,6 +390,66 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);background:var(--bg
 
   <!-- 메인 콘텐츠 -->
   <main class="main">
+
+    <!-- ══════════════════════════════════
+         섹션 0: 화면 구성 & 상단 버튼
+    ══════════════════════════════════ -->
+    <section class="guide-section" id="sec-header">
+      <div class="section-header sh-1">
+        <div class="section-icon">🧭</div>
+        <div>
+          <div class="section-title">화면 구성 &amp; 상단 버튼</div>
+          <div class="section-subtitle">화면 맨 위(헤더)에 있는 버튼 안내 — 모바일에서는 공간이 좁아 아이콘으로만 표시됩니다</div>
+        </div>
+      </div>
+
+      <div class="feature" id="header-buttons">
+        <div class="feature-title">
+          <span style="color:var(--c1)">00</span> 상단 헤더 버튼
+          <span class="feature-badge" style="background:var(--c1-lt);color:var(--c1)">HEADER</span>
+        </div>
+        <div class="feature-desc">
+          화면 오른쪽 위에 아래 버튼들이 있습니다. <strong>PC에서는 아이콘과 글자가 함께</strong>, <strong>모바일(휴대폰)에서는 공간이 좁아 아이콘만</strong> 표시되니 참고하세요.
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+
+          <div style="display:flex;align-items:flex-start;gap:13px;padding:14px 16px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:var(--radius)">
+            <span style="font-size:24px;flex-shrink:0;line-height:1.3">📖</span>
+            <div style="font-size:14px;line-height:1.65;color:var(--text)">
+              <strong style="color:#065f46">이용가이드</strong>
+              <span style="display:inline-block;font-size:11px;font-weight:700;background:#10b981;color:#fff;border-radius:20px;padding:1px 9px;margin-left:5px;vertical-align:middle">바로 이 페이지</span><br>
+              지금 보고 계신 사용설명서입니다. <strong>모바일에서는 📖 아이콘</strong>으로만 표시되며, 누르면 이 가이드가 새 탭으로 열립니다.
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:13px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <span style="font-size:24px;flex-shrink:0;line-height:1.3">🌙</span>
+            <div style="font-size:14px;line-height:1.65;color:var(--text)">
+              <strong>다크모드 전환</strong><br>
+              화면을 어둡게/밝게 바꿉니다. 밝은 화면에선 🌙, 어두운 테마에선 ☀️ 로 표시됩니다.
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:13px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <span style="font-size:24px;flex-shrink:0;line-height:1.3">📱</span>
+            <div style="font-size:14px;line-height:1.65;color:var(--text)">
+              <strong>모바일뷰 / PC뷰 전환</strong><br>
+              화면 배치를 모바일용/PC용으로 바꿉니다. 큰 화면에서도 모바일처럼 보거나, 휴대폰에서 PC 화면처럼 보고 싶을 때 사용하세요.
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:13px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <span style="font-size:24px;flex-shrink:0;line-height:1.3">📋</span>
+            <div style="font-size:14px;line-height:1.65;color:var(--text)">
+              <strong>내 목록</strong><br>
+              검색하다 담아둔 의약품을 모아보는 곳입니다. 버튼의 숫자 배지로 담은 개수가 표시됩니다.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
 
     <!-- ══════════════════════════════════
          섹션 1: 의약품 검색
