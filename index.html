@@ -5335,127 +5335,105 @@ function getFormGroup(productName) {
   return ''; // 알 수 없음
 }
 
+// ── 성분 추출/매칭 헬퍼 (동일성분·제네릭 공용) ──
+function extractBaseIngredients(ingrRaw) {
+  var s = (ingrRaw || '');
+  var segs = [];
+  if (s.indexOf('성분명') >= 0) {
+    var re = /성분명\s*:\s*([^|;]+)/g, m;
+    while ((m = re.exec(s)) !== null) segs.push(m[1]);
+  } else {
+    s = s.replace(/\[[^\]]*\]/g, '');
+    segs = s.split(/[|,;]/);
+  }
+  var saltRe = /(브롬화수소산염|메탄설폰산염|타르타르산염|이세티온산염|베실산염|말레산염|푸마르산염|숙신산염|호박산염|구연산염|시트르산염|메실산염|토실산염|팔미트산염|스테아르산염|아세트산염|초산염|염산염|황산염|인산염|질산염|일수화물|이수화물|삼수화물|사수화물|반수화물|수화물|무수물|나트륨|칼륨|칼슘|마그네슘|파우더|무수|건조)/g;
+  var out = [], seen = {};
+  segs.forEach(function(seg){
+    seg = seg.replace(/\([^)]*\)/g, '');
+    var km = seg.match(/[가-힣]{2,}/);
+    if (!km) return;
+    var name = km[0].replace(saltRe, '');
+    if (name.length >= 2 && !seen[name]) { seen[name] = true; out.push(name); }
+  });
+  return out;
+}
+function nameIngrSet(name) {
+  var matches = (name || '').match(/\(([^()]+)\)/g);
+  if (!matches || !matches.length) return null;
+  var inner = matches[matches.length - 1].slice(1, -1);
+  var set = extractBaseIngredients(inner);
+  return set.length ? set : null;
+}
+function ingrKey(arr){ return arr.slice().sort().join('|'); }
+// 후보가 기준약과 '동일 성분세트'인지 (복합제는 전 성분 일치, 추가성분 있으면 제외)
+function isSameIngrSet(itemName, srcIngrs, srcKey) {
+  var cs = nameIngrSet(itemName);
+  if (cs) return ingrKey(cs) === srcKey;
+  var n = (itemName || '').toLowerCase();
+  return srcIngrs.every(function(s){ return n.indexOf(s.toLowerCase()) >= 0; });
+}
+
+
 // 동일성분 의약품 조회
 function fetchSameIngredients() {
   if (!currentDetailDrug) return;
-  
   document.getElementById('sameIngredientsResult').innerHTML = '<div class="state"><span class="spinner"></span>동일성분 의약품 검색 중...</div>';
-  
-  // 주성분 추출
-  var ingr = currentDetailDrug.ingr;
+
+  var ingr = currentDetailDrug.ingr || '';
   var productName = currentDetailDrug.name || '';
-  var mainIngr = '';
-  
-  console.log('원본 주성분:', ingr);
-  console.log('제품명:', productName);
-  
-  // 1. 대괄호 [...] 제거
-  ingr = ingr.replace(/\[[^\]]*\]/g, '');
-  
-  // 2. 괄호 안의 내용 추출
-  var parenMatch = ingr.match(/\(([^)]+)\)/);
-  if (parenMatch && parenMatch[1]) {
-    mainIngr = parenMatch[1].trim();
-  } else {
-    mainIngr = ingr.split('|')[0].split(',')[0].split('(')[0].trim();
+  var srcIngrs = extractBaseIngredients(ingr);
+  if (srcIngrs.length === 0) {
+    var tmp = ingr.replace(/\[[^\]]*\]/g, '').match(/[가-힣]{2,}/);
+    if (tmp) srcIngrs = [tmp[0]];
   }
-  
-  // 3. 숫자와 하이픈 제거
-  mainIngr = mainIngr.replace(/[0-9\-\s]/g, '').trim();
-  
-  // 4. 너무 짧으면 한글 추출
-  if (mainIngr.length < 2) {
-    var km = ingr.match(/([가-힣]{2,})/);
-    if (km) mainIngr = km[1];
-  }
-  
-  // 5. 현재 제품의 제형 그룹 추출
   var myFormGroup = getFormGroup(productName);
-  
-  console.log('추출된 성분:', mainIngr);
-  console.log('제형 그룹:', myFormGroup || '(미분류)');
-  
-  if (!mainIngr || mainIngr.length < 2) {
-    document.getElementById('sameIngredientsResult').innerHTML = 
-      '<div class="state">주성분을 추출할 수 없습니다.</div>';
+  console.log('원본 주성분:', ingr, '→ 추출:', srcIngrs);
+
+  if (srcIngrs.length === 0) {
+    document.getElementById('sameIngredientsResult').innerHTML = '<div class="state">주성분을 추출할 수 없습니다.</div>';
     currentDetailDrug.sameIngredientsLoaded = true;
     return;
   }
-  
-  // 5페이지 병렬 조회
+
+  var srcKey = ingrKey(srcIngrs);
+  var ingrLabel = srcIngrs.join(' + ');
+  var pagesPer = srcIngrs.length >= 2 ? 4 : 5;
+
   var promises = [];
-  for (var page = 1; page <= 5; page++) {
-    promises.push(apiGetProxy('list', { item_name: mainIngr, numOfRows: 100, pageNo: page }));
-  }
-  
+  srcIngrs.forEach(function(bi){
+    for (var page = 1; page <= pagesPer; page++) {
+      promises.push(apiGetProxy('list', { item_name: bi, numOfRows: 100, pageNo: page }));
+    }
+  });
+
   Promise.all(promises).then(function(results) {
     var allItems = [];
-    for (var i = 0; i < results.length; i++) {
-      var items = (results[i] && results[i].body && results[i].body.items) ? results[i].body.items : [];
-      if (items.length > 0) allItems = allItems.concat(items);
-    }
-    
-    console.log('전체 검색 결과:', allItems.length + '건');
-    
-    if (allItems.length === 0) {
-      var shortIngr = mainIngr.substring(0, Math.min(4, mainIngr.length));
-      if (shortIngr.length >= 2 && shortIngr !== mainIngr) {
-        return apiGetProxy('list', { item_name: shortIngr, numOfRows: 200, pageNo: 1 })
-          .then(function(j2) { return (j2 && j2.body && j2.body.items) ? j2.body.items : []; });
-      }
-      return [];
-    }
-    return allItems;
-    
-  }).then(function(items) {
-    if (!items || items.length === 0) {
-      document.getElementById('sameIngredientsResult').innerHTML =
-        '<div class="state">동일성분 의약품을 찾을 수 없습니다.<br><span style="font-size:12px;color:var(--text3);margin-top:8px;display:block">검색 성분: ' + esc(mainIngr) + '</span></div>';
-      currentDetailDrug.sameIngredientsLoaded = true;
-      return;
-    }
-    
-    var mainIngrLower = mainIngr.toLowerCase();
-    
-    var filtered = items.filter(function(item) {
-      // 자기 자신 제외
-      if (item.ITEM_SEQ === currentDetailDrug.seq) return false;
-      
-      var iName = (item.ITEM_NAME || '');
-      var iNameLower = iName.toLowerCase();
-      
-      // 성분 매칭만 (제형 필터는 renderSameIngredients 탭에서 처리)
-      var hasIngr = iNameLower.indexOf(mainIngrLower) >= 0
-        || (item.MAIN_ITEM_INGR && item.MAIN_ITEM_INGR.toLowerCase().indexOf(mainIngrLower) >= 0)
-        || (item.MATERIAL_NAME && item.MATERIAL_NAME.toLowerCase().indexOf(mainIngrLower) >= 0);
-      
-      return hasIngr;
+    results.forEach(function(r){
+      var items = (r && r.body && r.body.items) ? r.body.items : [];
+      allItems = allItems.concat(items);
     });
-    
-    console.log('필터링 후:', filtered.length + '건');
-    
-    // 중복 제거
-    var uniqueItems = [];
-    var seqMap = {};
-    for (var i = 0; i < filtered.length; i++) {
-      var seq = filtered[i].ITEM_SEQ;
-      if (seq && !seqMap[seq]) { seqMap[seq] = true; uniqueItems.push(filtered[i]); }
-    }
-    
-    console.log('중복 제거 후:', uniqueItems.length + '건');
-    
+    console.log('전체 검색 결과:', allItems.length + '건');
+
+    var seen = {}, uniqueItems = [];
+    allItems.forEach(function(item){
+      var seq = item.ITEM_SEQ;
+      if (!seq || seen[seq] || seq === currentDetailDrug.seq) return;
+      if (!isSameIngrSet(item.ITEM_NAME || '', srcIngrs, srcKey)) return;
+      seen[seq] = true;
+      uniqueItems.push(item);
+    });
+    console.log('동일 성분세트 매칭:', uniqueItems.length + '건');
+
     if (uniqueItems.length === 0) {
       document.getElementById('sameIngredientsResult').innerHTML =
-        '<div class="state">동일성분 의약품이 없습니다.</div>';
+        '<div class="state">동일성분 의약품을 찾을 수 없습니다.<br><span style="font-size:12px;color:var(--text3);margin-top:8px;display:block">검색 성분: ' + esc(ingrLabel) + '</span></div>';
       currentDetailDrug.sameIngredientsLoaded = true;
       return;
     }
-    
-    // myFormGroup을 함께 전달해 해당 탭을 기본 선택
-    renderSameIngredients(uniqueItems, mainIngr, myFormGroup);
+
+    renderSameIngredients(uniqueItems, ingrLabel, myFormGroup);
     currentDetailDrug.sameIngredientsLoaded = true;
-    
-  }).catch(function(e) {
+  }).catch(function(e){
     console.error('동일성분 검색 오류:', e);
     document.getElementById('sameIngredientsResult').innerHTML =
       '<div class="state" style="color:var(--danger)">오류: ' + esc(e.message) + '</div>';
@@ -5680,33 +5658,28 @@ function openGenericModal(seq, name, ingr) {
     '<div class="state"><span class="spinner"></span> 제네릭 목록 조회 중...</div>';
   document.getElementById('genericModal').classList.add('open');
 
-  /* ── 주성분 추출 (fetchSameIngredients 와 동일 로직) ── */
-  var raw = (ingr || '').replace(/\[[^\]]*\]/g, '');
-  var mainIngr = '';
-  var pm = raw.match(/\(([^)]+)\)/);
-  if (pm && pm[1]) {
-    mainIngr = pm[1].trim();
-  } else {
-    mainIngr = raw.split('|')[0].split(',')[0].split('(')[0].trim();
+  /* ── 주성분 추출 (복합제는 전 성분) ── */
+  var srcIngrs = extractBaseIngredients(ingr);
+  if (srcIngrs.length === 0) {
+    var tmpG = (ingr || '').replace(/\[[^\]]*\]/g, '').match(/[가-힣]{2,}/);
+    if (tmpG) srcIngrs = [tmpG[0]];
   }
-  mainIngr = mainIngr.replace(/[0-9\-\s]/g, '').trim();
-  if (mainIngr.length < 2) {
-    var km = raw.match(/([가-힣]{2,})/);
-    if (km) mainIngr = km[1];
-  }
-
-  if (!mainIngr || mainIngr.length < 2) {
+  if (srcIngrs.length === 0) {
     document.getElementById('genericModalBody').innerHTML =
       '<div class="state">주성분을 추출할 수 없습니다.</div>';
     return;
   }
-  document.getElementById('genericModalIngr').textContent = '주성분: ' + mainIngr;
+  var srcKey = ingrKey(srcIngrs);
+  document.getElementById('genericModalIngr').textContent = '주성분: ' + srcIngrs.join(' + ');
 
-  /* ── API 조회 (5페이지 병렬) ── */
+  /* ── API 조회 ── */
+  var pagesPerG = srcIngrs.length >= 2 ? 4 : 5;
   var promises = [];
-  for (var p = 1; p <= 5; p++) {
-    promises.push(apiGetProxy('list', { item_name: mainIngr, numOfRows: 100, pageNo: p }));
-  }
+  srcIngrs.forEach(function(bi){
+    for (var p = 1; p <= pagesPerG; p++) {
+      promises.push(apiGetProxy('list', { item_name: bi, numOfRows: 100, pageNo: p }));
+    }
+  });
 
   Promise.all(promises).then(function(results) {
     var allItems = [];
@@ -5715,13 +5688,9 @@ function openGenericModal(seq, name, ingr) {
       allItems = allItems.concat(items);
     });
 
-    var ingrLower = mainIngr.toLowerCase();
     var filtered = allItems.filter(function(item) {
       if (item.ITEM_SEQ === seq) return false;
-      var nm = (item.ITEM_NAME || '').toLowerCase();
-      return nm.indexOf(ingrLower) >= 0
-        || ((item.MAIN_ITEM_INGR || '').toLowerCase().indexOf(ingrLower) >= 0)
-        || ((item.MATERIAL_NAME  || '').toLowerCase().indexOf(ingrLower) >= 0);
+      return isSameIngrSet(item.ITEM_NAME || '', srcIngrs, srcKey);
     });
 
     /* 중복 제거 */
