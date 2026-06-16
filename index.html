@@ -1537,10 +1537,41 @@ body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !imp
 
   /* recall notice 안내문 */
   .recall-notice {
-    padding: 12px 14px;
-    font-size: 12px;
-    margin-bottom: 14px;
+    padding: 9px 11px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    gap: 8px;
+    align-items: flex-start;
   }
+
+  /* 섹션 제목 블록 (recall-notice 바로 뒤 인라인 스타일 패턴) — 사이 여백·폰트 축소 */
+  .recall-notice + div[style*="margin-bottom:20px"] { margin-bottom: 12px !important; }
+  .recall-notice + div[style*="margin-bottom:20px"] > div:first-child { font-size: 16px !important; }
+  .recall-notice + div[style*="margin-bottom:20px"] > div:nth-child(2) { font-size: 12px !important; }
+
+  /* 서브탭 바 — 줄바꿈 대신 가로 스크롤(한 줄 유지) */
+  .sub-tab-bar {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  .sub-tab-bar::-webkit-scrollbar { display: none; }
+  .sub-tab { flex-shrink: 0; }
+
+  /* 검색 카드 내부 간격·라벨 축소 */
+  .search-card > div[style*="flex"] { gap: 8px !important; }
+  .search-card .sinput[style*="height:44px"] { height: 40px !important; }
+  .search-card button[style*="height:44px"] { height: 40px !important; padding: 0 16px !important; font-size: 13px !important; }
+
+  /* 라벨(제품명/업체명 위) 텍스트 작게 */
+  .search-card div[style*="text-transform:uppercase"] { font-size: 10px !important; margin-bottom: 4px !important; }
+
+  /* 페이지 푸터 위 여백 줄이기 */
+  .wrap { padding-bottom: 76px !important; }
 }
 
 /* ══════════════════════════════════════════════
