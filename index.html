@@ -2550,22 +2550,7 @@ kbd {
   </div>
 </div>
 
-<!-- 제네릭 목록 모달 -->
-<div id="genericModal" onclick="if(event.target===this)closeGenericModal()">
-  <div id="genericModalBox">
-    <div id="genericModalHeader">
-      <div class="gm-handle"></div>
-      <div class="gm-title-row">
-        <div class="gm-title" id="genericModalTitle">제네릭 의약품</div>
-        <button class="gm-close" onclick="closeGenericModal()">✕</button>
-      </div>
-      <div class="gm-ingr" id="genericModalIngr"></div>
-    </div>
-    <div id="genericModalBody">
-      <div class="state"><span class="spinner"></span> 조회 중...</div>
-    </div>
-  </div>
-</div>
+<!-- 제네릭 모달 제거됨 (동일성분 기능으로 통합) -->
 
 <script>
 /* ══ PRICE DB (약제급여목록 2026.5.1) ══════════ */
@@ -3441,9 +3426,6 @@ function go() {
           +     esc(packUnit).replace(/'/g,"\\'") + '\',\'' + esc(ingr).replace(/'/g,"\\'") + '\',\''
           +     esc(chartNm).replace(/'/g,"\\'") + '\',\'' + apprDate + '\',\'' + mfgLabel + '\',\''
           +     (isBio ? '생동성인정품목' : '생동성 미해당') + '\')">📄 상세보기</button>'
-          +   '<button class="generic-btn" onclick="openGenericModal(\''
-          +     esc(itemSeq) + '\',\'' + esc(itemNm).replace(/'/g,"\\'") + '\',\''
-          +     esc(ingr).replace(/'/g,"\\'") + '\')">🔬<span class="btn-label"> 제네릭</span></button>'
           +   '<button class="add-btn" id="addbtn_' + esc(itemSeq) + '"'
           +     ' data-seq="' + esc(itemSeq) + '"'
           +     ' data-name="' + esc(itemNm) + '"'
@@ -5493,6 +5475,8 @@ function renderSameIngredients(items, mainIngr, defaultGroup) {
     +     ' style="padding:4px 10px;border-radius:50px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);">이름순 ↑</button>'
     +   '<button class="si-sort-btn" data-sort="company" onclick="setSiSort(\'company\')"'
     +     ' style="padding:4px 10px;border-radius:50px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);">제조사순 ↑</button>'
+    +   '<button class="si-sort-btn" data-sort="price" onclick="setSiSort(\'price\')"'
+    +     ' style="padding:4px 10px;border-radius:50px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);">약가순 ↑</button>'
     + '</div>'
     + '</div>';
 
@@ -5592,6 +5576,15 @@ function buildSiTable(tagged, group, sort) {
     filtered.sort(function(a, b) {
       return (a.item.ENTP_NAME || '').localeCompare(b.item.ENTP_NAME || '', 'ko');
     });
+  } else if (sort === 'price') {
+    filtered.sort(function(a, b) {
+      var pa = getHiraPrice(a.item.ITEM_SEQ);
+      var pb = getHiraPrice(b.item.ITEM_SEQ);
+      if (pa === null && pb === null) return 0;
+      if (pa === null) return 1;
+      if (pb === null) return -1;
+      return pa - pb;
+    });
   }
 
   var formColors = {
@@ -5611,6 +5604,8 @@ function buildSiTable(tagged, group, sort) {
     var entpName = item.ENTP_NAME || '-';
     var packUnit = item.PACK_UNIT || '-';
     var itemSeq  = item.ITEM_SEQ  || '';
+    var price    = getHiraPrice(itemSeq);
+    var priceStr = (price !== null && price !== undefined) ? Number(price).toLocaleString() + '원' : '-';
     var formGrp  = filtered[i].group;
     var dotColor = formColors[formGrp] || '#94a3b8';
     var shortLbl = formLabel[formGrp]  || '?';
@@ -5623,12 +5618,14 @@ function buildSiTable(tagged, group, sort) {
       + '</div></td>'
       + '<td style="color:var(--text2);font-size:12px;">' + esc(entpName) + '</td>'
       + '<td style="font-size:11px;color:var(--text3);">' + esc(packUnit) + '</td>'
+      + '<td style="font-size:12px;text-align:right;white-space:nowrap;color:var(--primary);font-weight:700;">' + priceStr + '</td>'
       + '</tr>';
   }
 
   // 현재 정렬 상태 표시를 위한 헤더 (정렬된 열에 화살표)
   var nameArrow    = (sort === 'name')    ? ' ↑' : '';
   var companyArrow = (sort === 'company') ? ' ↑' : '';
+  var priceArrow   = (sort === 'price')   ? ' ↑' : '';
 
   return '<div class="tbl-wrap-outer"><div class="tbl-scroll"><table>'
     + '<thead><tr>'
@@ -5636,6 +5633,7 @@ function buildSiTable(tagged, group, sort) {
     + '<th>제품명' + nameArrow + '</th>'
     + '<th style="width:140px;">제조사' + companyArrow + '</th>'
     + '<th style="width:110px;">포장규격</th>'
+    + '<th style="width:96px;text-align:right;">약가' + priceArrow + '</th>'
     + '</tr></thead>'
     + '<tbody>' + rows + '</tbody>'
     + '</table></div></div>';
