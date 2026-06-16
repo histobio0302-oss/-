@@ -19,9 +19,12 @@
 <meta name="twitter:image" content="https://snowy-nine-21.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preload" href="/gnl-index.json" as="fetch" type="application/json" crossorigin>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ─── Design Tokens ─────────────────────────── */
 :root {
@@ -1060,8 +1063,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   #viewToggleBtn { padding: 6px 8px !important; }
   .guide-link-btn { padding: 6px 9px !important; }
   .guide-link-btn .guide-link-label { display: none !important; }
-  .update-link-btn { padding: 6px 9px !important; }
-  .update-link-btn .update-link-label { display: none !important; }
   .talk-inquiry-btn { display: none !important; }
   .kakao-login-btn, .kakao-signup-btn { padding: 5px 8px !important; font-size: 11px !important; gap: 4px !important; }
   .kakao-login-btn svg, .kakao-signup-btn svg { width: 13px !important; height: 13px !important; }
@@ -1403,8 +1404,6 @@ body.mobile-forced .header-sub { display: none !important; }
 body.mobile-forced .talk-inquiry-btn { display: none !important; }
 body.mobile-forced .guide-link-btn { display: flex !important; padding: 6px 9px !important; }
 body.mobile-forced .guide-link-btn .guide-link-label { display: none !important; }
-body.mobile-forced .update-link-btn { display: flex !important; padding: 6px 9px !important; }
-body.mobile-forced .update-link-btn .update-link-label { display: none !important; }
 body.mobile-forced .header-title { font-size: 13px !important; }
 body.mobile-forced #licTable thead,
 body.mobile-forced #adminTable thead { display: none !important; }
@@ -2017,8 +2016,8 @@ kbd {
 </style>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -2042,10 +2041,6 @@ kbd {
       <a href="/guide.html" target="_blank" class="guide-link-btn" title="이용가이드"
         style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #d1fae5;border-radius:20px;background:#ecfdf5;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:#065f46;white-space:nowrap;text-decoration:none">
         <span class="guide-link-icon">📖</span><span class="guide-link-label">이용가이드</span>
-      </a>
-      <a href="javascript:void(0)" onclick="openUpdateModal()" class="update-link-btn" title="업데이트 현황"
-        style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #fde68a;border-radius:20px;background:#fffbeb;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:#92400e;white-space:nowrap;text-decoration:none">
-        <span class="update-link-icon">🔔</span><span class="update-link-label">업데이트 현황</span>
       </a>
       <a href="http://pf.kakao.com/_CWlun/chat" target="_blank" class="talk-inquiry-btn"
         style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:#FEE500;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:#191919;white-space:nowrap;text-decoration:none;border:none">
@@ -6182,56 +6177,5 @@ setSubTab('info','license');
 })();
 </script>
 
-<!-- 업데이트 현황 팝업 -->
-<div id="updateModal" onclick="if(event.target===this)closeUpdateModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(15,23,42,.55);align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--surface,#fff);border-radius:16px;max-width:440px;width:100%;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;">
-    <div style="display:flex;align-items:center;gap:10px;padding:17px 20px;border-bottom:1px solid var(--border,#e2e8f0);">
-      <span style="font-size:22px;">📢</span>
-      <strong style="font-size:16px;flex:1;color:var(--text,#1e293b);">업데이트 현황</strong>
-      <button onclick="closeUpdateModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text3,#94a3b8);line-height:1;">✕</button>
-    </div>
-    <div id="updateModalBody" style="padding:8px 18px 14px;overflow-y:auto;flex:1;"></div>
-    <div id="updateModalFoot" style="padding:12px 18px;border-top:1px solid var(--border,#e2e8f0);display:flex;align-items:center;justify-content:space-between;gap:10px;"></div>
-  </div>
-</div>
-<script>
-(function(){
-  var UPDATE_VERSION = '2026-06-16c';
-  var UPDATES = [
-    {d:'2026.06.16', i:'🎯', t:'동일성분 — 심평원 주성분코드 기준', s:'약학정보원과 동일하게 주성분코드로 묶어 함량·제형·배합비까지 같은 제품만 표시합니다(취하 3년 경과 제외, 개수까지 일치).'},
-    {d:'2026.06.16', i:'🔔', t:'업데이트 현황 팝업 추가', s:'접속 시 한 번 자동으로 뜨고, 상단 버튼으로 언제든 다시 볼 수 있습니다(5개씩 페이지).'},
-    {d:'2026.06.16', i:'🛠️', t:'상세보기 버튼 오류 수정', s:'성상에 줄바꿈이 있는 일부 제품(트윈텔정 등)에서 상세보기가 눌리지 않던 문제를 수정했습니다.'},
-    {d:'2026.06.16', i:'📥', t:'동일성분 엑셀 내보내기', s:'동일성분 목록을 엑셀(.xlsx)로 저장할 수 있습니다.'},
-    {d:'2026.06.16', i:'💊', t:'동일성분에 약가 표시', s:'동일성분 표에 보험상한가 컬럼과 약가순 정렬을 추가했습니다.'},
-    {d:'2026.06.16', i:'🔗', t:'제네릭 → 동일성분 통합', s:'중복되던 제네릭 기능을 동일성분으로 합쳤습니다.'},
-    {d:'2026.06.16', i:'📖', t:'모바일 이용가이드 버튼', s:'휴대폰 상단에서 이용가이드를 바로 열 수 있습니다(📖).'}
-  ];
-  var PER = 5, page = 0;
-  function render(){
-    var pages = Math.max(1, Math.ceil(UPDATES.length/PER));
-    var items = UPDATES.slice(page*PER, page*PER+PER), html='';
-    items.forEach(function(u){
-      html += '<div style="display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--border,#eef2f6);">'
-        + '<span style="font-size:19px;flex-shrink:0;line-height:1.35;">' + u.i + '</span>'
-        + '<div><div style="font-size:11px;color:var(--text3,#94a3b8);margin-bottom:2px;">' + u.d + '</div>'
-        + '<div style="font-size:14px;font-weight:700;color:var(--text,#1e293b);margin-bottom:3px;">' + u.t + '</div>'
-        + '<div style="font-size:13px;line-height:1.55;color:var(--text2,#475569);">' + u.s + '</div></div></div>';
-    });
-    document.getElementById('updateModalBody').innerHTML = html;
-    var dis = 'padding:6px 13px;border-radius:8px;border:1px solid var(--border,#e2e8f0);background:var(--surface,#fff);color:var(--text2,#475569);cursor:pointer;font-size:13px;font-family:inherit;';
-    document.getElementById('updateModalFoot').innerHTML =
-      '<span style="font-size:12px;color:var(--text3,#94a3b8);">' + (page+1) + ' / ' + pages + ' 페이지</span>'
-      + '<div style="display:flex;gap:6px;">'
-      + '<button onclick="updatePage(-1)" ' + (page<=0?'disabled':'') + ' style="' + dis + (page<=0?'opacity:.4;cursor:default;':'') + '">◀ 이전</button>'
-      + '<button onclick="updatePage(1)" ' + (page>=pages-1?'disabled':'') + ' style="' + dis + (page>=pages-1?'opacity:.4;cursor:default;':'') + '">다음 ▶</button>'
-      + '</div>';
-  }
-  window.updatePage = function(d){ var pages=Math.ceil(UPDATES.length/PER); page=Math.max(0,Math.min(pages-1,page+d)); render(); };
-  window.openUpdateModal = function(){ page=0; render(); document.getElementById('updateModal').style.display='flex'; };
-  window.closeUpdateModal = function(){ document.getElementById('updateModal').style.display='none'; try{localStorage.setItem('update_seen',UPDATE_VERSION);}catch(e){} };
-  function autoShow(){ var seen=''; try{seen=localStorage.getItem('update_seen')||'';}catch(e){} if(seen!==UPDATE_VERSION) setTimeout(window.openUpdateModal,700); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',autoShow); else autoShow();
-})();
-</script>
 </body>
 </html>
