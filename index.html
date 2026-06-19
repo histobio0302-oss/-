@@ -1136,6 +1136,8 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   /* 필터 바 */
   #filterGrid { grid-template-columns: 1fr !important; gap: 8px !important; }
   #filterBar  { padding: 12px 14px; }
+  #coFilterGrid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  #coFilterGrid > button { grid-column: span 2; }
 
   /* 검색창 */
   .search-card { padding: 14px; border-radius: 12px; }
@@ -2408,7 +2410,42 @@ kbd {
   <div class="tab" id="tab-medical">
     <div class="sub-tab-bar">
       <button class="sub-tab" data-parent="medical" data-sub="map" onclick="setSubTab('medical','map')">&#128506; 건강지도</button>
+      <button class="sub-tab" data-parent="medical" data-sub="openings" onclick="setSubTab('medical','openings')">&#127973; 병의원 개원정보</button>
       </div>
+
+    <!-- ═══ 병의원 개원정보 (월별 신규 개원) ═══ -->
+    <div class="sub-content" data-parent="medical" data-sub="openings" style="display:none">
+      <div class="recall-notice" style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af">
+        🏥 <span><strong>병의원 개원정보</strong> — 심평원 병원정보서비스(hospInfoServicev2)의 <strong>개설일자(estbDd)</strong>를 활용해 선택한 시도·시군구에서 지정한 월에 신규 개원한 병의원 목록을 보여줍니다. (의원/병원/한방/치과 등 종별로 분류)</span>
+      </div>
+      <div style="margin-bottom:16px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">🏥 월별 병의원 개원정보</div><div style="font-size:12px;color:var(--text3)">시도 → 시군구 선택 후 조회</div></div>
+
+      <div class="search-card" style="margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end" id="coFilterGrid">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">조회 월</div>
+            <input id="coMonth" type="month" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit">
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">시/도 *</div>
+            <select id="coSido" onchange="coSidoChange()" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit">
+              <option value="">— 시도 선택 —</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">시/군/구</div>
+            <select id="coSggu" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit">
+              <option value="">전체</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="coRun()" id="coRunBtn" style="height:38px">🔍 조회</button>
+        </div>
+      </div>
+
+      <div id="coSummary" style="display:none;margin-bottom:12px;font-size:13px"></div>
+      <div id="coResults"></div>
+    </div>
+
     <div class="sub-content" data-parent="medical" data-sub="map" style="display:none">
     <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">&#128506; 병원&#183;약국 건강지도</div><div style="font-size:13px;color:var(--text3)">심평원 공식 지도 서비스 — 지도에서 직접 검색하세요.</div></div><a href="https://www.hira.or.kr/ra/hosp/getHealthMap.do?pgmid=HIRAA030002010000" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">&#128279; 새 탭에서 열기</a></div>
     <div style="position:relative;width:100%;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--surface)"><iframe id="hiramap" src="https://www.hira.or.kr/ra/hosp/getHealthMap.do?pgmid=HIRAA030002010000" style="width:100%;height:680px;border:none;display:block" title="심평원 건강지도" onload="checkHiramap(this)" onerror="showHiramapFallback()"></iframe><div id="hiramapLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);gap:16px;pointer-events:none"><span class="spinner"></span><div style="font-size:13px;color:var(--text3)">건강지도 로딩 중...</div></div><div id="hiramapFallback" style="display:none;height:400px;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px;text-align:center"><div style="font-size:48px">&#127973;</div><div style="font-size:15px;font-weight:700;color:var(--text)">심평원 건강지도</div><div style="font-size:13px;color:var(--text3);line-height:1.7">보안 정책으로 인해 내부에서 직접 표시할 수 없습니다.</div><a href="https://www.hira.or.kr/ra/hosp/getHealthMap.do?pgmid=HIRAA030002010000" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--primary);color:#fff;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128506; 심평원 건강지도 바로가기</a></div></div>
@@ -2960,6 +2997,7 @@ function setSubTab(parent, sub) {
     div.style.display=(div.dataset.sub===sub?'block':'none');
   });
   if(sub==='recall' && !recallRecentLoaded) loadRecentRecall();
+  if(parent==='medical' && sub==='openings') coInit();
 }
 
 function initViewMode() {
@@ -3010,6 +3048,147 @@ function toggleViewMode() {
     localStorage.setItem('drugapp_view_mode', 'mobile');
   }
   updateViewToggleBtn();
+}
+
+/* ═══ 병의원 개원정보 (의료기관 → openings 서브탭) ═══ */
+var _coSigungu = null;        // public/sigungu.json 로드 결과
+var _coInited  = false;
+var _coCatColor = {
+  '의원':'#2563eb', '병원':'#dc2626', '한방':'#16a34a',
+  '치과':'#9333ea', '보건기관':'#0891b2', '조산원':'#d97706', '기타':'#64748b'
+};
+
+function coInit(){
+  if (_coInited) return;
+  _coInited = true;
+  // 기본 월 = 이번달
+  var now = new Date();
+  var m = document.getElementById('coMonth');
+  if (m) m.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  // sigungu.json 로드
+  fetch('/sigungu.json', {cache:'force-cache'})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      _coSigungu = data;
+      var sel = document.getElementById('coSido');
+      if (!sel) return;
+      Object.keys(data).forEach(function(cd){
+        var opt = document.createElement('option');
+        opt.value = cd; opt.textContent = data[cd].name;
+        sel.appendChild(opt);
+      });
+    })
+    .catch(function(e){
+      console.warn('[openings] sigungu.json load fail', e);
+    });
+}
+
+function coSidoChange(){
+  var sidoCd = document.getElementById('coSido').value;
+  var sggu = document.getElementById('coSggu');
+  sggu.innerHTML = '<option value="">전체</option>';
+  if (!sidoCd || !_coSigungu || !_coSigungu[sidoCd]) return;
+  _coSigungu[sidoCd].sigungus.forEach(function(s){
+    var o = document.createElement('option');
+    o.value = s.cd; o.textContent = s.nm;
+    sggu.appendChild(o);
+  });
+}
+
+function coRun(){
+  var month  = document.getElementById('coMonth').value;
+  var sidoCd = document.getElementById('coSido').value;
+  var sgguCd = document.getElementById('coSggu').value;
+  if (!month)  { alert('조회 월을 선택하세요.'); return; }
+  if (!sidoCd) { alert('시도를 선택하세요. (전국 일괄 조회는 부하 때문에 제한)'); return; }
+
+  var btn = document.getElementById('coRunBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '조회 중...'; }
+  var results = document.getElementById('coResults');
+  var summary = document.getElementById('coSummary');
+  summary.style.display = 'none';
+  results.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span><div style="margin-top:10px;font-size:12px;color:var(--text3)">심평원 병원정보 조회 중...</div></div>';
+
+  var qs = new URLSearchParams({month:month, sidoCd:sidoCd});
+  if (sgguCd) qs.set('sgguCd', sgguCd);
+
+  fetch('/api/clinic-openings?' + qs.toString())
+    .then(function(r){ if (!r.ok) throw new Error('API '+r.status); return r.json(); })
+    .then(function(data){
+      coRenderResults(data);
+      if (btn) { btn.disabled = false; btn.textContent = '🔍 조회'; }
+    })
+    .catch(function(e){
+      results.innerHTML = '<div style="padding:30px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#991b1b;font-size:13px;text-align:center">⚠️ 조회 실패: ' + (e.message||e) + '</div>';
+      if (btn) { btn.disabled = false; btn.textContent = '🔍 조회'; }
+    });
+}
+
+function coRenderResults(data){
+  var items   = data.items || [];
+  var summary = document.getElementById('coSummary');
+  var results = document.getElementById('coResults');
+
+  // 요약바
+  var smBoxes = '';
+  ['의원','병원','한방','치과','보건기관','조산원','기타'].forEach(function(k){
+    if (data.summary && data.summary[k]) {
+      var c = _coCatColor[k] || '#64748b';
+      smBoxes += '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:'+c+'15;color:'+c+';border:1px solid '+c+'40;border-radius:18px;font-size:12px;font-weight:700">'+esc(k)+' <strong>'+data.summary[k]+'</strong></span>';
+    }
+  });
+  summary.style.display = 'flex';
+  summary.style.flexWrap = 'wrap';
+  summary.style.gap = '8px';
+  summary.innerHTML = '<span style="font-size:13px;font-weight:600;color:var(--text2);margin-right:6px">'+esc(data.month)+' 조회 결과 — 전체 <strong style="color:var(--primary)">'+items.length+'건</strong></span>' + smBoxes;
+
+  if (!items.length){
+    results.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:10px"><div style="font-size:36px;margin-bottom:10px">🏥</div><div style="font-size:14px;font-weight:600">선택 조건에 해당하는 신규 개원 정보가 없습니다.</div><div style="font-size:12px;margin-top:6px">스캔 대상: '+data.totalScanned+'건 (조건 외 제외)</div></div>';
+    return;
+  }
+
+  // 카테고리 그룹화
+  var groups = {};
+  items.forEach(function(it){
+    var k = it.category || '기타';
+    if (!groups[k]) groups[k] = [];
+    groups[k].push(it);
+  });
+  var order = ['의원','병원','한방','치과','보건기관','조산원','기타'];
+  var ordered = order.filter(function(k){ return groups[k] && groups[k].length; });
+
+  var html = ordered.map(function(cat){
+    var c = _coCatColor[cat] || '#64748b';
+    var rows = groups[cat].map(function(it){
+      var dt = it.openedAt || '-';
+      var addr = esc(it.address || '');
+      var phone = esc(it.phone || '-');
+      var nm = esc(it.name || '');
+      var sub = esc(it.clCdNm || '');
+      var region = esc(it.region || '');
+      var docCnt = it.doctorTotal != null ? '<span style="font-size:11px;color:var(--text3);margin-left:8px">의사 '+it.doctorTotal+'명</span>' : '';
+      var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🔗 홈페이지</a>' : '';
+      return '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);margin-bottom:8px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">'+nm+' <span style="font-size:11px;font-weight:600;color:'+c+';background:'+c+'15;padding:2px 8px;border-radius:10px;margin-left:4px">'+sub+'</span></div>'
+        + '<div style="font-size:12px;color:var(--text2);margin-bottom:5px">📍 '+esc(region)+' · '+addr+'</div>'
+        + '<div style="font-size:12px;color:var(--text3)">📞 '+phone+docCnt+url+'</div>'
+        + '</div>'
+        + '<div style="font-size:11px;color:'+c+';font-weight:600;white-space:nowrap;background:'+c+'10;padding:5px 10px;border-radius:8px">개원 '+esc(dt)+'</div>'
+        + '</div></div>';
+    }).join('');
+
+    return '<section style="margin-bottom:22px">'
+      + '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:'+c+'10;border-left:4px solid '+c+';border-radius:6px 6px 0 0;margin-bottom:10px">'
+      + '<strong style="font-size:15px;color:'+c+'">'+esc(cat)+'</strong>'
+      + '<span style="font-size:12px;color:var(--text3)">'+groups[cat].length+'건</span>'
+      + '</div>'
+      + rows
+      + '</section>';
+  }).join('');
+
+  results.innerHTML = html;
 }
 
 function checkHiramap(iframe) {
@@ -6862,9 +7041,10 @@ setSubTab('info','license');
 </div>
 <script>
 (function(){
-  var UPDATE_VERSION = '2026-06-16g';
+  var UPDATE_VERSION = '2026-06-19a';
   // 이용가이드 '수정된 사항' 섹션 미러 (가이드 #sec-updates 와 동기 유지)
   var UPDATES = [
+    {d:'2026.06.19', i:'🏥', t:'병의원 개원정보 — 월별 신규 개원 병의원 조회', s:'의료기관 → 🏥 병의원 개원정보 서브탭에서 시도·시군구·월을 선택하면 심평원 병원정보서비스의 개설일자(estbDd) 기준으로 그 달에 새로 문 연 의원·병원·한방·치과를 종별로 그룹화해 보여줍니다.'},
     {d:'2026.06.16', i:'📈', t:'약가 안내 — 심평원 약가기준정보 API 연동', s:'약품 상세의 📈 약가 안내 탭에서 심평원 약가기준정보(약가목록조회)를 실시간 조회합니다. 현재 상한가·적용시작일자를 모든 등재 품목에 표시하고, 제품코드 변경 이력(chgBfMdsCd 체인)을 자동 추적해 과거 가격 변동 점을 차트에 함께 표시합니다.'},
     {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
     {d:'2026.06.16', i:'🛠️', t:"제형 분류 오류 수정 — 브랜드명 중간 '주'가 주사제로 잘못 분류되던 문제", s:"동일성분 필터의 '주사제/정제' 등 제형 분류가 브랜드명 중간의 '주' 글자(예: 아주스타정·아주리정)를 주사제로 잘못 분류하던 문제를 수정했습니다. 이제 제품명 끝의 형태명(정·캡슐·시럽·주사제·연고·점안액·좌제·질정 등)만으로 정확히 분류하며, 함량·포장 표기는 무시합니다."},
