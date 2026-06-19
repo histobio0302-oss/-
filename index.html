@@ -1492,48 +1492,43 @@ body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !imp
 
   .card-ingr { padding: 8px 14px; }
 
-  /* ── 모바일 카드: 제형/허가일/보험상한가(card-meta) 숨김 ── */
-  .card-meta { display: none !important; }
-
-  /* ── 모바일 카드 액션: 아이콘+텍스트 함께 표시, flex-wrap 자연 배치 ── */
+  /* 버튼 2단 레이아웃: 1행=상세보기+제네릭(주요), 2행=⭐⚖️📤＋🔗(보조·아이콘전용) */
   .card-actions {
-    padding: 10px 12px;
-    gap: 6px;
+    padding: 8px 10px;
+    gap: 5px;
     flex-wrap: wrap;
-    justify-content: space-between;
   }
-  .detail-btn,
-  .generic-btn,
-  .fav-btn,
-  .cmp-btn,
-  .share-btn,
-  .add-btn,
-  .link-btn {
-    flex: 1 1 auto;
-    min-width: max-content;
-    padding: 9px 12px;
+  /* 1행: 주요 액션 - 50/50 너비 */
+  .detail-btn, .generic-btn {
+    flex: 0 0 calc(50% - 3px);
+    order: 1;
+    padding: 10px 6px;
     font-size: 12px;
     font-weight: 600;
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
     justify-content: center;
-    gap: 5px;
-    aspect-ratio: unset;
-    order: 0;
     white-space: nowrap;
   }
-  /* 라벨은 모바일에서도 함께 표시 */
+  /* 2행: 보조 액션 - 아이콘 + 최소 텍스트 */
+  .fav-btn, .cmp-btn, .share-btn, .add-btn, .link-btn {
+    flex: 1;
+    order: 2;
+    padding: 7px 3px;
+    font-size: 10px;
+    gap: 2px;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 0;
+  }
   .fav-btn .btn-label,
   .cmp-btn .btn-label,
   .share-btn .btn-label,
   .add-btn .btn-label,
   .link-btn .btn-label {
-    display: inline !important;
-    font-size: 11.5px !important;
-    overflow: visible !important;
-    max-width: none !important;
-    text-overflow: clip !important;
+    font-size: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
   /* ── 회수·판매중지 검색행 ───────────────── */
@@ -2234,23 +2229,6 @@ kbd {
       <button class="sub-tab" data-parent="search" data-sub="single" onclick="setSubTab('search','single')">&#128269; 의약품 검색</button>
       </div>
     <div class="sub-content" data-parent="search" data-sub="single" style="display:none">
-
-    <!-- 주사집(JUSAZIP) 소개 배너 — 처음 접속 시 노출 (X 버튼으로 닫을 수 있음) -->
-    <div id="jusaBanner" style="display:none;position:relative;margin-bottom:16px;background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);border:1px solid #93c5fd;border-radius:14px;padding:18px 22px;box-shadow:0 4px 16px rgba(37,99,235,0.12);overflow:hidden">
-      <button onclick="closeJusaBanner()" aria-label="배너 닫기" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.6);border:none;font-size:14px;color:#1e3a8a;cursor:pointer;line-height:1;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='#fff';this.style.opacity='1'" onmouseout="this.style.background='rgba(255,255,255,.6)'">✕</button>
-      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-        <div style="flex-shrink:0;background:#fff;border-radius:10px;padding:10px 18px;box-shadow:0 2px 6px rgba(37,99,235,0.15);display:flex;align-items:center;justify-content:center">
-          <img src="/images/jusazip-logo.png" alt="JUSA Z/P" style="height:36px;width:auto;display:block">
-        </div>
-        <div style="flex:1;min-width:220px">
-          <div style="font-size:15px;font-weight:800;color:#1e3a8a;margin-bottom:4px;letter-spacing:-0.2px">병의원 전용 의약품 도매몰</div>
-          <div style="font-size:12.5px;color:#1e40af;line-height:1.6">주사제·수액제 등 전문 의약품을 합리적 가격으로 구매하세요. 검색 결과 카드의 <strong>🛒 주사집</strong> 버튼을 누르면 해당 상품 페이지로 바로 이동합니다.</div>
-          <div style="margin-top:8px;padding:7px 10px;background:rgba(255,255,255,.55);border-left:3px solid #f59e0b;border-radius:6px;font-size:11.5px;color:#92400e;line-height:1.55"><strong>🔒 회원가입 필수:</strong> 주사집은 병의원 사업자 회원만 이용 가능한 <strong>폐쇄몰</strong>입니다. 상품 정보를 보려면 <a href="https://www.jusazip.com/loading#/home" target="_blank" rel="noopener" style="color:#b45309;font-weight:700;text-decoration:underline">주사집</a>에서 먼저 회원가입(사업자등록증 인증)을 진행해주세요.</div>
-        </div>
-        <a href="https://www.jusazip.com/loading#/home" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:11px 22px;background:#2563eb;color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;transition:all .15s;box-shadow:0 2px 8px rgba(37,99,235,0.35)" onmouseover="this.style.background='#1d4ed8';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#2563eb';this.style.transform='translateY(0)'">바로가기 →</a>
-      </div>
-    </div>
-
     <div class="recall-notice">
       &#9432; <span><strong>의약품 단건 검색</strong> — 의약품 정보 품목(포장, 보험금액, 허가, 업체, 성상, 주성분 등)을 조회합니다. 최신 정보는 <a href="https://nedrug.mfds.go.kr/index" target="_blank" style="color:#9a3412;font-weight:700">의약품안전나라 &#8599;</a>에서도 확인하세요.</span>
     </div>
@@ -2782,103 +2760,6 @@ var currentSearchExportRows = [];
 
 
 /* ══════════════════════════════════════════════
-   주사집(JUSAZIP) 상품 매핑 조회
-══════════════════════════════════════════════ */
-var JUSAZIP_MAP = null;
-(function loadJusazipMap(){
-  fetch('/jusazip-products.json', {cache:'force-cache'})
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      JUSAZIP_MAP = j;
-      // 검색 결과가 화면에 이미 있으면 재렌더로 🛒 버튼 즉시 표시
-      try {
-        if (typeof currentSearchKeyword === 'string' && currentSearchKeyword &&
-            typeof go === 'function' &&
-            document.querySelector('#result .result-card')) {
-          var inp = document.querySelector('input[onkeydown*="go"], #searchQ, input[name="q"]');
-          if (inp && inp.value && inp.value === currentSearchKeyword) {
-            go();
-          }
-        }
-      } catch(e) {}
-    })
-    .catch(function(){ JUSAZIP_MAP = {bySeq:{}, byName:{}}; });
-})();
-// 주사집은 주사제·수액제만 취급 — 베이스 매칭 시 제형 가드용
-function isJusaInjectable(itemName){
-  var n = (itemName || '') + '';
-  if (!n) return false;
-  // 1) 제형 분류기로 1차 판정 (있을 때만)
-  if (typeof getFormGroup === 'function') {
-    var fg = getFormGroup(n);
-    if (fg === 'injection') return true;
-    if (fg === 'liquid')    return true;   // 수액제·일부 액제
-    if (fg === 'tablet' || fg === 'capsule' || fg === 'granule' ||
-        fg === 'topical' || fg === 'suppository' || fg === 'eye_ear_nose' ||
-        fg === 'inhalation') return false;  // 정장제·캡슐·연고 등 명시 차단
-  }
-  // 2) 이름 기반 보조 검증 (제형 분류 실패 시)
-  var stripped = n.replace(/\([^)]*\)/g, '').trim();
-  if (/주사|수액/.test(stripped)) return true;
-  if (/[가-힣]주(\d|\(|\s|$|\[|mg|ml|IU)/i.test(stripped)) return true;  // '신델라주(', '신델라주5mg' 등
-  if (/[가-힣]주$/.test(stripped)) return true;
-  return false;
-}
-
-/* 주사집 배너 — 처음 접속 시 노출, 닫으면 localStorage에 저장 */
-function showJusaBanner(){
-  try {
-    var dismissed = localStorage.getItem('jusaBannerDismissed');
-    if (dismissed === '1') return;
-    var b = document.getElementById('jusaBanner');
-    if (b) b.style.display = 'block';
-  } catch(e){}
-}
-function closeJusaBanner(){
-  var b = document.getElementById('jusaBanner');
-  if (b) b.style.display = 'none';
-  try { localStorage.setItem('jusaBannerDismissed', '1'); } catch(e){}
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', showJusaBanner);
-} else {
-  setTimeout(showJusaBanner, 0);
-}
-
-function lookupJusazip(itemSeq, itemName){
-  if (!JUSAZIP_MAP) return null;
-  // 1순위: ITEM_SEQ (보험코드) 직매핑 — 가장 신뢰도 높음
-  if (itemSeq && JUSAZIP_MAP.bySeq && JUSAZIP_MAP.bySeq[itemSeq]) return JUSAZIP_MAP.bySeq[itemSeq];
-  if (!itemName) return null;
-  // 2순위: 정규화된 이름 완전일치
-  var k = (itemName + '').replace(/\s+/g, '');
-  if (JUSAZIP_MAP.byName && JUSAZIP_MAP.byName[k]) return JUSAZIP_MAP.byName[k];
-  // 3순위: 베이스 브랜드명 매칭 — 주사제·수액제일 때만
-  if (JUSAZIP_MAP.byBase && isJusaInjectable(itemName)) {
-    var s = (itemName + '').trim();
-    s = s.replace(/^\([^)]*\)/, '').trim();         // 선두 (...) 제거
-    var m = s.match(/^([^\d\(\)_\[/]+)/);            // 첫 숫자/괄호/[/_ 이전
-    if (m) {
-      var base = m[1].trim();
-      if (base.length >= 3 && JUSAZIP_MAP.byBase[base]) return JUSAZIP_MAP.byBase[base];
-    }
-  }
-  return null;
-}
-function jusazipBtn(itemSeq, itemName, mode){
-  var m = lookupJusazip(itemSeq, itemName);
-  if (!m) return '';
-  var url = 'https://www.jusazip.com/product/' + encodeURIComponent(m.g);
-  if (mode === 'icon') {
-    return '<a href="'+url+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;padding:9px 12px;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집에서 바로 구매 ('+esc(m.n||'')+')">🛒</a>';
-  }
-  if (mode === 'inline') {
-    return '<a href="'+url+'" target="_blank" rel="noopener" style="color:#92400e;font-size:11px;text-decoration:none;margin-left:8px" title="주사집에서 바로 구매">🛒 주사집</a>';
-  }
-  return '<a href="'+url+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집에서 바로 구매 ('+esc(m.n||'')+')">🛒<span class="btn-label"> 주사집</span></a>';
-}
-
-/* ══════════════════════════════════════════════
    보험상한금액 조회 (약제급여목록 2026.5.1 기준)
 ══════════════════════════════════════════════ */
 function lookupPrice(itemSeq, itemName) {
@@ -3041,7 +2922,6 @@ function renderFavorites() {
       + '<div class="card-actions">'
       +   '<button class="detail-btn" style="flex:1" onclick="openDetailModal(\''+esc(f.seq)+'\',\''+jsArg(f.name||'')+'\',\''+jsArg(f.seller||'')+'\',\''+jsArg(f.maker||'')+'\',\''+jsArg(f.pack||'')+'\',\''+jsArg(f.ingr||'')+'\',\'\',\''+esc(f.date||'')+'\',\'-\',\'-\')">📄 상세보기</button>'
       + (f.seq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(f.seq)+'" target="_blank" class="link-btn" style="flex:0 0 auto;padding:9px 12px;" title="의약품안전나라">🔗</a>' : '')
-      + jusazipBtn(f.seq, f.name, 'icon')
       + '</div></div>';
   }
   html += '</div>';
@@ -4296,7 +4176,6 @@ function go() {
           + (itemSeq
               ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" style="flex:0 0 auto;" title="의약품안전나라">🔗<span class="btn-label"> 안전나라</span></a>'
               : '')
-          + jusazipBtn(itemSeq, itemNm, 'full')
           + '</div>'
           + '</div>';
       }
@@ -5017,7 +4896,6 @@ function renderBulk(results) {
       : '<span class="badge '+mfgBadgeCls[r.mfgType]+'">'+esc(r.mfgLabel)+'</span>';
     var bc2 = r.isBio ? '<span class="badge badge-bio">✓ 생동</span>' : '<span style="color:var(--text3)">-</span>';
     var link = r.itemSeq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(r.itemSeq)+'" target="_blank" style="color:var(--accent2);font-size:11px;text-decoration:none">🔗 안전나라</a>' : '-';
-    link = link + jusazipBtn(r.itemSeq, r.name, 'inline');
     rows += '<tr class="row-'+(r.error?'err':r.mfgType)+'">'
       + '<td class="mono">'+(i+1)+'</td>'
       + '<td>'+esc(r.name)+'</td>'
@@ -7630,10 +7508,9 @@ setSubTab('info','license');
 </div>
 <script>
 (function(){
-  var UPDATE_VERSION = '2026-06-19b';
+  var UPDATE_VERSION = '2026-06-19a';
   // 이용가이드 '수정된 사항' 섹션 미러 (가이드 #sec-updates 와 동기 유지)
   var UPDATES = [
-    {d:'2026.06.19', i:'🛒', t:'주사집(JUSAZIP) 직링크 연동 — 매핑된 167개 상품 바로 구매', s:'검색 결과·즐겨찾기·동일성분 카드에 🛒 주사집 버튼이 표시되어 주사집 상품 페이지로 바로 이동합니다. 우리 포털의 ITEM_SEQ(보험코드)·상품명·베이스 브랜드명 3중 매칭으로 매핑된 상품에만 노출되며 정제·캡슐 등 비주사제는 차단됩니다. ※ 주사집은 병의원 사업자 전용 폐쇄몰이므로 회원가입 후 이용 가능합니다.'},
     {d:'2026.06.19', i:'🏥', t:'병의원 개원정보 — 월별 신규 개원 병의원 조회', s:'의료기관 → 🏥 병의원 개원정보 서브탭에서 시도·시군구·월을 선택하면 심평원 병원정보서비스의 개설일자(estbDd) 기준으로 그 달에 새로 문 연 의원·병원·한방·치과를 종별로 그룹화해 보여줍니다.'},
     {d:'2026.06.16', i:'📈', t:'약가 안내 — 심평원 약가기준정보 API 연동', s:'약품 상세의 📈 약가 안내 탭에서 심평원 약가기준정보(약가목록조회)를 실시간 조회합니다. 현재 상한가·적용시작일자를 모든 등재 품목에 표시하고, 제품코드 변경 이력(chgBfMdsCd 체인)을 자동 추적해 과거 가격 변동 점을 차트에 함께 표시합니다.'},
     {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
