@@ -2489,6 +2489,20 @@ kbd {
       </div>
 
       <div id="coResults"></div>
+
+      <!-- ═══ 의료기관 상세 모달 (의료기관별상세정보 + 우수기관평가) ═══ -->
+      <div id="coDetailModal" onclick="if(event.target===this)coCloseDetail()" style="display:none;position:fixed;inset:0;z-index:3500;background:rgba(15,23,42,.6);align-items:center;justify-content:center;padding:16px">
+        <div style="background:var(--surface);border-radius:14px;max-width:780px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden">
+          <div id="coDetailHeader" style="display:flex;align-items:flex-start;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface2)">
+            <div style="flex:1;min-width:0">
+              <div id="coDetailTitle" style="font-size:17px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:4px">병원명</div>
+              <div id="coDetailSub" style="font-size:12px;color:var(--text2)">종별 · 지역</div>
+            </div>
+            <button onclick="coCloseDetail()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--text3);line-height:1;padding:0 4px">✕</button>
+          </div>
+          <div id="coDetailBody" style="padding:18px 22px;overflow-y:auto;flex:1"></div>
+        </div>
+      </div>
     </div>
 
     <div class="sub-content" data-parent="medical" data-sub="map" style="display:none">
@@ -3374,12 +3388,14 @@ function coRenderCard(it, c){
   var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🔗 홈페이지</a>' : '';
   var mapQ = encodeURIComponent((it.region||'') + ' ' + (it.address||'') + ' ' + (it.name||''));
   var mapLink = '<a href="https://map.kakao.com/?q='+mapQ+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🗺️ 지도</a>';
+  var detailBtn = it.ykiho ? '<button onclick="coShowDetail(\''+esc(it.ykiho)+'\',\''+jsArg(it.name||'')+'\',\''+jsArg((it.region||'')+' · '+(it.clCdNm||''))+'\')" style="margin-top:8px;background:'+c+';color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit">📋 상세보기</button>' : '';
   return '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);margin-bottom:8px">'
     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'
     + '<div style="flex:1;min-width:0">'
     + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">'+nm+' <span style="font-size:11px;font-weight:600;color:'+c+';background:'+c+'15;padding:2px 8px;border-radius:10px;margin-left:4px">'+sub+'</span></div>'
     + '<div style="font-size:12px;color:var(--text2);margin-bottom:5px">📍 '+region+' · '+addr+'</div>'
     + '<div style="font-size:12px;color:var(--text3)">📞 '+phone+docCnt+mapLink+url+'</div>'
+    + detailBtn
     + '</div>'
     + '<div style="font-size:11px;color:'+c+';font-weight:600;white-space:nowrap;background:'+c+'10;padding:5px 10px;border-radius:8px">개원 '+esc(dt)+'</div>'
     + '</div></div>';
@@ -3395,6 +3411,7 @@ function coRenderListCard(it, c){
   var docCnt = it.doctorTotal != null ? '의사 '+it.doctorTotal+'명' : '';
   var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px">🔗 홈페이지</a>' : '';
   var mapQ = encodeURIComponent((it.region||'') + ' ' + (it.address||'') + ' ' + (it.name||''));
+  var detailBtn = it.ykiho ? '<button onclick="coShowDetail(\''+esc(it.ykiho)+'\',\''+jsArg(it.name||'')+'\',\''+jsArg((it.region||'')+' · '+(it.clCdNm||''))+'\')" style="flex:1;background:'+c+';color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📋 상세보기</button>' : '';
   return '<div style="border:1px solid var(--border);border-top:3px solid '+c+';border-radius:10px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:6px">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">'
     + '<strong style="font-size:13.5px;color:var(--text)">'+nm+'</strong>'
@@ -3406,8 +3423,197 @@ function coRenderListCard(it, c){
     + (docCnt ? '<span>'+docCnt+'</span>' : '')
     + '<span style="color:'+c+';font-weight:700">개원 '+esc(dt)+'</span>'
     + '</div>'
-    + '<div style="display:flex;gap:10px;font-size:11px"><a href="https://map.kakao.com/?q='+mapQ+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none">🗺️ 지도</a>'+url+'</div>'
+    + '<div style="display:flex;gap:6px;align-items:center;font-size:11px">'
+    + detailBtn
+    + '<a href="https://map.kakao.com/?q='+mapQ+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;padding:6px 8px;border:1px solid var(--border);border-radius:6px">🗺️</a>'
+    + (it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;padding:6px 8px;border:1px solid var(--border);border-radius:6px">🔗</a>' : '')
+    + '</div>'
     + '</div>';
+}
+
+/* ═══ 의료기관 상세 모달 ═══ */
+var _coDetailCache = {}; // ykiho → {dtl, dgsbjt, asm}
+var _CO_GOV_BASE = '/api/gov';
+
+function coCloseDetail(){
+  var m = document.getElementById('coDetailModal');
+  if (m) m.style.display = 'none';
+}
+
+function coShowDetail(ykiho, name, sub){
+  if (!ykiho) return;
+  var modal = document.getElementById('coDetailModal');
+  var title = document.getElementById('coDetailTitle');
+  var subL  = document.getElementById('coDetailSub');
+  var body  = document.getElementById('coDetailBody');
+  if (!modal) return;
+  title.textContent = name || '병원 상세';
+  subL.textContent  = sub  || '';
+  modal.style.display = 'flex';
+  body.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span><div style="margin-top:12px;font-size:12px;color:var(--text3)">의료기관별 상세정보 + 우수기관평가 조회 중...</div></div>';
+
+  if (_coDetailCache[ykiho]) {
+    coRenderDetail(_coDetailCache[ykiho]);
+    return;
+  }
+
+  // gov-proxy를 통해 3개 API 병렬 호출
+  var p1 = fetchGov('B551182/MadmDtlInfoService2.8/getDtlInfo2.8',         {ykiho:ykiho, numOfRows:3,  pageNo:1, _type:'json'});
+  var p2 = fetchGov('B551182/MadmDtlInfoService2.8/getDgsbjtInfo2.8',      {ykiho:ykiho, numOfRows:50, pageNo:1, _type:'json'});
+  var p3 = fetchGov('B551182/exclInstHospAsmInfoService1/getExclInstHospAsmInfo1', {ykiho:ykiho, numOfRows:50, pageNo:1, _type:'json'});
+
+  Promise.all([p1, p2, p3]).then(function(rs){
+    var pack = {
+      dtl:    extractItem(rs[0]),
+      dgsbjt: extractItems(rs[1]),
+      asm:    extractItems(rs[2])
+    };
+    _coDetailCache[ykiho] = pack;
+    coRenderDetail(pack);
+  }).catch(function(e){
+    body.innerHTML = '<div style="padding:30px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#991b1b;font-size:13px;text-align:center">⚠️ 조회 실패: ' + (e.message||e) + '</div>';
+  });
+}
+
+function fetchGov(path, params){
+  var qs = new URLSearchParams();
+  qs.set('_path', path);
+  Object.keys(params||{}).forEach(function(k){ qs.set(k, params[k]); });
+  return fetch(_CO_GOV_BASE + '/' + path + '?' + qs.toString().replace(/^_path=[^&]+&/,''))
+    .then(function(r){ if (!r.ok) throw new Error('API '+r.status); return r.json(); });
+}
+
+function extractItem(payload){
+  var b = payload && payload.response && payload.response.body;
+  if (!b || !b.items) return null;
+  var raw = b.items.item;
+  if (!raw) return null;
+  if (Array.isArray(raw)) return raw[0] || null;
+  return raw;
+}
+function extractItems(payload){
+  var b = payload && payload.response && payload.response.body;
+  if (!b || !b.items) return [];
+  var raw = b.items.item;
+  if (!raw) return [];
+  return Array.isArray(raw) ? raw : [raw];
+}
+
+function coRenderDetail(pack){
+  var body = document.getElementById('coDetailBody');
+  if (!body) return;
+  var html = '';
+
+  // 우수기관평가 (상단 강조)
+  if (pack.asm && pack.asm.length){
+    var asmRows = pack.asm.map(function(a){
+      var grd = (a.asmGrd || '');
+      var gNm = esc(a.asmGrdNm || '');
+      var nm  = esc(a.asmNm || '-');
+      var gradeColor = '#16a34a';
+      if (String(grd)==='1') gradeColor = '#16a34a';
+      else if (String(grd)==='2') gradeColor = '#0891b2';
+      else if (String(grd)==='3') gradeColor = '#d97706';
+      else if (String(grd)==='4' || String(grd)==='5') gradeColor = '#dc2626';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;gap:10px">'
+        + '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">'
+        + '<div style="width:46px;height:46px;border-radius:10px;background:'+gradeColor+'15;color:'+gradeColor+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;border:2px solid '+gradeColor+'40">'+esc(String(grd)||'?')+'</div>'
+        + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">'+nm+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+gNm+'</div></div>'
+        + '</div>'
+        + '<span style="font-size:10px;font-weight:700;color:'+gradeColor+';background:'+gradeColor+'15;padding:4px 8px;border-radius:10px;white-space:nowrap">등급 '+esc(String(grd)||'?')+'</span>'
+        + '</div>';
+    }).join('');
+    html += sec('⭐ 우수기관평가 ('+pack.asm.length+'건)',
+      '<div style="display:flex;flex-direction:column;gap:6px">'+asmRows+'</div>',
+      '#16a34a');
+  } else {
+    html += sec('⭐ 우수기관평가',
+      '<div style="padding:14px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text3);text-align:center">평가 데이터가 없습니다. (요양병원·의원급은 평가 대상이 아닐 수 있습니다)</div>',
+      '#94a3b8');
+  }
+
+  // 진료시간 & 응급/주차
+  if (pack.dtl){
+    var d = pack.dtl;
+    var timeRows = [];
+    var dayMap = {Mon:'월',Tue:'화',Wed:'수',Thu:'목',Fri:'금',Sat:'토'};
+    Object.keys(dayMap).forEach(function(k){
+      var s = d['trmt'+k+'Start']; var e = d['trmt'+k+'End'];
+      if (s || e) timeRows.push({d:dayMap[k], s:fmtTime(s), e:fmtTime(e)});
+    });
+    var timeHtml = timeRows.length
+      ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px">'
+        + timeRows.map(function(r){return '<div style="padding:7px 9px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px"><strong style="color:var(--primary);margin-right:6px">'+r.d+'</strong><span style="color:var(--text2)">'+r.s+'~'+r.e+'</span></div>';}).join('')
+        + '</div>'
+        + (d.lunchWeek ? '<div style="margin-top:8px;font-size:12px;color:var(--text3)">🍱 점심시간: <strong style="color:var(--text2)">'+esc(d.lunchWeek)+'</strong></div>' : '')
+        + (d.noTrmtSun ? '<div style="font-size:12px;color:var(--text3)">🗓️ 일요일: <strong style="color:var(--text2)">'+esc(d.noTrmtSun)+'</strong></div>' : '')
+        + (d.noTrmtHoli ? '<div style="font-size:12px;color:var(--text3)">🗓️ 공휴일: <strong style="color:var(--text2)">'+esc(d.noTrmtHoli)+'</strong></div>' : '')
+      : '<div style="padding:14px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text3);text-align:center">진료시간 정보 없음</div>';
+    html += sec('🕒 진료시간', timeHtml, '#2563eb');
+
+    var emyHtml = '';
+    if (d.emyDayYn === 'Y' || d.emyNgtYn === 'Y') {
+      emyHtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      if (d.emyDayYn === 'Y') emyHtml += '<div style="padding:10px 12px;background:#fef3c7;border:1px solid #fde68a;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:3px">🌞 주간 응급실</div><div style="font-size:12px;color:#92400e">'+esc(d.emyDayTelNo1||'')+(d.emyDayTelNo2?' · '+esc(d.emyDayTelNo2):'')+'</div></div>';
+      if (d.emyNgtYn === 'Y') emyHtml += '<div style="padding:10px 12px;background:#312e81;border:1px solid #4338ca;border-radius:8px;color:#fff"><div style="font-size:11px;font-weight:700;margin-bottom:3px">🌙 야간 응급실</div><div style="font-size:12px">'+esc(d.emyNgtTelNo1||'')+(d.emyNgtTelNo2?' · '+esc(d.emyNgtTelNo2):'')+'</div></div>';
+      emyHtml += '</div>';
+      html += sec('🚨 응급실', emyHtml, '#dc2626');
+    }
+
+    if (d.parkQty || d.parkXpnsYn) {
+      var parkHtml = '<div style="display:flex;flex-direction:column;gap:6px">'
+        + (d.parkQty ? '<div style="font-size:12px;color:var(--text2)"><strong>🅿️ 주차 가능:</strong> '+esc(String(d.parkQty))+'대</div>' : '')
+        + (d.parkXpnsYn ? '<div style="font-size:12px;color:var(--text2)"><strong>💰 주차요금:</strong> '+esc(d.parkXpnsYn==='Y'?'유료':'무료')+'</div>' : '')
+        + (d.parkEtc ? '<div style="font-size:11px;color:var(--text3);line-height:1.5;padding:8px;background:var(--surface2);border-radius:6px;margin-top:4px">'+esc(d.parkEtc)+'</div>' : '')
+        + '</div>';
+      html += sec('🅿️ 주차 안내', parkHtml, '#0891b2');
+    }
+
+    if (d.plcNm || d.plcDir || d.plcDist) {
+      var locHtml = '<div style="font-size:12px;color:var(--text2);line-height:1.7">'
+        + (d.plcNm   ? '<div>📍 <strong>인근 위치:</strong> '+esc(d.plcNm)+'</div>' : '')
+        + (d.plcDir  ? '<div>🧭 <strong>방향:</strong> '+esc(d.plcDir)+'</div>' : '')
+        + (d.plcDist ? '<div>📏 <strong>거리:</strong> '+esc(d.plcDist)+'</div>' : '')
+        + '</div>';
+      html += sec('🗺️ 위치 안내', locHtml, '#7c3aed');
+    }
+  } else {
+    html += sec('🕒 진료시간 & 부가정보',
+      '<div style="padding:14px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text3);text-align:center">상세정보가 등록되지 않은 기관입니다.</div>',
+      '#94a3b8');
+  }
+
+  // 진료과목 (전문의수)
+  if (pack.dgsbjt && pack.dgsbjt.length){
+    var dgsbjtSorted = pack.dgsbjt.slice().sort(function(a,b){
+      return (Number(b.dgsbjtPrSdrCnt)||0) - (Number(a.dgsbjtPrSdrCnt)||0);
+    });
+    var dgHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px">'
+      + dgsbjtSorted.map(function(d){
+        var cnt = Number(d.dgsbjtPrSdrCnt) || 0;
+        var bg = cnt >= 10 ? '#dbeafe' : (cnt >= 5 ? '#e0e7ff' : 'var(--surface)');
+        var fg = cnt >= 10 ? '#1e40af' : (cnt >= 5 ? '#4338ca' : 'var(--text2)');
+        return '<div style="padding:8px 10px;background:'+bg+';border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:12px;color:'+fg+';font-weight:600">'+esc(d.dgsbjtCdNm||'-')+'</span><strong style="font-size:13px;color:'+fg+'">'+cnt+'</strong></div>';
+      }).join('')
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--text3);margin-top:8px">전문의 수 기준 정렬 · 총 '+pack.dgsbjt.length+'개 과목</div>';
+    html += sec('🩺 진료과목 ('+pack.dgsbjt.length+'개)', dgHtml, '#0891b2');
+  }
+
+  body.innerHTML = html;
+}
+
+/* 섹션 카드 helper */
+function sec(title, body, color){
+  return '<section style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid '+color+'30"><strong style="font-size:13px;color:'+color+';font-weight:800">'+title+'</strong></div>'+body+'</section>';
+}
+
+function fmtTime(t){
+  if (t == null) return '-';
+  var s = String(t).replace(/\D/g,'');
+  if (s.length === 4) return s.slice(0,2)+':'+s.slice(2);
+  if (s.length === 3) return '0'+s.slice(0,1)+':'+s.slice(1);
+  return String(t);
 }
 
 function coSetView(v){
