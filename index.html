@@ -2922,7 +2922,6 @@ function renderFavorites() {
       + '<div class="card-actions">'
       +   '<button class="detail-btn" style="flex:1" onclick="openDetailModal(\''+esc(f.seq)+'\',\''+jsArg(f.name||'')+'\',\''+jsArg(f.seller||'')+'\',\''+jsArg(f.maker||'')+'\',\''+jsArg(f.pack||'')+'\',\''+jsArg(f.ingr||'')+'\',\'\',\''+esc(f.date||'')+'\',\'-\',\'-\')">📄 상세보기</button>'
       + (f.seq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(f.seq)+'" target="_blank" class="link-btn" style="flex:0 0 auto;padding:9px 12px;" title="의약품안전나라">🔗</a>' : '')
-      + '<a href="https://www.jusazip.com/#/product?query='+encodeURIComponent(f.name||'')+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;padding:9px 12px;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집(JUSAZIP)에서 구매처 검색">🛒</a>'
       + '</div></div>';
   }
   html += '</div>';
@@ -4177,7 +4176,6 @@ function go() {
           + (itemSeq
               ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" style="flex:0 0 auto;" title="의약품안전나라">🔗<span class="btn-label"> 안전나라</span></a>'
               : '')
-          + '<a href="https://www.jusazip.com/#/product?query=' + encodeURIComponent(itemNm) + '" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집(JUSAZIP)에서 구매처 검색">🛒<span class="btn-label"> 주사집</span></a>'
           + '</div>'
           + '</div>';
       }
@@ -4898,8 +4896,6 @@ function renderBulk(results) {
       : '<span class="badge '+mfgBadgeCls[r.mfgType]+'">'+esc(r.mfgLabel)+'</span>';
     var bc2 = r.isBio ? '<span class="badge badge-bio">✓ 생동</span>' : '<span style="color:var(--text3)">-</span>';
     var link = r.itemSeq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(r.itemSeq)+'" target="_blank" style="color:var(--accent2);font-size:11px;text-decoration:none">🔗 안전나라</a>' : '-';
-    var jusaLink = '<a href="https://www.jusazip.com/#/product?query='+encodeURIComponent(r.name||'')+'" target="_blank" rel="noopener" style="color:#92400e;font-size:11px;text-decoration:none;margin-left:8px" title="주사집에서 구매처 검색">🛒 주사집</a>';
-    link = link + jusaLink;
     rows += '<tr class="row-'+(r.error?'err':r.mfgType)+'">'
       + '<td class="mono">'+(i+1)+'</td>'
       + '<td>'+esc(r.name)+'</td>'
