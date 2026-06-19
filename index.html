@@ -2416,16 +2416,39 @@ kbd {
     <!-- ═══ 병의원 개원정보 (월별 신규 개원) ═══ -->
     <div class="sub-content" data-parent="medical" data-sub="openings" style="display:none">
       <div class="recall-notice" style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af">
-        🏥 <span><strong>병의원 개원정보</strong> — 심평원 병원정보서비스(hospInfoServicev2)의 <strong>개설일자(estbDd)</strong>를 활용해 선택한 시도·시군구에서 지정한 월에 신규 개원한 병의원 목록을 보여줍니다. (의원/병원/한방/치과 등 종별로 분류)</span>
+        🏥 <span><strong>병의원 개원정보</strong> — 심평원 병원정보서비스(hospInfoServicev2)의 <strong>개설일자(estbDd)</strong>를 활용해 선택한 시도·시군구에서 지정한 월에 신규 개원한 병의원 목록을 보여줍니다. (의원/병원/한방/치과 등 종별로 분류, 진료과목·종별 다중 필터, 카드/리스트 보기 전환, 엑셀 내보내기 지원)</span>
       </div>
-      <div style="margin-bottom:16px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">🏥 월별 병의원 개원정보</div><div style="font-size:12px;color:var(--text3)">시도 → 시군구 선택 후 조회</div></div>
+      <div style="margin-bottom:16px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">🏥 월별 병의원 개원정보</div><div style="font-size:12px;color:var(--text3)">시도 → 시군구 선택 후 조회 · 종별·진료과목 추가 필터 가능</div></div>
+
+      <!-- 커스텀 월 선택기 (네이티브 input[type=month] 와 완전히 다른 디자인) -->
+      <div class="co-month-picker" style="background:linear-gradient(135deg,#1e40af 0%,#3b82f6 100%);border-radius:14px;padding:16px 18px;margin-bottom:14px;color:#fff;box-shadow:0 4px 16px rgba(59,130,246,0.25)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">📅</span>
+            <strong style="font-size:14px;letter-spacing:.5px">조회 시점</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button type="button" onclick="coMonthShift(-1)" title="지난달" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center">◀</button>
+            <button type="button" onclick="coMonthToday()" title="이번달" style="background:rgba(255,255,255,.22);color:#fff;border:none;border-radius:8px;padding:0 12px;height:32px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.5px">오늘</button>
+            <button type="button" onclick="coMonthShift(1)" title="다음달" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center">▶</button>
+          </div>
+        </div>
+        <!-- 큰 디스플레이: 2026년 6월 -->
+        <div id="coMonthDisplay" style="font-size:26px;font-weight:800;letter-spacing:.5px;margin-bottom:14px">- 년 -월</div>
+        <!-- 년도 segmented control -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+          <button type="button" onclick="coYearShift(-1)" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:12px">‹</button>
+          <div id="coYearBar" style="display:flex;flex:1;gap:6px;justify-content:center"></div>
+          <button type="button" onclick="coYearShift(1)" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:12px">›</button>
+        </div>
+        <!-- 월 chip grid: 6 cols x 2 rows -->
+        <div id="coMonthGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+        <!-- hidden value -->
+        <input type="hidden" id="coMonth">
+      </div>
 
       <div class="search-card" style="margin-bottom:14px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end" id="coFilterGrid">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">조회 월</div>
-            <input id="coMonth" type="month" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit">
-          </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end" id="coFilterGrid">
           <div>
             <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">시/도 *</div>
             <select id="coSido" onchange="coSidoChange()" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);font-family:inherit">
@@ -2438,11 +2461,33 @@ kbd {
               <option value="">전체</option>
             </select>
           </div>
-          <button class="btn btn-primary" onclick="coRun()" id="coRunBtn" style="height:38px">🔍 조회</button>
+          <button class="btn btn-primary" onclick="coRun()" id="coRunBtn" style="height:38px;padding:0 20px;white-space:nowrap">🔍 조회</button>
+        </div>
+        <!-- 종별 chip 필터 (조회 결과 좁히기, 클라이언트측) -->
+        <div style="margin-top:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">종별 선택 (다중)</div>
+          <div id="coCatChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
         </div>
       </div>
 
       <div id="coSummary" style="display:none;margin-bottom:12px;font-size:13px"></div>
+
+      <!-- 결과 상단 툴바: 검색·정렬·뷰모드·엑셀 -->
+      <div id="coToolbar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
+        <input id="coKeyword" placeholder="🔍 이름·주소·진료과목 필터..." oninput="coApplyClientFilters()" style="flex:1 1 200px;height:34px;padding:0 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit">
+        <select id="coSort" onchange="coApplyClientFilters()" style="height:34px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit">
+          <option value="recent">개원일 최신순</option>
+          <option value="old">개원일 오래된순</option>
+          <option value="name">이름순(가나다)</option>
+          <option value="doctor">의사수 많은순</option>
+        </select>
+        <div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <button type="button" id="coViewGroup" onclick="coSetView('group')" title="종별 그룹" style="height:34px;padding:0 12px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">📑 그룹</button>
+          <button type="button" id="coViewList" onclick="coSetView('list')" title="카드형 리스트" style="height:34px;padding:0 12px;border:none;background:var(--surface);color:var(--text2);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;border-left:1px solid var(--border)">📋 리스트</button>
+        </div>
+        <button type="button" onclick="coExportXlsx()" title="엑셀로 내보내기" style="height:34px;padding:0 12px;background:#16a34a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit">📥 엑셀</button>
+      </div>
+
       <div id="coResults"></div>
     </div>
 
@@ -3051,21 +3096,120 @@ function toggleViewMode() {
 }
 
 /* ═══ 병의원 개원정보 (의료기관 → openings 서브탭) ═══ */
-var _coSigungu = null;        // public/sigungu.json 로드 결과
+var _coSigungu = null;
 var _coInited  = false;
+var _coRaw     = [];           // 서버 응답 원본 items
+var _coMeta    = {};           // 서버 응답 메타(month/totalScanned 등)
+var _coView    = 'group';      // 'group' | 'list'
+var _coCatSel  = null;         // 선택된 종별 set (null = 전체)
+var _coYearAnchor = 0;         // 년도 segmented 표시용
+var _CO_CATS = ['의원','병원','한방','치과','보건기관','조산원','기타'];
 var _coCatColor = {
   '의원':'#2563eb', '병원':'#dc2626', '한방':'#16a34a',
   '치과':'#9333ea', '보건기관':'#0891b2', '조산원':'#d97706', '기타':'#64748b'
 };
 
+/* ── 커스텀 월 선택기 ── */
+function coMonthPickerInit(initYear, initMonth){
+  _coYearAnchor = initYear;
+  coMonthSet(initYear, initMonth, true);
+}
+function coRenderMonthPicker(){
+  var input = document.getElementById('coMonth');
+  if (!input || !input.value) return;
+  var parts = input.value.split('-');
+  var curY = parseInt(parts[0],10), curM = parseInt(parts[1],10);
+  // 년도 bar (anchor ± 1)
+  var yb = document.getElementById('coYearBar');
+  if (yb) {
+    var ys = [];
+    for (var i=-1; i<=1; i++){
+      var y = _coYearAnchor + i;
+      var on = (y === curY);
+      ys.push('<button type="button" onclick="coYearPick('+y+')" style="background:'+(on?'#fff':'rgba(255,255,255,.15)')+';color:'+(on?'#1e40af':'#fff')+';border:none;border-radius:8px;padding:5px 14px;cursor:pointer;font-size:13px;font-weight:'+(on?800:600)+';font-family:inherit">'+y+'</button>');
+    }
+    yb.innerHTML = ys.join('');
+  }
+  // 월 grid (1~12)
+  var mg = document.getElementById('coMonthGrid');
+  if (mg) {
+    var ms = [];
+    for (var m=1; m<=12; m++){
+      var on = (curY===_coYearAnchor && m===curM);
+      ms.push('<button type="button" onclick="coMonthPick('+m+')" style="background:'+(on?'#fff':'rgba(255,255,255,.13)')+';color:'+(on?'#1e40af':'#fff')+';border:none;border-radius:8px;padding:8px 0;cursor:pointer;font-size:12px;font-weight:'+(on?800:600)+';font-family:inherit;letter-spacing:.3px">'+m+'월</button>');
+    }
+    mg.innerHTML = ms.join('');
+  }
+  // 큰 디스플레이
+  var disp = document.getElementById('coMonthDisplay');
+  if (disp) disp.textContent = curY + '년 ' + curM + '월';
+}
+function coMonthSet(year, month, suppressRender){
+  var input = document.getElementById('coMonth');
+  if (!input) return;
+  input.value = year + '-' + String(month).padStart(2,'0');
+  if (!suppressRender) coRenderMonthPicker();
+}
+function coYearShift(delta){ _coYearAnchor += delta; coRenderMonthPicker(); }
+function coYearPick(y){
+  var input = document.getElementById('coMonth');
+  var m = input.value ? parseInt(input.value.split('-')[1],10) : 6;
+  _coYearAnchor = y;
+  coMonthSet(y, m);
+}
+function coMonthPick(m){
+  var input = document.getElementById('coMonth');
+  var y = input.value ? parseInt(input.value.split('-')[0],10) : _coYearAnchor;
+  coMonthSet(y, m);
+}
+function coMonthShift(delta){
+  var input = document.getElementById('coMonth');
+  if (!input || !input.value) return;
+  var p = input.value.split('-');
+  var y = parseInt(p[0],10), m = parseInt(p[1],10) + delta;
+  while (m < 1) { m += 12; y -= 1; }
+  while (m > 12){ m -= 12; y += 1; }
+  _coYearAnchor = y;
+  coMonthSet(y, m);
+}
+function coMonthToday(){
+  var n = new Date();
+  _coYearAnchor = n.getFullYear();
+  coMonthSet(n.getFullYear(), n.getMonth()+1);
+}
+
+/* ── 종별 chip (전체/의원/병원/한방/치과/보건/조산/기타) ── */
+function coRenderCatChips(){
+  var box = document.getElementById('coCatChips');
+  if (!box) return;
+  var chips = [];
+  // '전체' chip
+  var allOn = (_coCatSel === null);
+  chips.push('<button type="button" onclick="coCatToggle(null)" style="border:1.5px solid '+(allOn?'#2563eb':'var(--border)')+';background:'+(allOn?'#2563eb':'var(--surface)')+';color:'+(allOn?'#fff':'var(--text2)')+';border-radius:18px;padding:6px 14px;font-size:12px;font-weight:'+(allOn?800:600)+';cursor:pointer;font-family:inherit">전체</button>');
+  _CO_CATS.forEach(function(k){
+    var c = _coCatColor[k];
+    var on = (_coCatSel && _coCatSel[k]);
+    chips.push('<button type="button" onclick="coCatToggle(\''+k+'\')" style="border:1.5px solid '+(on?c:'var(--border)')+';background:'+(on?c:'var(--surface)')+';color:'+(on?'#fff':'var(--text2)')+';border-radius:18px;padding:6px 14px;font-size:12px;font-weight:'+(on?800:600)+';cursor:pointer;font-family:inherit">'+esc(k)+'</button>');
+  });
+  box.innerHTML = chips.join('');
+}
+function coCatToggle(cat){
+  if (cat === null) { _coCatSel = null; }
+  else {
+    if (_coCatSel === null) _coCatSel = {};
+    if (_coCatSel[cat]) { delete _coCatSel[cat]; if (!Object.keys(_coCatSel).length) _coCatSel = null; }
+    else _coCatSel[cat] = true;
+  }
+  coRenderCatChips();
+  if (_coRaw.length) coApplyClientFilters();
+}
+
 function coInit(){
   if (_coInited) return;
   _coInited = true;
-  // 기본 월 = 이번달
   var now = new Date();
-  var m = document.getElementById('coMonth');
-  if (m) m.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
-  // sigungu.json 로드
+  coMonthPickerInit(now.getFullYear(), now.getMonth()+1);
+  coRenderCatChips();
   fetch('/sigungu.json', {cache:'force-cache'})
     .then(function(r){ return r.json(); })
     .then(function(data){
@@ -3078,9 +3222,7 @@ function coInit(){
         sel.appendChild(opt);
       });
     })
-    .catch(function(e){
-      console.warn('[openings] sigungu.json load fail', e);
-    });
+    .catch(function(e){ console.warn('[openings] sigungu.json load fail', e); });
 }
 
 function coSidoChange(){
@@ -3106,7 +3248,9 @@ function coRun(){
   if (btn) { btn.disabled = true; btn.textContent = '조회 중...'; }
   var results = document.getElementById('coResults');
   var summary = document.getElementById('coSummary');
+  var toolbar = document.getElementById('coToolbar');
   summary.style.display = 'none';
+  if (toolbar) toolbar.style.display = 'none';
   results.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span><div style="margin-top:10px;font-size:12px;color:var(--text3)">심평원 병원정보 조회 중...</div></div>';
 
   var qs = new URLSearchParams({month:month, sidoCd:sidoCd});
@@ -3115,7 +3259,9 @@ function coRun(){
   fetch('/api/clinic-openings?' + qs.toString())
     .then(function(r){ if (!r.ok) throw new Error('API '+r.status); return r.json(); })
     .then(function(data){
-      coRenderResults(data);
+      _coRaw  = data.items || [];
+      _coMeta = {month:data.month, totalScanned:data.totalScanned, summary:data.summary||{}, sidoCd:data.sidoCd, sgguCd:data.sgguCd};
+      coApplyClientFilters();
       if (btn) { btn.disabled = false; btn.textContent = '🔍 조회'; }
     })
     .catch(function(e){
@@ -3124,61 +3270,79 @@ function coRun(){
     });
 }
 
-function coRenderResults(data){
-  var items   = data.items || [];
+/* 클라이언트측 필터/정렬 적용 → 렌더 */
+function coApplyClientFilters(){
+  var keyword = (document.getElementById('coKeyword')||{}).value || '';
+  var sort    = (document.getElementById('coSort')||{}).value || 'recent';
+  var kw = keyword.trim().toLowerCase();
+
+  var items = _coRaw.slice();
+  // 종별
+  if (_coCatSel) items = items.filter(function(it){ return _coCatSel[it.category || '기타']; });
+  // 키워드
+  if (kw) items = items.filter(function(it){
+    return (it.name||'').toLowerCase().indexOf(kw) >= 0
+        || (it.address||'').toLowerCase().indexOf(kw) >= 0
+        || (it.clCdNm||'').toLowerCase().indexOf(kw) >= 0
+        || (it.region||'').toLowerCase().indexOf(kw) >= 0;
+  });
+  // 정렬
+  items.sort(function(a,b){
+    if (sort==='old')    return (a.openedRaw||0) - (b.openedRaw||0);
+    if (sort==='name')   return (a.name||'').localeCompare(b.name||'', 'ko');
+    if (sort==='doctor') return (b.doctorTotal||0) - (a.doctorTotal||0);
+    return (b.openedRaw||0) - (a.openedRaw||0);
+  });
+
+  coRenderResults(items);
+}
+
+/* ── 결과 렌더 (요약 + 결과 그룹 또는 리스트) ── */
+function coRenderResults(items){
   var summary = document.getElementById('coSummary');
+  var toolbar = document.getElementById('coToolbar');
   var results = document.getElementById('coResults');
 
-  // 요약바
+  // 요약 (서버 summary 기반 — 필터 무관 전체 통계)
   var smBoxes = '';
-  ['의원','병원','한방','치과','보건기관','조산원','기타'].forEach(function(k){
-    if (data.summary && data.summary[k]) {
+  _CO_CATS.forEach(function(k){
+    if (_coMeta.summary && _coMeta.summary[k]) {
       var c = _coCatColor[k] || '#64748b';
-      smBoxes += '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:'+c+'15;color:'+c+';border:1px solid '+c+'40;border-radius:18px;font-size:12px;font-weight:700">'+esc(k)+' <strong>'+data.summary[k]+'</strong></span>';
+      smBoxes += '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:'+c+'15;color:'+c+';border:1px solid '+c+'40;border-radius:18px;font-size:12px;font-weight:700">'+esc(k)+' <strong>'+_coMeta.summary[k]+'</strong></span>';
     }
   });
+  var totalAll = _coRaw.length;
   summary.style.display = 'flex';
   summary.style.flexWrap = 'wrap';
   summary.style.gap = '8px';
-  summary.innerHTML = '<span style="font-size:13px;font-weight:600;color:var(--text2);margin-right:6px">'+esc(data.month)+' 조회 결과 — 전체 <strong style="color:var(--primary)">'+items.length+'건</strong></span>' + smBoxes;
+  summary.innerHTML = '<span style="font-size:13px;font-weight:600;color:var(--text2);margin-right:6px">'+esc(_coMeta.month||'')+' 조회 결과 — 전체 <strong style="color:var(--primary)">'+totalAll+'건</strong>'+(items.length!==totalAll?' (필터 후 <strong>'+items.length+'</strong>건)':'')+'</span>' + smBoxes;
+  if (toolbar) toolbar.style.display = totalAll ? 'flex' : 'none';
 
+  if (!_coRaw.length){
+    results.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:10px"><div style="font-size:36px;margin-bottom:10px">🏥</div><div style="font-size:14px;font-weight:600">선택 조건에 해당하는 신규 개원 정보가 없습니다.</div><div style="font-size:12px;margin-top:6px">스캔 대상: '+(_coMeta.totalScanned||0)+'건 (조건 외 제외)</div></div>';
+    return;
+  }
   if (!items.length){
-    results.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:10px"><div style="font-size:36px;margin-bottom:10px">🏥</div><div style="font-size:14px;font-weight:600">선택 조건에 해당하는 신규 개원 정보가 없습니다.</div><div style="font-size:12px;margin-top:6px">스캔 대상: '+data.totalScanned+'건 (조건 외 제외)</div></div>';
+    results.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:13px">🔎 필터 조건에 해당하는 결과가 없습니다.</div>';
     return;
   }
 
-  // 카테고리 그룹화
+  if (_coView === 'list') results.innerHTML = coRenderList(items);
+  else                    results.innerHTML = coRenderGroup(items);
+}
+
+/* 그룹 보기 (종별로 묶음) */
+function coRenderGroup(items){
   var groups = {};
   items.forEach(function(it){
     var k = it.category || '기타';
     if (!groups[k]) groups[k] = [];
     groups[k].push(it);
   });
-  var order = ['의원','병원','한방','치과','보건기관','조산원','기타'];
-  var ordered = order.filter(function(k){ return groups[k] && groups[k].length; });
-
-  var html = ordered.map(function(cat){
+  var ordered = _CO_CATS.filter(function(k){ return groups[k] && groups[k].length; });
+  return ordered.map(function(cat){
     var c = _coCatColor[cat] || '#64748b';
-    var rows = groups[cat].map(function(it){
-      var dt = it.openedAt || '-';
-      var addr = esc(it.address || '');
-      var phone = esc(it.phone || '-');
-      var nm = esc(it.name || '');
-      var sub = esc(it.clCdNm || '');
-      var region = esc(it.region || '');
-      var docCnt = it.doctorTotal != null ? '<span style="font-size:11px;color:var(--text3);margin-left:8px">의사 '+it.doctorTotal+'명</span>' : '';
-      var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🔗 홈페이지</a>' : '';
-      return '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);margin-bottom:8px">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'
-        + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">'+nm+' <span style="font-size:11px;font-weight:600;color:'+c+';background:'+c+'15;padding:2px 8px;border-radius:10px;margin-left:4px">'+sub+'</span></div>'
-        + '<div style="font-size:12px;color:var(--text2);margin-bottom:5px">📍 '+esc(region)+' · '+addr+'</div>'
-        + '<div style="font-size:12px;color:var(--text3)">📞 '+phone+docCnt+url+'</div>'
-        + '</div>'
-        + '<div style="font-size:11px;color:'+c+';font-weight:600;white-space:nowrap;background:'+c+'10;padding:5px 10px;border-radius:8px">개원 '+esc(dt)+'</div>'
-        + '</div></div>';
-    }).join('');
-
+    var rows = groups[cat].map(function(it){ return coRenderCard(it, c); }).join('');
     return '<section style="margin-bottom:22px">'
       + '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:'+c+'10;border-left:4px solid '+c+';border-radius:6px 6px 0 0;margin-bottom:10px">'
       + '<strong style="font-size:15px;color:'+c+'">'+esc(cat)+'</strong>'
@@ -3187,8 +3351,103 @@ function coRenderResults(data){
       + rows
       + '</section>';
   }).join('');
+}
 
-  results.innerHTML = html;
+/* 카드형 리스트 (그룹 없이 그리드 2열, 작은 카드) */
+function coRenderList(items){
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px">'
+    + items.map(function(it){
+        var c = _coCatColor[it.category||'기타'] || '#64748b';
+        return coRenderListCard(it, c);
+      }).join('')
+    + '</div>';
+}
+
+function coRenderCard(it, c){
+  var dt = it.openedAt || '-';
+  var addr = esc(it.address || '');
+  var phone = esc(it.phone || '-');
+  var nm = esc(it.name || '');
+  var sub = esc(it.clCdNm || '');
+  var region = esc(it.region || '');
+  var docCnt = it.doctorTotal != null ? '<span style="font-size:11px;color:var(--text3);margin-left:8px">의사 '+it.doctorTotal+'명</span>' : '';
+  var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🔗 홈페이지</a>' : '';
+  var mapQ = encodeURIComponent((it.region||'') + ' ' + (it.address||'') + ' ' + (it.name||''));
+  var mapLink = '<a href="https://map.kakao.com/?q='+mapQ+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px;margin-left:8px">🗺️ 지도</a>';
+  return '<div style="padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);margin-bottom:8px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">'
+    + '<div style="flex:1;min-width:0">'
+    + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">'+nm+' <span style="font-size:11px;font-weight:600;color:'+c+';background:'+c+'15;padding:2px 8px;border-radius:10px;margin-left:4px">'+sub+'</span></div>'
+    + '<div style="font-size:12px;color:var(--text2);margin-bottom:5px">📍 '+region+' · '+addr+'</div>'
+    + '<div style="font-size:12px;color:var(--text3)">📞 '+phone+docCnt+mapLink+url+'</div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:'+c+';font-weight:600;white-space:nowrap;background:'+c+'10;padding:5px 10px;border-radius:8px">개원 '+esc(dt)+'</div>'
+    + '</div></div>';
+}
+
+function coRenderListCard(it, c){
+  var dt = it.openedAt || '-';
+  var nm = esc(it.name || '');
+  var sub = esc(it.clCdNm || '');
+  var region = esc(it.region || '');
+  var addr = esc(it.address || '');
+  var phone = esc(it.phone || '-');
+  var docCnt = it.doctorTotal != null ? '의사 '+it.doctorTotal+'명' : '';
+  var url = it.hospUrl ? '<a href="'+esc(it.hospUrl)+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:11px">🔗 홈페이지</a>' : '';
+  var mapQ = encodeURIComponent((it.region||'') + ' ' + (it.address||'') + ' ' + (it.name||''));
+  return '<div style="border:1px solid var(--border);border-top:3px solid '+c+';border-radius:10px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:6px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">'
+    + '<strong style="font-size:13.5px;color:var(--text)">'+nm+'</strong>'
+    + '<span style="font-size:10.5px;font-weight:700;color:'+c+';background:'+c+'15;padding:2px 8px;border-radius:10px">'+sub+'</span>'
+    + '</div>'
+    + '<div style="font-size:11.5px;color:var(--text2);line-height:1.45">📍 '+region+'<br>'+addr+'</div>'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;padding-top:6px;border-top:1px dashed var(--border);font-size:11px;color:var(--text3)">'
+    + '<span>📞 '+phone+'</span>'
+    + (docCnt ? '<span>'+docCnt+'</span>' : '')
+    + '<span style="color:'+c+';font-weight:700">개원 '+esc(dt)+'</span>'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;font-size:11px"><a href="https://map.kakao.com/?q='+mapQ+'" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none">🗺️ 지도</a>'+url+'</div>'
+    + '</div>';
+}
+
+function coSetView(v){
+  _coView = v;
+  var g = document.getElementById('coViewGroup');
+  var l = document.getElementById('coViewList');
+  if (g && l) {
+    g.style.background = (v==='group') ? 'var(--primary)' : 'var(--surface)';
+    g.style.color      = (v==='group') ? '#fff' : 'var(--text2)';
+    l.style.background = (v==='list')  ? 'var(--primary)' : 'var(--surface)';
+    l.style.color      = (v==='list')  ? '#fff' : 'var(--text2)';
+  }
+  if (_coRaw.length) coApplyClientFilters();
+}
+
+/* 엑셀 내보내기 */
+function coExportXlsx(){
+  if (typeof XLSX === 'undefined') { alert('엑셀 라이브러리 로드 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  var keyword = (document.getElementById('coKeyword')||{}).value || '';
+  var kw = keyword.trim().toLowerCase();
+  var items = _coRaw.slice();
+  if (_coCatSel) items = items.filter(function(it){ return _coCatSel[it.category || '기타']; });
+  if (kw) items = items.filter(function(it){
+    return (it.name||'').toLowerCase().indexOf(kw) >= 0
+        || (it.address||'').toLowerCase().indexOf(kw) >= 0
+        || (it.clCdNm||'').toLowerCase().indexOf(kw) >= 0;
+  });
+  if (!items.length) { alert('내보낼 결과가 없습니다.'); return; }
+  var rows = [['개원일','종별','분류','병원명','지역','주소','전화','의사수','홈페이지']];
+  items.forEach(function(it){
+    rows.push([
+      it.openedAt||'', it.category||'', it.clCdNm||'', it.name||'',
+      it.region||'', it.address||'', it.phone||'',
+      it.doctorTotal!=null?it.doctorTotal:'', it.hospUrl||''
+    ]);
+  });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), '개원정보');
+  var month = (_coMeta.month||'').replace('-','');
+  XLSX.writeFile(wb, '병의원개원정보_'+month+'.xlsx');
 }
 
 function checkHiramap(iframe) {
