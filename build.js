@@ -53,3 +53,10 @@ const result = html.replace(
 
 fs.writeFileSync(OUTPUT, result, 'utf8');
 console.log('[build] 완료: ' + blockCount + '개 블록 난독화, ' + errorCount + '개 블록 원본 유지 → ' + OUTPUT);
+
+// 약가 변동 TOP — 대시보드 카드용
+try {
+  require('./build-price-changes.js').build();
+} catch (e) {
+  console.warn('[build] 약가 변동 분석 건너뜀:', e.message);
+}

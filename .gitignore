@@ -4,6 +4,7 @@ package-lock.json
 
 # 빌드 산출물 (Vercel이 build.js로 재생성)
 public/index.html
+public/price-changes.json
 
 # 시크릿
 serviceAccount.json

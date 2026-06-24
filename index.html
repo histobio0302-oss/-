@@ -2229,6 +2229,80 @@ kbd {
       <button class="sub-tab" data-parent="search" data-sub="single" onclick="setSubTab('search','single')">&#128269; 의약품 검색</button>
       </div>
     <div class="sub-content" data-parent="search" data-sub="single" style="display:none">
+
+    <!-- 주사집(JUSAZIP) 소개 배너 — 항상 표시 -->
+    <div id="jusaBanner" style="display:block;position:relative;margin-bottom:16px;background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);border:1px solid #93c5fd;border-radius:14px;padding:18px 22px;box-shadow:0 4px 16px rgba(37,99,235,0.12);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div style="flex-shrink:0;background:#fff;border-radius:10px;padding:10px 18px;box-shadow:0 2px 6px rgba(37,99,235,0.15);display:flex;align-items:center;justify-content:center">
+          <img src="/images/jusazip-logo.png" alt="JUSA Z/P" style="height:36px;width:auto;display:block" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=&quot;font-size:18px;font-weight:900;color:#2563eb;letter-spacing:-0.5px;&quot;>JUSA Z/P</div>'">
+        </div>
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:15px;font-weight:800;color:#1e3a8a;margin-bottom:4px;letter-spacing:-0.2px">병의원 전용 의약품 도매몰</div>
+          <div style="font-size:12.5px;color:#1e40af;line-height:1.6">의약품·의약외품 도소매. 상품 검색 후 카드의 <strong>🛒 주사집</strong> 버튼을 누르면 해당 상품페이지로 바로 이동합니다.</div>
+          <div style="margin-top:8px;padding:7px 10px;background:rgba(255,255,255,.55);border-left:3px solid #f59e0b;border-radius:6px;font-size:11.5px;color:#92400e;line-height:1.55"><strong>🔒 회원가입 필수:</strong> 주사집은 병의원 사업자 회원만 이용 가능한 <strong>폐쇄몰</strong>입니다. 상품 정보를 보려면 <a href="https://www.jusazip.com/loading#/home" target="_blank" rel="noopener" style="color:#b45309;font-weight:700;text-decoration:underline">주사집</a>에서 먼저 회원가입(사업자등록증 인증)을 진행해주세요.</div>
+        </div>
+        <a href="https://www.jusazip.com/loading#/home" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:11px 22px;background:#2563eb;color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;transition:all .15s;box-shadow:0 2px 8px rgba(37,99,235,0.35)" onmouseover="this.style.background='#1d4ed8';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#2563eb';this.style.transform='translateY(0)'">바로가기 →</a>
+      </div>
+    </div>
+
+    <!-- ═══ 이달의 의약품 정보 대시보드 ═══ -->
+    <section id="dashSection" style="margin-bottom:18px;">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;padding:0 2px;flex-wrap:wrap;">
+        <span style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px;">📊 이달의 의약품 정보</span>
+        <span id="dashSubtitle" style="font-size:11.5px;color:var(--text3);font-weight:500;"></span>
+      </div>
+      <div id="dashGrid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+        <div class="dash-card dash-card-price">
+          <div class="dash-card-head">
+            <span class="dash-card-ic">💰</span>
+            <div>
+              <div class="dash-card-title">이달의 약값 정보</div>
+              <div class="dash-card-sub" id="dashPriceSub">최신 등재 · 동일성분 가성비</div>
+            </div>
+          </div>
+          <div id="dashPriceBody" class="dash-card-body">
+            <div class="dash-skel"></div><div class="dash-skel"></div><div class="dash-skel"></div>
+          </div>
+          <div class="dash-card-actions">
+            <button type="button" class="dash-tabbtn on" data-mode="latest" onclick="dashSetPriceMode('latest',this)">최신 등재</button>
+            <button type="button" class="dash-tabbtn" data-mode="value" onclick="dashSetPriceMode('value',this)">동일성분 가성비</button>
+            <button type="button" class="dash-tabbtn" data-mode="cheap" onclick="dashSetPriceMode('cheap',this)">저단가</button>
+          </div>
+        </div>
+        <div class="dash-card dash-card-safety">
+          <div class="dash-card-head">
+            <span class="dash-card-ic">⚠️</span>
+            <div>
+              <div class="dash-card-title">회수·행정처분 요약</div>
+              <div class="dash-card-sub">식약처 최신 안전정보</div>
+            </div>
+          </div>
+          <div id="dashSafetyBody" class="dash-card-body">
+            <div class="dash-skel"></div><div class="dash-skel"></div><div class="dash-skel"></div>
+          </div>
+          <div class="dash-card-actions">
+            <button type="button" class="dash-tabbtn on" data-mode="recall" onclick="dashSetSafetyMode('recall',this)">회수</button>
+            <button type="button" class="dash-tabbtn" data-mode="admin" onclick="dashSetSafetyMode('admin',this)">행정처분</button>
+            <button type="button" class="dash-more" onclick="setTab('safety')">전체보기 →</button>
+          </div>
+        </div>
+        <div class="dash-card dash-card-kakao">
+          <div class="dash-card-head">
+            <span class="dash-card-ic">💬</span>
+            <div>
+              <div class="dash-card-title">카카오 채널 소식 알림</div>
+              <div class="dash-card-sub" id="dashKakaoSub">최신 채널 게시물</div>
+            </div>
+          </div>
+          <div id="dashKakaoBody" class="dash-card-body"></div>
+          <div class="dash-card-actions">
+            <button type="button" class="dash-tabbtn" id="dashKakaoNextBtn" onclick="dashNextKakao()" style="display:none;">↻ 다음 소식</button>
+            <a class="dash-more" href="http://pf.kakao.com/_CWlun" target="_blank" rel="noopener">채널 전체 보기 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div class="recall-notice">
       &#9432; <span><strong>의약품 단건 검색</strong> — 의약품 정보 품목(포장, 보험금액, 허가, 업체, 성상, 주성분 등)을 조회합니다. 최신 정보는 <a href="https://nedrug.mfds.go.kr/index" target="_blank" style="color:#9a3412;font-weight:700">의약품안전나라 &#8599;</a>에서도 확인하세요.</span>
     </div>
@@ -7553,5 +7627,295 @@ setSubTab('info','license');
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',autoShow); else autoShow();
 })();
 </script>
+
+<!-- ═══ 대시보드 + 카카오 FAB 스타일 (이식) ═══ -->
+<style>
+.dash-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 15px 16px 13px; display: flex; flex-direction: column;
+  transition: border-color .15s, box-shadow .15s; min-height: 230px;
+}
+.dash-card:hover { border-color: var(--primary); box-shadow: 0 4px 14px rgba(37,99,235,.08); }
+.dash-card-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 11px; }
+.dash-card-ic { font-size: 24px; line-height: 1.1; flex-shrink: 0; }
+.dash-card-title { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -.2px; line-height: 1.3; }
+.dash-card-sub { font-size: 11.5px; color: var(--text3); margin-top: 2px; font-weight: 500; line-height: 1.35; }
+.dash-card-body { flex: 1; min-height: 132px; font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+.dash-card-actions {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; padding-top: 11px;
+  border-top: 1px dashed var(--border); align-items: center;
+}
+.dash-tabbtn {
+  padding: 5px 10px; border: 1px solid var(--border); background: var(--surface);
+  border-radius: 50px; font-size: 11.5px; font-weight: 600; color: var(--text3);
+  cursor: pointer; font-family: inherit; transition: all .12s; line-height: 1.1;
+}
+.dash-tabbtn:hover { color: var(--primary); border-color: var(--primary); }
+.dash-tabbtn.on { background: var(--primary); color: #fff; border-color: var(--primary); }
+.dash-more {
+  margin-left: auto; padding: 5px 10px; background: transparent; border: none;
+  font-size: 11.5px; font-weight: 700; color: var(--primary); cursor: pointer; font-family: inherit;
+  text-decoration: none;
+}
+.dash-more:hover { text-decoration: underline; }
+.dash-row {
+  display: flex; align-items: flex-start; gap: 8px; padding: 7px 0;
+  border-bottom: 1px dotted var(--border); font-size: 12.5px; line-height: 1.45;
+}
+.dash-row:last-child { border-bottom: 0; }
+.dash-row-num { flex-shrink: 0; width: 18px; color: var(--text3); font-weight: 700; font-size: 11px; padding-top: 1px; }
+.dash-row-main { flex: 1; min-width: 0; }
+.dash-row-nm { font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.dash-row-meta { font-size: 11px; color: var(--text3); margin-top: 1px; line-height: 1.4; }
+.dash-row-tag { display: inline-block; padding: 1px 7px; background: #eff6ff; color: #1d4ed8; border-radius: 50px; font-size: 10px; font-weight: 700; margin-right: 4px; }
+.dash-row-warn { background: #fef3c7; color: #92400e; }
+.dash-row-price { flex-shrink: 0; text-align: right; font-weight: 800; font-size: 12.5px; color: var(--primary); }
+.dash-skel {
+  height: 28px; margin: 7px 0; border-radius: 6px;
+  background: linear-gradient(90deg, var(--hover) 0%, var(--border) 50%, var(--hover) 100%);
+  background-size: 200% 100%; animation: dashSkel 1.4s infinite;
+}
+@keyframes dashSkel { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+.dash-err { padding: 24px 12px; text-align: center; color: var(--text3); font-size: 12px; }
+.dash-kakao-card {
+  display: block; padding: 14px 15px; border-radius: 10px; text-decoration: none;
+  background: linear-gradient(135deg,#FEE500 0%,#FFF7B2 100%);
+  color: #191919; border: 1px solid #f0d000;
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+}
+.dash-kakao-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(254,229,0,.45); }
+.dash-kakao-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 50px;
+  background: #d97706; color: #fff; font-size: 10px; font-weight: 800;
+  letter-spacing: .3px; margin-bottom: 8px;
+}
+.dash-kakao-title { font-size: 13.5px; font-weight: 800; color: #191919; line-height: 1.4; margin-bottom: 6px; letter-spacing: -.2px; }
+.dash-kakao-summary { font-size: 12px; color: #3b3b3b; line-height: 1.6; margin-bottom: 11px; }
+.dash-kakao-summary strong { color: #d97706; font-weight: 800; }
+.dash-kakao-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 9px; border-top: 1px dashed rgba(0,0,0,.18);
+  font-size: 11.5px; font-weight: 700;
+}
+.dash-kakao-date { color: #6b5b00; }
+.dash-kakao-cta { color: #191919; }
+.dash-kakao-card:hover .dash-kakao-cta { color: #d97706; }
+@media (max-width: 900px) { #dashGrid { grid-template-columns: 1fr !important; } .dash-card { min-height: auto; } }
+
+#kakaoFab {
+  position: fixed; right: 18px; bottom: 18px; z-index: 1150;
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; width: 64px; height: 64px;
+  background: #FEE500; color: #191919; border-radius: 50%;
+  text-decoration: none; box-shadow: 0 6px 20px rgba(254,229,0,.55), 0 2px 6px rgba(0,0,0,.18);
+  transition: transform .15s, box-shadow .15s;
+  font-family: inherit;
+}
+#kakaoFab:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 10px 28px rgba(254,229,0,.7), 0 3px 10px rgba(0,0,0,.22); }
+.kakao-fab-ic { font-size: 22px; line-height: 1; }
+.kakao-fab-label { font-size: 9.5px; font-weight: 800; line-height: 1.15; text-align: center; }
+@media (max-width: 720px) {
+  #kakaoFab { right: 14px; bottom: 92px; width: 56px; height: 56px; }
+  .kakao-fab-ic { font-size: 20px; }
+  .kakao-fab-label { font-size: 9px; }
+}
+</style>
+
+<!-- ═══ 대시보드 + 카카오 FAB 로직 (이식) ═══ -->
+<script>
+var DASH_PRICES = null;
+var DASH_PRICE_MODE = 'latest';
+var DASH_SAFETY = { recall:null, admin:null };
+var DASH_SAFETY_MODE = 'recall';
+
+var DASH_KAKAO_POSTS = [
+  {
+    t: '비보존제약-어나프라주 제품 소개',
+    body: '<strong>비보존제약</strong>의 <strong>어나프라주</strong> 제품 소개와 상세 정보를 카카오톡 채널에서 확인해보세요. 자세한 내용은 소식 보러가기 버튼을 눌러 카카오톡 게시물에서 만나보실 수 있습니다.',
+    date: '2026-06-24',
+    url: 'https://pf.kakao.com/_CWlun/113748270'
+  }
+];
+var DASH_KAKAO_IDX = 0;
+
+function dashInit() {
+  try {
+    dashRenderKakao();
+    dashLoadPrices();
+    dashLoadSafety();
+  } catch (e) { console.warn('[dashInit]', e); }
+}
+
+function dashLoadPrices() {
+  fetch('/price-changes.json', { cache:'force-cache' })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(j){
+      DASH_PRICES = j;
+      var sub = document.getElementById('dashPriceSub');
+      if (sub && j.latestAdtDt) sub.textContent = '약가 고시 ' + j.latestAdtDt + ' 기준';
+      var subt = document.getElementById('dashSubtitle');
+      if (subt && j.latestAdtDt) subt.textContent = '· 약가 기준일 ' + j.latestAdtDt;
+      dashRenderPrices();
+    })
+    .catch(function(){
+      var b = document.getElementById('dashPriceBody');
+      if (b) b.innerHTML = '<div class="dash-err">약값 정보를 불러오지 못했습니다.</div>';
+    });
+}
+
+function dashSetPriceMode(m) {
+  DASH_PRICE_MODE = m;
+  var btns = document.querySelectorAll('.dash-card-price .dash-tabbtn');
+  for (var i=0; i<btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-mode')===m);
+  dashRenderPrices();
+}
+
+function dashFmtWon(v) { return (Number(v)||0).toLocaleString() + '원'; }
+
+function dashRenderPrices() {
+  var box = document.getElementById('dashPriceBody');
+  if (!box || !DASH_PRICES) return;
+  var arr = (DASH_PRICES[DASH_PRICE_MODE] || []).slice(0, 5);
+  if (!arr.length) { box.innerHTML = '<div class="dash-err">데이터가 없습니다.</div>'; return; }
+  box.innerHTML = arr.map(function(r, i){
+    var meta = '', price = dashFmtWon(r.price);
+    if (DASH_PRICE_MODE === 'value') {
+      meta = '<span class="dash-row-tag">최저</span>' + esc(r.ent || '') + ' · 평균 대비 ' + r.saveRatio + '% ↓ (' + r.groupSize + '품목)';
+    } else {
+      meta = esc(r.ent || '');
+    }
+    var nm = (r.nm || '').replace(/_\(.*?\)\s*$/, '');
+    var safeNm = (typeof jsArg === 'function') ? jsArg(nm) : nm.replace(/'/g, "\\'");
+    return ''
+      + '<div class="dash-row" onclick="dashGoSearch(\'' + safeNm + '\')" style="cursor:pointer;">'
+      +   '<span class="dash-row-num">' + (i+1) + '.</span>'
+      +   '<div class="dash-row-main">'
+      +     '<div class="dash-row-nm">' + esc(nm) + '</div>'
+      +     '<div class="dash-row-meta">' + meta + '</div>'
+      +   '</div>'
+      +   '<div class="dash-row-price">' + price + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function dashGoSearch(nm) {
+  if (typeof setTab === 'function') setTab('search');
+  if (typeof setSubTab === 'function') setSubTab('search','single');
+  if (typeof setSearchMode === 'function') setSearchMode('name');
+  var q = document.getElementById('q'); if (q) q.value = nm;
+  if (typeof closeRecent === 'function') closeRecent();
+  if (typeof go === 'function') go();
+}
+
+function dashLoadSafety() {
+  fetch('/api/gov/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=x&type=json&numOfRows=5&pageNo=1', { cache:'default' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var items = ((j||{}).body||{}).items || [];
+      DASH_SAFETY.recall = items.map(function(x){ return x.item || x; });
+      if (DASH_SAFETY_MODE === 'recall') dashRenderSafety();
+    })
+    .catch(function(){ DASH_SAFETY.recall = []; if (DASH_SAFETY_MODE === 'recall') dashRenderSafety(); });
+  fetch('/api/gov/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=x&type=json&numOfRows=5&pageNo=1', { cache:'default' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var items = ((j||{}).body||{}).items || [];
+      DASH_SAFETY.admin = items.map(function(x){ return x.item || x; });
+      if (DASH_SAFETY_MODE === 'admin') dashRenderSafety();
+    })
+    .catch(function(){ DASH_SAFETY.admin = []; if (DASH_SAFETY_MODE === 'admin') dashRenderSafety(); });
+}
+
+function dashSetSafetyMode(m) {
+  DASH_SAFETY_MODE = m;
+  var btns = document.querySelectorAll('.dash-card-safety .dash-tabbtn');
+  for (var i=0; i<btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-mode')===m);
+  dashRenderSafety();
+}
+
+function dashFmtDate(s) {
+  if (!s) return '';
+  s = String(s).replace(/[^\d]/g,'').slice(0,8);
+  if (s.length !== 8) return '';
+  return s.slice(0,4) + '.' + s.slice(4,6) + '.' + s.slice(6);
+}
+
+function dashRenderSafety() {
+  var box = document.getElementById('dashSafetyBody');
+  if (!box) return;
+  var arr = DASH_SAFETY[DASH_SAFETY_MODE];
+  if (arr === null) { box.innerHTML = '<div class="dash-skel"></div><div class="dash-skel"></div><div class="dash-skel"></div>'; return; }
+  if (!arr.length) { box.innerHTML = '<div class="dash-err">최근 항목이 없습니다.</div>'; return; }
+  box.innerHTML = arr.slice(0,5).map(function(it, i){
+    if (DASH_SAFETY_MODE === 'recall') {
+      var nm = it.PRDUCT || it.ITEM_NAME || '';
+      var ent = it.ENTRPS || '';
+      var dt = dashFmtDate(it.RECALL_COMMAND_DATE || it.RTRVL_CMMND_DT || '');
+      var tagText = it.ENFRC_YN === 'Y' ? '강제회수' : (it.ENFRC_YN === 'N' ? '자진회수' : '회수');
+      return ''
+        + '<div class="dash-row" onclick="if(typeof setTab===\'function\'){setTab(\'safety\');if(typeof setSubTab===\'function\')setSubTab(\'safety\',\'recall\')}" style="cursor:pointer;">'
+        +   '<span class="dash-row-num">' + (i+1) + '.</span>'
+        +   '<div class="dash-row-main">'
+        +     '<div class="dash-row-nm">' + esc(nm.length>40?nm.slice(0,38)+'…':nm) + '</div>'
+        +     '<div class="dash-row-meta"><span class="dash-row-tag dash-row-warn">' + tagText + '</span>' + esc(ent) + (dt?' · '+dt:'') + '</div>'
+        +   '</div>'
+        + '</div>';
+    } else {
+      var nm2 = it.ITEM_NAME || '';
+      var ent2 = it.ENTP_NAME || '';
+      var dt2 = dashFmtDate(it.LAST_SETTLE_DATE || '');
+      return ''
+        + '<div class="dash-row" onclick="if(typeof setTab===\'function\'){setTab(\'safety\');if(typeof setSubTab===\'function\')setSubTab(\'safety\',\'admin\')}" style="cursor:pointer;">'
+        +   '<span class="dash-row-num">' + (i+1) + '.</span>'
+        +   '<div class="dash-row-main">'
+        +     '<div class="dash-row-nm">' + esc(ent2) + '</div>'
+        +     '<div class="dash-row-meta"><span class="dash-row-tag dash-row-warn">행정처분</span>' + esc(nm2.length>32?nm2.slice(0,30)+'…':nm2) + (dt2?' · '+dt2:'') + '</div>'
+        +   '</div>'
+        + '</div>';
+    }
+  }).join('');
+}
+
+function dashRenderKakao() {
+  var box = document.getElementById('dashKakaoBody');
+  if (!box) return;
+  var len = DASH_KAKAO_POSTS.length;
+  var p = DASH_KAKAO_POSTS[DASH_KAKAO_IDX % len];
+  var sub = document.getElementById('dashKakaoSub');
+  if (sub) sub.textContent = len > 1 ? ('소식 ' + ((DASH_KAKAO_IDX % len) + 1) + ' / ' + len) : '최신 채널 게시물';
+  var nextBtn = document.getElementById('dashKakaoNextBtn');
+  if (nextBtn) nextBtn.style.display = len > 1 ? '' : 'none';
+  box.innerHTML = ''
+    + '<a href="' + p.url + '" target="_blank" rel="noopener" class="dash-kakao-card">'
+    +   '<div class="dash-kakao-badge">📢 NEW</div>'
+    +   '<div class="dash-kakao-title">' + esc(p.t) + '</div>'
+    +   '<div class="dash-kakao-summary">' + p.body + '</div>'
+    +   '<div class="dash-kakao-foot">'
+    +     '<span class="dash-kakao-date">📅 ' + esc(p.date || '') + '</span>'
+    +     '<span class="dash-kakao-cta">소식 보러가기 →</span>'
+    +   '</div>'
+    + '</a>';
+}
+
+function dashNextKakao() {
+  DASH_KAKAO_IDX = (DASH_KAKAO_IDX + 1) % DASH_KAKAO_POSTS.length;
+  dashRenderKakao();
+}
+
+(function(){
+  function _go(){ dashInit(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _go);
+  else _go();
+})();
+</script>
+
+<!-- ═══ 카카오톡 채널 FAB (우하단) ═══ -->
+<a id="kakaoFab" href="http://pf.kakao.com/_CWlun" target="_blank" rel="noopener"
+   aria-label="카카오톡 채널로 이동" title="카카오톡 채널">
+  <span class="kakao-fab-ic">💬</span>
+  <span class="kakao-fab-label">카카오톡<br>채널</span>
+</a>
+
 </body>
 </html>
