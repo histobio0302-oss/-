@@ -2996,6 +2996,7 @@ function renderFavorites() {
       + '<div class="card-actions">'
       +   '<button class="detail-btn" style="flex:1" onclick="openDetailModal(\''+esc(f.seq)+'\',\''+jsArg(f.name||'')+'\',\''+jsArg(f.seller||'')+'\',\''+jsArg(f.maker||'')+'\',\''+jsArg(f.pack||'')+'\',\''+jsArg(f.ingr||'')+'\',\'\',\''+esc(f.date||'')+'\',\'-\',\'-\')">📄 상세보기</button>'
       + (f.seq ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq='+esc(f.seq)+'" target="_blank" class="link-btn" style="flex:0 0 auto;padding:9px 12px;" title="의약품안전나라">🔗</a>' : '')
+      + (typeof jusazipBtn === 'function' ? jusazipBtn(f.seq, f.name, 'icon') : '')
       + '</div></div>';
   }
   html += '</div>';
@@ -4250,6 +4251,7 @@ function go() {
           + (itemSeq
               ? '<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=' + esc(itemSeq) + '" target="_blank" class="link-btn" style="flex:0 0 auto;" title="의약품안전나라">🔗<span class="btn-label"> 안전나라</span></a>'
               : '')
+          + (typeof jusazipBtn === 'function' ? jusazipBtn(itemSeq, itemNm, 'full') : '')
           + '</div>'
           + '</div>';
       }
@@ -7916,6 +7918,76 @@ function dashNextKakao() {
   <span class="kakao-fab-ic">💬</span>
   <span class="kakao-fab-label">카카오톡<br>채널</span>
 </a>
+
+<!-- ═══ 주사집(JUSAZIP) 상품 매핑 + 버튼 (이식) ═══ -->
+<script>
+var JUSAZIP_MAP = null;
+(function loadJusazipMap(){
+  fetch('/jusazip-products.json?v=20260624', {cache:'default'})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      JUSAZIP_MAP = j;
+      // 이미 화면에 검색 결과가 있으면 재렌더 시도 (선택)
+      try {
+        if (typeof go === 'function' && document.querySelector('#result .result-card, #result .card')) {
+          var inp = document.getElementById('q');
+          if (inp && inp.value) go();
+        }
+      } catch(e) {}
+    })
+    .catch(function(){ JUSAZIP_MAP = {bySeq:{}, byName:{}, byBase:{}}; });
+})();
+
+function isJusaInjectable(itemName){
+  var n = (itemName || '') + '';
+  if (!n) return false;
+  if (typeof getFormGroup === 'function') {
+    var fg = getFormGroup(n);
+    if (fg === 'injection') return true;
+    if (fg === 'liquid')    return true;
+    if (fg === 'tablet' || fg === 'capsule' || fg === 'granule' ||
+        fg === 'topical' || fg === 'suppository' || fg === 'eye_ear_nose' ||
+        fg === 'inhalation') return false;
+  }
+  var stripped = n.replace(/\([^)]*\)/g, '').trim();
+  if (/주사|수액/.test(stripped)) return true;
+  if (/[가-힣]주(\d|\(|\s|$|\[|mg|ml|IU)/i.test(stripped)) return true;
+  if (/[가-힣]주$/.test(stripped)) return true;
+  return false;
+}
+
+function lookupJusazip(itemSeq, itemName){
+  if (!JUSAZIP_MAP) return null;
+  if (itemSeq && JUSAZIP_MAP.bySeq && JUSAZIP_MAP.bySeq[itemSeq]) return JUSAZIP_MAP.bySeq[itemSeq];
+  if (!itemName) return null;
+  var k = (itemName + '').replace(/\s+/g, '');
+  if (JUSAZIP_MAP.byName && JUSAZIP_MAP.byName[k]) return JUSAZIP_MAP.byName[k];
+  if (JUSAZIP_MAP.byBase && isJusaInjectable(itemName)) {
+    var s = (itemName + '').trim();
+    s = s.replace(/^\([^)]*\)/, '').trim();
+    var m = s.match(/^([^\d\(\)_\[/]+)/);
+    if (m) {
+      var base = m[1].trim();
+      if (base.length >= 3 && JUSAZIP_MAP.byBase[base]) return JUSAZIP_MAP.byBase[base];
+    }
+  }
+  return null;
+}
+
+function jusazipBtn(itemSeq, itemName, mode){
+  var m = lookupJusazip(itemSeq, itemName);
+  if (!m) return '';
+  var url = 'https://www.jusazip.com/product/' + encodeURIComponent(m.g);
+  var safeN = (typeof esc === 'function') ? esc(m.n || '') : (m.n || '');
+  if (mode === 'icon') {
+    return '<a href="'+url+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;padding:9px 12px;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집에서 바로 구매 ('+safeN+')">🛒</a>';
+  }
+  if (mode === 'inline') {
+    return '<a href="'+url+'" target="_blank" rel="noopener" style="color:#92400e;font-size:11px;text-decoration:none;margin-left:8px" title="주사집에서 바로 구매">🛒 주사집</a>';
+  }
+  return '<a href="'+url+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집에서 바로 구매 ('+safeN+')">🛒<span class="btn-label"> 주사집</span></a>';
+}
+</script>
 
 </body>
 </html>
