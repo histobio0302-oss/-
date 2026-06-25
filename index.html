@@ -7780,15 +7780,20 @@ setSubTab('info','license');
     padding-top: 2px !important;
   }
   .dash-row-main {
-    flex: 0 1 auto !important;     /* 자연 너비, 부족하면 줄어듦 — main이 가로 전체로 늘어나는 걸 막음 */
+    flex: 0 1 auto !important;     /* 자연 너비, 부족하면 줄어듦 */
     min-width: 0 !important;
-    max-width: calc(100% - clamp(80px, 25vw, 130px)) !important;  /* 가격 자리 보장 */
+  }
+  /* 가격이 있는 행에만 가격 칸을 위한 max-width — 회수·행정처분 행은 full-width */
+  .dash-row:has(.dash-row-price) .dash-row-main {
+    max-width: calc(100% - clamp(80px, 25vw, 130px)) !important;
   }
   .dash-row-nm {
     font-size: clamp(14.5px, 4vw, 17px) !important;
     line-height: 1.4 !important;
-    white-space: normal !important;          /* 너무 길면 줄바꿈 (어르신용) */
+    white-space: normal !important;          /* 길면 자연 줄바꿈 */
+    overflow: visible !important;            /* 잘림 방지 */
     text-overflow: clip !important;
+    word-break: break-word !important;       /* 긴 단어도 줄바꿈 */
   }
   .dash-row-meta {
     font-size: clamp(12px, 3.4vw, 14px) !important;
