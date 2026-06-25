@@ -7724,6 +7724,140 @@ setSubTab('info','license');
   .kakao-fab-ic { font-size: 20px; }
   .kakao-fab-label { font-size: 9px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   어르신 친화 모바일 시안성 강화 (max-width: 720px)
+   — 모든 텍스트 1.2~1.4배 확대, 터치 영역 확대, 여백 강화
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  /* ── 검색 입력창·버튼 크게 ── */
+  .sinput {
+    font-size: 17px !important;
+    padding: 14px 16px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+  }
+  .btn-primary, .btn.btn-primary {
+    font-size: 16px !important;
+    padding: 14px 22px !important;
+    min-height: 52px !important;
+    font-weight: 700 !important;
+  }
+  .smode-row, .smode-label { font-size: 14px !important; }
+  .smode-btn { font-size: 14px !important; padding: 9px 16px !important; min-height: 40px !important; }
+
+  /* ── 안내 배너(recall-notice) ── */
+  .recall-notice { font-size: 14px !important; line-height: 1.7 !important; padding: 14px 16px !important; }
+  .recall-notice strong { font-size: 15px !important; }
+
+  /* ── 대시보드 섹션 타이틀 ── */
+  #dashSection > div:first-child > span:first-child { font-size: 19px !important; letter-spacing: -.3px; }
+  #dashSubtitle { font-size: 13px !important; }
+
+  /* ── 대시보드 카드 ── */
+  .dash-card { padding: 18px 18px 16px !important; min-height: auto !important; border-radius: 16px !important; }
+  .dash-card-ic { font-size: 32px !important; }
+  .dash-card-title { font-size: 18px !important; line-height: 1.35 !important; }
+  .dash-card-sub { font-size: 13.5px !important; margin-top: 4px !important; }
+
+  /* 대시보드 행(데이터 한 줄) — 글자 크게, 여백 넉넉히 */
+  .dash-card-body { min-height: auto !important; }
+  .dash-row { padding: 14px 0 !important; gap: 10px !important; }
+  .dash-row-num { font-size: 15px !important; width: 22px !important; }
+  .dash-row-nm { font-size: 16px !important; line-height: 1.4 !important; white-space: normal !important; }
+  .dash-row-meta { font-size: 13px !important; margin-top: 4px !important; line-height: 1.5 !important; }
+  .dash-row-tag { font-size: 12px !important; padding: 3px 10px !important; }
+  .dash-row-price { font-size: 17px !important; font-weight: 800 !important; }
+
+  /* 대시보드 액션 버튼(모드 전환) */
+  .dash-tabbtn { font-size: 13px !important; padding: 9px 14px !important; min-height: 38px !important; }
+  .dash-more { font-size: 13px !important; padding: 9px 12px !important; }
+
+  /* 카카오 소식 카드(대시보드 3번 카드) */
+  .dash-kakao-card { padding: 18px 18px !important; border-radius: 14px !important; }
+  .dash-kakao-badge { font-size: 12px !important; padding: 3px 11px !important; margin-bottom: 10px !important; }
+  .dash-kakao-title { font-size: 16px !important; line-height: 1.45 !important; margin-bottom: 8px !important; }
+  .dash-kakao-summary { font-size: 13.5px !important; line-height: 1.7 !important; margin-bottom: 14px !important; }
+  .dash-kakao-foot { font-size: 13px !important; padding-top: 11px !important; }
+
+  /* ── 검색 결과 카드 텍스트 확대 ── */
+  .card-name, .result-card .card-title, .result-card h3 {
+    font-size: 17px !important; line-height: 1.4 !important; font-weight: 700 !important;
+  }
+  .card-seller, .card-maker, .result-card .card-sub {
+    font-size: 14px !important; line-height: 1.5 !important;
+  }
+  .card-ingr-label, .meta-label { font-size: 11px !important; font-weight: 700 !important; }
+  .card-ingr-value, .meta-value { font-size: 14px !important; line-height: 1.5 !important; }
+  .card-ingr { padding: 12px 16px !important; }
+
+  /* 카드 액션 버튼 — 터치 영역 확대 */
+  .card-actions { gap: 8px !important; padding: 12px 14px !important; }
+  .detail-btn, .fav-btn, .cmp-btn, .share-btn, .add-btn, .link-btn, .generic-btn {
+    font-size: 13.5px !important;
+    padding: 12px 14px !important;
+    min-height: 44px !important;
+    font-weight: 700 !important;
+  }
+  .fav-btn .btn-label, .cmp-btn .btn-label, .share-btn .btn-label,
+  .add-btn .btn-label, .link-btn .btn-label { font-size: 13px !important; }
+
+  /* 비급여·확인필요 배지 */
+  .badge, .card-badge, [class*="badge"] { font-size: 12px !important; padding: 4px 10px !important; }
+
+  /* ── 증상별 빠른검색 칩 ── */
+  .symptom-section .recall-notice, .symptom-section { font-size: 14px !important; }
+  .symptom-chip, [class*="symptom"] button, .chip {
+    font-size: 14.5px !important;
+    padding: 12px 18px !important;
+    min-height: 44px !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+  }
+
+  /* ── 필터 박스 ── */
+  .filter-box, .filter-section { font-size: 14px !important; }
+  .filter-label, label { font-size: 13px !important; font-weight: 700 !important; }
+  select, .filter-box select {
+    font-size: 15px !important;
+    padding: 12px 14px !important;
+    min-height: 48px !important;
+    border-radius: 10px !important;
+  }
+
+  /* ── 결과 카운트 / 헤더 ── */
+  .result-count, .total-count, [class*="result-count"] { font-size: 15px !important; }
+
+  /* 페이지네이션 버튼 */
+  .pager button, .pagination button, [class*="page-btn"] {
+    font-size: 14px !important; padding: 10px 16px !important; min-height: 42px !important;
+  }
+
+  /* 탭 버튼 */
+  .tab-btn, .sub-tab, .np-subtab-btn {
+    font-size: 14.5px !important; padding: 11px 18px !important; min-height: 44px !important;
+  }
+
+  /* 모바일 하단 네비 라벨 키움 */
+  .mnav-btn .mnav-label, [class*="mnav"] .label, nav[class*="bottom"] span {
+    font-size: 11.5px !important; font-weight: 700 !important;
+  }
+  .mnav-btn .mnav-icon, [class*="mnav"] .icon { font-size: 22px !important; }
+
+  /* 주사집 배너 텍스트 */
+  #jusaBanner { padding: 16px 18px !important; }
+  #jusaBanner div[style*="font-size:15px"] { font-size: 16px !important; }
+  #jusaBanner div[style*="font-size:12.5px"] { font-size: 14px !important; line-height: 1.7 !important; }
+  #jusaBanner a[style*="font-size:13px"] { font-size: 14px !important; padding: 13px 22px !important; min-height: 48px !important; }
+}
+
+/* 매우 좁은 폰(< 380px) 보정 */
+@media (max-width: 380px) {
+  .sinput { font-size: 16px !important; padding: 13px 14px !important; height: 50px !important; }
+  .dash-card-title { font-size: 17px !important; }
+  .dash-row-nm { font-size: 15px !important; }
+  .dash-row-price { font-size: 16px !important; }
+}
 </style>
 
 <!-- ═══ 대시보드 + 카카오 FAB 로직 (이식) ═══ -->
@@ -7780,7 +7914,9 @@ function dashFmtWon(v) { return (Number(v)||0).toLocaleString() + '원'; }
 function dashRenderPrices() {
   var box = document.getElementById('dashPriceBody');
   if (!box || !DASH_PRICES) return;
-  var arr = (DASH_PRICES[DASH_PRICE_MODE] || []).slice(0, 5);
+  // 모바일에선 2개, 데스크톱은 5개 — 어르신 시안성 우선
+  var _lim = (window.innerWidth && window.innerWidth < 720) ? 2 : 5;
+  var arr = (DASH_PRICES[DASH_PRICE_MODE] || []).slice(0, _lim);
   if (!arr.length) { box.innerHTML = '<div class="dash-err">데이터가 없습니다.</div>'; return; }
   box.innerHTML = arr.map(function(r, i){
     var meta = '', price = dashFmtWon(r.price);
@@ -7851,7 +7987,9 @@ function dashRenderSafety() {
   var arr = DASH_SAFETY[DASH_SAFETY_MODE];
   if (arr === null) { box.innerHTML = '<div class="dash-skel"></div><div class="dash-skel"></div><div class="dash-skel"></div>'; return; }
   if (!arr.length) { box.innerHTML = '<div class="dash-err">최근 항목이 없습니다.</div>'; return; }
-  box.innerHTML = arr.slice(0,5).map(function(it, i){
+  // 모바일 2개 / 데스크톱 5개 — 어르신 시안성 우선
+  var _lim = (window.innerWidth && window.innerWidth < 720) ? 2 : 5;
+  box.innerHTML = arr.slice(0, _lim).map(function(it, i){
     if (DASH_SAFETY_MODE === 'recall') {
       var nm = it.PRDUCT || it.ITEM_NAME || '';
       var ent = it.ENTRPS || '';
