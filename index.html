@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>의약품 안전정보 포털</title>
 <meta name="description" content="식약처·심평원 공공데이터 통합 조회 — 의약품 허가·성분·DUR·약가·낱알식별 정보">
 <!-- 링크 미리보기(Open Graph / 카카오톡·트위터) -->
@@ -81,6 +81,12 @@
 
 /* ─── Reset ─────────────────────────────────── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  -webkit-text-size-adjust: 100%;  /* 안드로이드/iOS 시스템 글꼴 크기 자동 확대 차단 */
+  text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: pan-y pinch-zoom; /* 가로 핀치줌 제한, 세로 스크롤만 */
+}
 body {
   font-family: 'Noto Sans KR', -apple-system, sans-serif;
   background: var(--bg);
@@ -89,6 +95,7 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;  /* 가로 스크롤 차단 — 카드 안 콘텐츠가 vw 넘어가도 페이지 안 밀림 */
 }
 
 /* ─── Header ─────────────────────────────────── */
@@ -7755,10 +7762,17 @@ setSubTab('info','license');
   #dashSubtitle { font-size: 13px !important; }
 
   /* ── 페이지 전체 좌우 패딩 통일 (화면 너비에 따라 자동 적응) ── */
-  .wrap { padding: 10px clamp(10px, 3.2vw, 18px) 80px !important; }
+  .wrap { padding: 10px clamp(10px, 3.2vw, 18px) 80px !important; max-width: 100vw !important; overflow-x: hidden !important; }
 
-  /* ── 대시보드 카드 ── */
-  .dash-card { padding: clamp(15px, 4vw, 20px) !important; min-height: auto !important; border-radius: 16px !important; }
+  /* ── 대시보드 카드: overflow 안전망 (긴 텍스트가 카드 밖으로 새지 못함) ── */
+  .dash-card {
+    padding: clamp(15px, 4vw, 20px) !important;
+    min-height: auto !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  .dash-card-body, .dash-cw, .dash-cw-page { max-width: 100% !important; overflow-x: hidden !important; min-width: 0 !important; }
   .dash-card-ic { font-size: 32px !important; }
   .dash-card-title { font-size: 18px !important; line-height: 1.35 !important; }
   .dash-card-sub { font-size: 13.5px !important; margin-top: 4px !important; }
