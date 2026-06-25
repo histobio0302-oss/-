@@ -7899,6 +7899,14 @@ setSubTab('info','license');
   }
   .mnav-btn .mnav-icon, [class*="mnav"] .icon { font-size: 22px !important; }
 
+  /* ── 검색 기능을 화면 맨 위로 (어르신 즉시 검색) ── */
+  #tab-search .sub-content[data-sub="single"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #tab-search .sub-content[data-sub="single"] > .search-card { order: -1 !important; margin-bottom: 14px !important; }
+  #tab-search .sub-content[data-sub="single"] > .recall-notice:has(+ .search-card) { order: -2 !important; }
+
   /* 주사집 배너 텍스트 */
   #jusaBanner { padding: 16px 18px !important; }
   #jusaBanner div[style*="font-size:15px"] { font-size: 16px !important; }
