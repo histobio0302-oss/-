@@ -2055,6 +2055,23 @@ kbd {
   margin-bottom: 12px;
 }
 .gm-count-bar strong { color: var(--primary); }
+/* ════════════════════════════════════════════════════════════
+   자동 PC·모바일 적응 — 강제 뷰 모드(pc-forced / mobile-forced) 무력화
+   이용가이드 버튼은 모바일에서도 라벨 보이게
+   ════════════════════════════════════════════════════════════ */
+body.pc-forced, body.mobile-forced { /* 강제 모드 무력화: 자연 @media 동작 보장 */ }
+.guide-link-btn .guide-link-label,
+body.mobile-forced .guide-link-btn .guide-link-label {
+  display: inline !important;
+}
+@media (max-width: 720px) {
+  .guide-link-btn { padding: 8px 14px !important; }
+  .guide-link-btn .guide-link-label {
+    display: inline !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+}
 </style>
 
   <!-- Firebase SDK -->
@@ -2062,6 +2079,26 @@ kbd {
   <script defer src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
+<script>
+/* 자동 PC·모바일 적응 — 페이지 진입 즉시 강제 모드 초기화 */
+(function clearForcedView(){
+  try {
+    localStorage.removeItem('drugapp_view_mode');
+    localStorage.removeItem('darkMode');
+  } catch(e) {}
+  var b = document.body;
+  if (b) { b.classList.remove('pc-forced'); b.classList.remove('mobile-forced'); b.classList.remove('dark'); }
+  // setTab 이전 어떤 코드도 강제 클래스 못 붙이도록 미리 차단 — 매 100ms 짧게 폴링하다가 첫 클릭 이후 자동 종료
+  var ticks = 0;
+  var iv = setInterval(function(){
+    if (++ticks > 30) { clearInterval(iv); return; }  // 3초 후 자동 종료
+    if (document.body) {
+      document.body.classList.remove('pc-forced');
+      document.body.classList.remove('mobile-forced');
+    }
+  }, 100);
+})();
+</script>
 
 <header id="mainHeader">
   <div class="header-inner">
@@ -2071,15 +2108,6 @@ kbd {
     <span class="header-sub">식약처&#183;심평원 공공데이터 통합 조회</span>
     <div class="header-right" style="display:flex;align-items:center;gap:8px">
       <button id="adminUploadBtn" onclick="openAdminUpload()" style="display:none;padding:5px 12px;border:1px solid var(--primary-md);border-radius:20px;background:var(--primary-lt);cursor:pointer;font-size:12px;color:var(--primary);font-family:inherit;font-weight:600">📂 약가이력</button>
-      <button id="darkToggleBtn" onclick="toggleDarkMode()" title="다크모드 전환">
-        <span id="darkIcon">🌙</span>
-        <span id="darkLabel" style="display:none">다크</span>
-      </button>
-      <button id="viewToggleBtn" onclick="toggleViewMode()"
-        style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap">
-        <span id="viewToggleIcon">&#128241;</span>
-        <span id="viewToggleLabel" class="view-toggle-label">모바일뷰</span>
-      </button>
       <a href="/guide.html" target="_blank" class="guide-link-btn" title="이용가이드"
         style="display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #d1fae5;border-radius:20px;background:#ecfdf5;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:#065f46;white-space:nowrap;text-decoration:none">
         <span class="guide-link-icon">📖</span><span class="guide-link-label">이용가이드</span>
