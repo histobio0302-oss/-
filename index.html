@@ -7907,11 +7907,56 @@ setSubTab('info','license');
   #tab-search .sub-content[data-sub="single"] > .search-card { order: -1 !important; margin-bottom: 14px !important; }
   #tab-search .sub-content[data-sub="single"] > .recall-notice:has(+ .search-card) { order: -2 !important; }
 
-  /* 주사집 배너 텍스트 */
-  #jusaBanner { padding: 16px 18px !important; }
-  #jusaBanner div[style*="font-size:15px"] { font-size: 16px !important; }
+  /* ── 주사집 배너 — 모바일에서 세로 스택 + 로고 박스 풀폭·크게 ── */
+  #jusaBanner { padding: 14px !important; }
+  #jusaBanner > div:first-child {
+    flex-direction: column !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+  /* 로고 박스: 배너 여백 가득 채우게, 위아래 두툼하게 */
+  #jusaBanner > div:first-child > div:first-child {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    padding: clamp(22px, 6vw, 32px) clamp(14px, 4vw, 20px) !important;
+    background: #fff !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+  }
+  /* 로고 이미지 — 크게 (height clamp) */
+  #jusaBanner img[alt="JUSA Z/P"] {
+    height: clamp(54px, 13vw, 72px) !important;
+    max-width: 100% !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+  /* fallback 텍스트 (이미지 onerror 시) — 크게 가운데 정렬 */
+  #jusaBanner > div:first-child > div:first-child > div {
+    font-size: clamp(32px, 9vw, 44px) !important;
+    text-align: center !important;
+    letter-spacing: -1px !important;
+  }
+  /* 본문 — 풀폭 */
+  #jusaBanner > div:first-child > div:nth-child(2) {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  /* "바로가기 →" 버튼 — 풀폭 */
+  #jusaBanner > div:first-child > a {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  /* 본문 텍스트 사이즈 */
+  #jusaBanner div[style*="font-size:15px"] { font-size: 17px !important; }
   #jusaBanner div[style*="font-size:12.5px"] { font-size: 14px !important; line-height: 1.7 !important; }
-  #jusaBanner a[style*="font-size:13px"] { font-size: 14px !important; padding: 13px 22px !important; min-height: 48px !important; }
+  #jusaBanner a[style*="font-size:13px"] { font-size: 15px !important; padding: 15px 22px !important; min-height: 52px !important; }
+  /* 다크모드에서도 fallback 텍스트 가독성 */
+  body.dark #jusaBanner > div:first-child > div:first-child > div {
+    color: #93c5fd !important;
+  }
 
   /* ── 대시보드 Carousel (스와이프 + 하단 화살표 + 점 인디케이터) ── */
   .dash-cw {
