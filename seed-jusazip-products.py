@@ -25,8 +25,9 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_XLSX = Path(r"C:\Users\GB\Downloads\20260624_goods_info.xlsx")
+DEFAULT_XLSX = Path(r"C:\Users\GB\Documents\카카오톡 받은 파일\20260703_goods_info.xlsx")
 OUT = ROOT / "public" / "jusazip-products.json"
+VERSION = "20260703"
 
 COLS = [
     'seqn','goodsCd','goodsNm','category','seller','manufacturer','vendorCd',
@@ -82,7 +83,7 @@ def build(xlsx_path):
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out = {
-        'v': '20260624',
+        'v': VERSION,
         'count': count,
         'bySeq': by_seq,
         'byName': by_name,
