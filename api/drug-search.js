@@ -56,23 +56,40 @@ export default async function handler(req, res) {
   console.log('[drug-search] 요청 URL:', url);
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
-    });
+    // 식약처 API 무한 대기 방지 (9초 타임아웃 — Vercel 10초 제한 내)
+    const ctrl = new AbortController();
+    const tmo = setTimeout(() => ctrl.abort(), 9000);
+    let response;
+    try {
+      response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+        signal: ctrl.signal
+      });
+    } finally {
+      clearTimeout(tmo);
+    }
 
     const text = await response.text();
-    
+
     try {
       const data = JSON.parse(text);
-      console.log('[drug-search] 응답 성공:', data.header?.resultCode);
+      // Vercel CDN(edge) 캐싱 — 의약품 데이터는 하루 1회 정도만 변경
+      //   s-maxage=21600(6h): CDN이 6시간 캐시 → 인기 검색은 식약처 안 거치고 즉시
+      //   stale-while-revalidate=86400(24h): 만료 후에도 옛 응답 즉시 주고 백그라운드 갱신
+      const ok = data && data.header && (data.header.resultCode === '00' || data.header.resultCode === undefined);
+      if (ok) {
+        res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400, max-age=3600');
+        res.setHeader('CDN-Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
+      } else {
+        res.setHeader('Cache-Control', 's-maxage=60');
+      }
       return res.status(200).json(data);
     } catch (parseError) {
       console.error('[drug-search] JSON 파싱 오류:', parseError);
-      return res.status(200).json({ 
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).json({
         raw: text,
-        error: 'JSON 파싱 실패' 
+        error: 'JSON 파싱 실패'
       });
     }
   } catch (error) {

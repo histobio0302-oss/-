@@ -1,0 +1,31 @@
+name: warm-cache
+
+# 인기 검색어 CDN 캐시 워밍 — 식약처 cold-miss(첫 검색 2~9초) 방지.
+# Vercel 엣지 캐시 s-maxage=6h 가 만료되기 전에 3시간마다 인기 약품을 미리 호출해
+# 엣지를 항상 따뜻하게 유지한다.
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'   # 3시간마다 (UTC)
+  workflow_dispatch: {}      # 수동 실행 허용
+
+permissions:
+  contents: read
+
+concurrency:
+  group: warm-cache
+  cancel-in-progress: true
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Warm CDN cache
+        env:
+          WARM_BASE: https://snowy-nine-21.vercel.app
+        run: node scripts/warm-cache.mjs

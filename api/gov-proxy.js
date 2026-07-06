@@ -34,6 +34,12 @@ export default async function handler(req, res) {
     const contentType = response.headers.get('content-type') || 'application/json';
     const text = await response.text();
     res.setHeader('Content-Type', contentType);
+    // 정상 응답(2xx + resultCode 00)만 Vercel CDN 캐싱 (6h + 24h SWR, 브라우저 1h)
+    if (response.status >= 200 && response.status < 300 && /resultCode["']?\s*:\s*["']?00/.test(text)) {
+      res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400, max-age=3600');
+    } else {
+      res.setHeader('Cache-Control', 's-maxage=60');
+    }
     res.status(response.status).send(text);
   } catch (err) {
     res.status(500).json({ error: err.message });
