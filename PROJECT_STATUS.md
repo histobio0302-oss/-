@@ -1,6 +1,30 @@
 # 📋 PROJECT_STATUS.md — 의약품 안전정보 포털
 
-> 마지막 업데이트: 2026-05-15
+> 마지막 업데이트: 2026-07-13
+
+---
+
+## 0. 현재 배포 정체성 & 최근 작업 (2026-07-13)
+
+> ⚠️ 아래 §1의 표는 옛 `drug-search-app2` 시절 정보다. **현재 운영 기준은 이 §0**을 따른다.
+
+| 항목 | 값 |
+|---|---|
+| 로컬 경로 | `C:\Users\GB\Documents\snowy-nine-21` |
+| 배포 URL | https://snowy-nine-21.vercel.app |
+| GitHub | `histobio0302-oss/-.git` (레포명이 문자 그대로 `-`, **cslis07 아님**) |
+| 빌드 | `node build.js` — 소스 `index.html` → `public/index.html`(gitignore, Vercel 재생성) + `price-changes.json` |
+
+**⚠️ push 절차 (histobio 전용)**: 이 머신 기본 계정은 cslis07 → 바로 push하면 403.
+`gh auth switch --user histobio0302-oss` → `git push origin main` → **끝나면 반드시 `gh auth switch --user cslis07`로 복원**.
+gitignore: `public/index.html`, `public/price-changes.json`만. manifest·sw·icons는 커밋 대상.
+
+### ✅ PWA 앱 설치 + 모바일 (2026-07-13 추가)
+- `public/manifest.json` (standalone, 아이콘 3종), `public/sw.js` (오프라인 셸 + 색인 SWR + `/api` network-only, 캐시버전 **`v1-20260713`**)
+- `public/icons/` — 192·512·maskable·apple-touch. **아이콘 = HISTOBIO ∞ INFINITY 워드마크**(흰 배경 검정), headless Chrome로 SVG 렌더. 재생성 소스는 세션 스크래치패드의 `icon-any/solid/maskable.html`
+- `index.html`: head PWA 메타(manifest·theme-color `#2563eb`·apple 홈화면)·설치 프롬프트(Android/데스크톱 `#pwaInstallBtn`)·iOS Safari 안내·`?tab=` 딥링크. PWA 스크립트는 **`data-noobfuscate`**라 빌드 시 원본 유지
+- FCM 푸시는 **미포함**(drug-portal과 달리 snowy엔 푸시 인프라 없음). sw는 캐시 전용
+- sw 캐시 갱신 시 `CACHE_VERSION` 문자열을 바꿔야 구버전 셸이 정리됨
 
 ---
 
