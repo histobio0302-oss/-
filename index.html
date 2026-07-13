@@ -17,6 +17,23 @@
 <meta name="twitter:title" content="의약품 안전정보 포털">
 <meta name="twitter:description" content="식약처·심평원 공공데이터 통합 조회 — 의약품 허가·성분·DUR·약가·낱알식별 정보">
 <meta name="twitter:image" content="https://snowy-nine-21.vercel.app/og-image.png">
+<!-- ═══ PWA (설치형 앱) ═══ -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2563eb">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+<!-- iOS 홈 화면 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="약안전">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<style>
+#pwaInstallBtn { position: fixed; z-index: 9400; right: 14px; bottom: calc(20px + env(safe-area-inset-bottom, 0)); padding: 10px 16px; border: none; border-radius: 24px; background: var(--primary); color: #fff; font-family: inherit; font-size: 13px; font-weight: 800; box-shadow: 0 6px 20px rgba(37,99,235,.4); cursor: pointer; -webkit-tap-highlight-color: transparent; animation: pwaBtnIn .3s ease; }
+#pwaInstallBtn:active { transform: scale(.96); }
+@keyframes pwaBtnIn { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -7762,6 +7779,83 @@ function jusazipBtn(itemSeq, itemName, mode){
   }
   return '<a href="'+url+'" target="_blank" rel="noopener" class="link-btn" style="flex:0 0 auto;background:#fffbeb;border-color:#fde68a;color:#92400e" title="주사집에서 바로 구매 ('+safeN+')">🛒<span class="btn-label"> 주사집</span></a>';
 }
+</script>
+
+<!-- ═══ PWA: 서비스워커 · 설치 · 딥링크 ═══ -->
+<script data-noobfuscate>
+(function(){
+  // 1) 앱(스탠드얼론)으로 실행 중이면 body에 클래스
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.matchMedia('(display-mode: minimal-ui)').matches
+      || window.navigator.standalone === true;
+  }
+  if (isStandalone()) document.documentElement.classList.add('app-mode');
+
+  // 2) 서비스워커 등록
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(e){ console.warn('[sw] 등록 실패', e); });
+    });
+  }
+
+  // 3) 딥링크 (?tab=search|safety|medical …)
+  try {
+    var tab = new URLSearchParams(location.search).get('tab');
+    if (tab) {
+      var run = function(){ if (typeof setTab === 'function') setTab(tab); };
+      if (document.readyState === 'complete') setTimeout(run, 60);
+      else window.addEventListener('load', function(){ setTimeout(run, 60); });
+    }
+  } catch(e){}
+
+  // 4) 설치 프롬프트 (Android/데스크톱) — 홈 화면에 추가 버튼
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallBtn();
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    var b = document.getElementById('pwaInstallBtn'); if (b) b.remove();
+    try { localStorage.setItem('pwaInstalled','1'); } catch(e){}
+  });
+  function showInstallBtn(){
+    if (document.getElementById('pwaInstallBtn')) return;
+    if (isStandalone()) return;
+    var b = document.createElement('button');
+    b.id = 'pwaInstallBtn';
+    b.type = 'button';
+    b.innerHTML = '📲 앱 설치';
+    b.onclick = function(){
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(function(){ deferredPrompt = null; b.remove(); });
+    };
+    document.body.appendChild(b);
+  }
+
+  // 5) iOS Safari: beforeinstallprompt 미지원 → 첫 방문 시 1회 안내
+  window.addEventListener('load', function(){
+    try {
+      var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      var isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+      var seen = localStorage.getItem('iosInstallHint');
+      if (isIOS && isSafari && !isStandalone() && !seen) {
+        setTimeout(function(){
+          var t = document.createElement('div');
+          t.id = 'iosInstallHint';
+          t.innerHTML = '<div style="font-weight:700;margin-bottom:4px">📲 홈 화면에 앱으로 추가</div>'
+            + '<div style="font-size:12.5px;line-height:1.5;color:var(--text2)">Safari 하단 <b>공유 <span style="font-size:15px">&#x2191;</span></b> → <b>홈 화면에 추가</b>를 누르면 앱처럼 사용할 수 있어요.</div>'
+            + '<button onclick="this.parentNode.remove();localStorage.setItem(\'iosInstallHint\',\'1\')" style="margin-top:8px;padding:6px 14px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-weight:700;font-family:inherit;font-size:12.5px;cursor:pointer">알겠어요</button>';
+          t.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0));z-index:9500;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,.18)';
+          document.body.appendChild(t);
+        }, 3000);
+      }
+    } catch(e){}
+  });
+})();
 </script>
 
 </body>
