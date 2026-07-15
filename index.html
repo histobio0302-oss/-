@@ -579,6 +579,12 @@ header {
 #recentDropdown.open { display: block; }
 .ac-hl { background: transparent; color: var(--primary); font-weight: 800; }
 .recent-item.ac-active { background: var(--primary-lt); }
+#viewedSection:empty { display: none; }
+#viewedSection { border-bottom: 1px solid var(--border); }
+.viewed-head { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px 5px; font-size: 11px; font-weight: 700; color: var(--text3); }
+.viewed-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+.viewed-chip { padding: 5px 11px; border-radius: 50px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
+.viewed-chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
 .recent-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px 8px;
@@ -2367,6 +2373,7 @@ body.mobile-forced .guide-link-btn .guide-link-label {
           <span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span>
           <!-- 최근 검색어 / 자동완성 드롭다운 -->
           <div id="recentDropdown">
+            <div id="viewedSection"></div>
             <div class="recent-header">
               <span class="recent-header-title" id="recentHeaderTitle">🕐 최근 검색어</span>
               <button class="recent-clear-btn" id="recentClearBtn" onclick="clearRecent()">전체 삭제</button>
@@ -3559,6 +3566,7 @@ function openRecent() {
   if (v.trim()) { onSearchInput(v); return; }
   setRecentHeader('recent');
   _acItems = []; _acActive = -1;
+  renderRecentViewed();
   renderRecentList('');
   if (dd) dd.classList.add('open');
 }
@@ -3574,10 +3582,12 @@ function onSearchInput(val) {
   if (!val || !val.trim()) {
     _acItems = []; _acActive = -1;
     setRecentHeader('recent');
+    renderRecentViewed();
     renderRecentList('');
     dd.classList.add('open');
     return;
   }
+  var _vs = document.getElementById('viewedSection'); if (_vs) _vs.innerHTML = '';
   dd.classList.add('open');
   if (_acTimer) clearTimeout(_acTimer);
   var v = val;
@@ -7090,10 +7100,41 @@ function openDetailModal(seq, name, seller, maker, pack, ingr, chart, apprDate, 
     pack:pack, ingr:ingr, chart:chart, apprDate:apprDate,
     mfgLabel:mfgLabel, bioStatus:bioStatus };
 
+  pushRecentViewed(currentDetailDrug);
   document.getElementById('detailModalTitle').textContent = '📄 ' + name;
   renderDetailInfo();
   switchDetailTab('info');
   document.getElementById('detailModal').classList.add('open');
+}
+
+/* ── 최근 본 약 (localStorage) ── */
+var RV_KEY = 'recentlyViewed_v1';
+function loadRecentViewed() { try { return JSON.parse(localStorage.getItem(RV_KEY) || '[]'); } catch(e) { return []; } }
+function pushRecentViewed(d) {
+  if (!d || !d.seq) return;
+  var list = loadRecentViewed().filter(function(x){ return x.seq !== d.seq; });
+  list.unshift({ seq:d.seq, name:d.name, seller:d.seller||'', maker:d.maker||'', pack:d.pack||'',
+    ingr:d.ingr||'', chart:d.chart||'', apprDate:d.apprDate||'', mfgLabel:d.mfgLabel||'', bioStatus:d.bioStatus||'' });
+  if (list.length > 12) list = list.slice(0, 12);
+  try { localStorage.setItem(RV_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function openRecentViewedByIdx(i) {
+  var d = loadRecentViewed()[i]; if (!d) return;
+  closeRecent();
+  openDetailModal(d.seq, d.name, d.seller, d.maker, d.pack, d.ingr, d.chart, d.apprDate, d.mfgLabel, d.bioStatus);
+}
+function clearRecentViewed() { try { localStorage.removeItem(RV_KEY); } catch(e) {} renderRecentViewed(); }
+function renderRecentViewed() {
+  var el = document.getElementById('viewedSection'); if (!el) return;
+  var list = loadRecentViewed();
+  if (!list.length) { el.innerHTML = ''; return; }
+  var chips = list.slice(0, 10).map(function(d, i) {
+    var nm = (d.name || '').split('(')[0];
+    return '<button class="viewed-chip" onclick="openRecentViewedByIdx(' + i + ')" title="' + esc(d.name) + '">👁 ' + esc(nm) + '</button>';
+  }).join('');
+  el.innerHTML = '<div class="viewed-head"><span>👁 최근 본 약</span>'
+    + '<button class="recent-clear-btn" onclick="clearRecentViewed()">삭제</button></div>'
+    + '<div class="viewed-chips">' + chips + '</div>';
 }
 
 function closeDetailModal() {
@@ -7249,9 +7290,13 @@ setSubTab('info','license');
 </div>
 <script>
 (function(){
-  var UPDATE_VERSION = '2026-06-19a';
+  var UPDATE_VERSION = '2026-07-14a';
   // 이용가이드 '수정된 사항' 섹션 미러 (가이드 #sec-updates 와 동기 유지)
   var UPDATES = [
+    {d:'2026.07.13', i:'💊', t:'검색어 자동완성', s:'검색창에 몇 글자만 입력하면 일치하는 제품명·성분명이 즉시 추천됩니다. ↑↓ 방향키로 고르고 Enter로 바로 검색할 수 있습니다.'},
+    {d:'2026.07.13', i:'🔡', t:'초성 검색 · 띄어쓰기 무시', s:'약 이름의 초성만 입력해도 찾을 수 있습니다. 예: ㅌㅇㄹㄴ→타이레놀. 띄어쓰기는 자동으로 무시됩니다.'},
+    {d:'2026.07.13', i:'🔽', t:'검색 결과 정렬 · 생동성 필터', s:'검색 결과를 약가 낮은순·높은순·이름순·최신 허가순으로 정렬할 수 있고, 생동성인정 품목만 보는 필터도 추가됐습니다.'},
+    {d:'2026.07.13', i:'👁', t:'최근 본 약', s:'상세보기로 열어본 약이 검색창을 누르면 "👁 최근 본 약"으로 표시됩니다. 한 번에 상세정보로 이동할 수 있습니다.'},
     {d:'2026.06.16', i:'📈', t:'약가 안내 — 심평원 약가기준정보 API 연동', s:'약품 상세의 📈 약가 안내 탭에서 심평원 약가기준정보(약가목록조회)를 실시간 조회합니다. 현재 상한가·적용시작일자를 모든 등재 품목에 표시하고, 제품코드 변경 이력(chgBfMdsCd 체인)을 자동 추적해 과거 가격 변동 점을 차트에 함께 표시합니다.'},
     {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
     {d:'2026.06.16', i:'🛠️', t:"제형 분류 오류 수정 — 브랜드명 중간 '주'가 주사제로 잘못 분류되던 문제", s:"동일성분 필터의 '주사제/정제' 등 제형 분류가 브랜드명 중간의 '주' 글자(예: 아주스타정·아주리정)를 주사제로 잘못 분류하던 문제를 수정했습니다. 이제 제품명 끝의 형태명(정·캡슐·시럽·주사제·연고·점안액·좌제·질정 등)만으로 정확히 분류하며, 함량·포장 표기는 무시합니다."},
