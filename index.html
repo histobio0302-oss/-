@@ -305,15 +305,15 @@ header {
 
 /* 카드 헤더 */
 .card-top, .result-top {
-  padding: 16px 18px 12px;
+  padding: 11px 14px 8px;
   display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 12px;
+  justify-content: space-between; gap: 10px;
 }
 .drug-info { flex: 1; min-width: 0; }
 .drug-name {
   font-size: 15px; font-weight: 700;
   color: var(--text); letter-spacing: -0.3px;
-  line-height: 1.4; margin-bottom: 4px;
+  line-height: 1.3; margin-bottom: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .drug-company {
@@ -342,28 +342,28 @@ header {
   border-bottom: 1px solid var(--border);
 }
 .meta-item {
-  padding: 10px 14px;
+  padding: 7px 12px;
   border-right: 1px solid var(--border);
 }
 .meta-item:last-child { border-right: none; }
 .meta-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.7px;
-  text-transform: uppercase; color: var(--text3); margin-bottom: 4px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 2px;
 }
 .meta-value {
   font-size: 12px; font-weight: 600; color: var(--text);
-  line-height: 1.4; word-break: break-all;
+  line-height: 1.35; word-break: break-all;
 }
 
 /* 주성분 영역 */
 .card-ingr {
-  padding: 10px 18px;
+  padding: 7px 14px;
   border-bottom: 1px solid var(--border);
   background: var(--surface2);
 }
 .card-ingr-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.7px;
-  text-transform: uppercase; color: var(--text3); margin-bottom: 3px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 2px;
 }
 .card-ingr-value {
   font-size: 12px; color: var(--text2); line-height: 1.5;
@@ -385,7 +385,7 @@ header {
 
 /* 카드 액션 버튼 */
 .card-actions {
-  padding: 12px 14px;
+  padding: 9px 12px;
   display: flex; gap: 8px; flex-wrap: wrap;
   margin-top: auto;
 }
@@ -577,6 +577,8 @@ header {
 }
 @keyframes dropDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
 #recentDropdown.open { display: block; }
+.ac-hl { background: transparent; color: var(--primary); font-weight: 800; }
+.recent-item.ac-active { background: var(--primary-lt); }
 .recent-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px 8px;
@@ -2358,16 +2360,16 @@ body.mobile-forced .guide-link-btn .guide-link-label {
         <div class="recent-wrap" style="flex:1;min-width:0;">
           <input class="sinput" id="q" style="width:100%;"
             placeholder="제품명 입력  (예: 풀미큐어, 타이레놀, 아모잘탄정...)"
-            onkeydown="if(event.key==='Enter'){closeRecent();go();}"
+            onkeydown="searchKeydown(event)"
             onfocus="openRecent()"
             oninput="onSearchInput(this.value)"
             autocomplete="off">
           <span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span>
-          <!-- 최근 검색어 드롭다운 -->
+          <!-- 최근 검색어 / 자동완성 드롭다운 -->
           <div id="recentDropdown">
             <div class="recent-header">
-              <span class="recent-header-title">🕐 최근 검색어</span>
-              <button class="recent-clear-btn" onclick="clearRecent()">전체 삭제</button>
+              <span class="recent-header-title" id="recentHeaderTitle">🕐 최근 검색어</span>
+              <button class="recent-clear-btn" id="recentClearBtn" onclick="clearRecent()">전체 삭제</button>
             </div>
             <div id="recentList"></div>
           </div>
@@ -2382,7 +2384,19 @@ body.mobile-forced .guide-link-btn .guide-link-label {
         <span style="font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;">🔽 검색 필터</span>
         <button onclick="resetFilters()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 6px;border-radius:4px;" id="filterResetBtn">초기화</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="filterGrid">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;" id="filterGrid">
+
+        <!-- 정렬 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">정렬</div>
+          <select id="sortResults" onchange="sortResults()" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:var(--surface);cursor:pointer;font-family:inherit;">
+            <option value="">관련도순</option>
+            <option value="price_asc">약가 낮은순</option>
+            <option value="price_desc">약가 높은순</option>
+            <option value="name">이름순</option>
+            <option value="date_desc">최신 허가순</option>
+          </select>
+        </div>
 
         <!-- 제조사 필터 -->
         <div>
@@ -2418,6 +2432,15 @@ body.mobile-forced .guide-link-btn .guide-link-label {
             <option value="2010">2010년 이후</option>
             <option value="2000">2000년 이후</option>
             <option value="~2000">1999년 이전</option>
+          </select>
+        </div>
+
+        <!-- 생동성 필터 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;">생동성</div>
+          <select id="filterBio" onchange="applyFilters()" style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:var(--surface);cursor:pointer;font-family:inherit;">
+            <option value="">전체</option>
+            <option value="bio">생동성인정만</option>
           </select>
         </div>
 
@@ -3248,6 +3271,29 @@ function fetchBio(name) {
 ══════════════════════════════════════════════ */
 var USE_NAME_INDEX = true;
 var _ingrIdx = null, _ingrIdxLoading = null;
+// ── 초성·공백무시 검색 헬퍼 (자동완성·메인 검색 공용) ──
+var _CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+function chosungOf(str) {
+  var out = '';
+  for (var i = 0; i < str.length; i++) {
+    var c = str.charCodeAt(i);
+    if (c >= 0xAC00 && c <= 0xD7A3) out += _CHO[Math.floor((c - 0xAC00) / 588)];
+    else out += str[i];
+  }
+  return out;
+}
+function isChosungQuery(q) { return /^[ㄱ-ㅎ]+$/.test(q); }
+function prepQuery(q) {
+  q = (q || '').trim().replace(/\s/g, '');
+  var qc = isChosungQuery(q);
+  return { qc: qc, qn: qc ? q : q.toLowerCase() };
+}
+function matchPos(name, pq) {
+  var nmn = (name || '').replace(/\s/g, '');
+  var base = pq.qc ? chosungOf(nmn) : nmn.toLowerCase();
+  return { pos: base.indexOf(pq.qn), baseLen: base.length };
+}
+
 function loadIngrIndex() {
   if (_ingrIdx) return Promise.resolve(_ingrIdx);
   if (_ingrIdxLoading) return _ingrIdxLoading;
@@ -3266,17 +3312,17 @@ function fetchListByName(name, limit) {
   if (!USE_NAME_INDEX) return fetchList(q, limit, 1, 'item_name');
   return loadIngrIndex().then(function(idx){
     var s = idx.s || {}, kArr = idx.k || [];
-    var ql = q.toLowerCase(), cap = limit * 3;
+    var pq = prepQuery(q), cap = limit * 3;   // 초성·공백무시
     var exact = [], prefix = [], mid = [];
     for (var seq in s) {
       if (!s.hasOwnProperty(seq)) continue;
       var r = s[seq]; var nm = r[1] || '';
       if (!nm) continue;
-      var p = nm.toLowerCase().indexOf(ql);
+      var m = matchPos(nm, pq); var p = m.pos;
       if (p < 0) continue;
       var ingrNm = (kArr[r[0]] || '').replace(/\|/g, ', ');
       var item = { ITEM_SEQ: seq, ITEM_NAME: nm, ENTP_NAME: r[2] || '', ITEM_INGR_NAME: ingrNm };
-      if (p === 0) { if (nm.length === q.length) exact.push(item); else if (prefix.length < cap) prefix.push(item); }
+      if (p === 0) { if (m.baseLen === pq.qn.length) exact.push(item); else if (prefix.length < cap) prefix.push(item); }
       else if (mid.length < cap) mid.push(item);
     }
     var items = exact.concat(prefix).concat(mid).slice(0, limit);
@@ -3398,9 +3444,122 @@ function renderRecentList(keyword) {
   }).join('');
 }
 
-function openRecent() {
-  renderRecentList('');
+// ── 자동완성 (로컬 색인 기반 — 입력 즉시 추천) ──
+var _acTimer = null, _acItems = [], _acActive = -1;
+
+function setRecentHeader(mode) {
+  var title = document.getElementById('recentHeaderTitle');
+  var clr = document.getElementById('recentClearBtn');
+  if (mode === 'suggest') { if (title) title.textContent = '💊 추천 검색어'; if (clr) clr.style.display = 'none'; }
+  else { if (title) title.textContent = '🕐 최근 검색어'; if (clr) clr.style.display = ''; }
+}
+
+// 한글 성분명 목록 — 색인 k는 영문이라 제품명 괄호 속 한글 성분(nameIngrSet)에서 1회 추출·빈도순 캐시
+var _korIngrList = null, _korIngrPending = null;
+function getKorIngrList() {
+  if (_korIngrList) return Promise.resolve(_korIngrList);
+  if (_korIngrPending) return _korIngrPending;
+  _korIngrPending = loadIngrIndex().then(function(idx) {
+    var s = idx.s || {}, freq = {};
+    for (var seq in s) {
+      if (!s.hasOwnProperty(seq)) continue;
+      var arr = nameIngrSet(s[seq][1] || '');
+      if (arr) for (var i = 0; i < arr.length; i++) {
+        var n = arr[i];
+        if (n && n.length >= 2) freq[n] = (freq[n] || 0) + 1;
+      }
+    }
+    _korIngrList = Object.keys(freq).sort(function(a, b) { return freq[b] - freq[a]; });
+    return _korIngrList;
+  }).catch(function() { _korIngrPending = null; return []; });
+  return _korIngrPending;
+}
+
+function buildSuggestions(val, mode, cb) {
+  var q = (val || '').trim().toLowerCase();
+  if (!q) { cb([]); return; }
+  var pq = prepQuery(val);
+  if (mode === 'ingr') {
+    getKorIngrList().then(function(list) {
+      var seen = {}, pre = [], mid = [];
+      for (var i = 0; i < list.length; i++) {
+        var name = list[i]; if (seen[name]) continue;
+        var p = matchPos(name, pq).pos;
+        if (p < 0) continue; seen[name] = 1;
+        (p === 0 ? pre : mid).push(name);
+      }
+      cb(pre.concat(mid).slice(0, 8));
+    }).catch(function() { cb([]); });
+    return;
+  }
+  loadIngrIndex().then(function(idx) {
+    var s = idx.s || {}, seen = {}, pre = [], mid = [];
+    for (var seq in s) {
+      if (!s.hasOwnProperty(seq)) continue;
+      var nm = s[seq][1] || ''; if (!nm || seen[nm]) continue;
+      var p = matchPos(nm, pq).pos;
+      if (p < 0) continue; seen[nm] = 1;
+      if (p === 0) { if (pre.length < 60) pre.push(nm); }
+      else { if (mid.length < 60) mid.push(nm); }
+      if (pre.length >= 60 && mid.length >= 60) break;
+    }
+    var byLen = function(a, b) { return a.length - b.length; };
+    pre.sort(byLen); mid.sort(byLen);
+    cb(pre.concat(mid).slice(0, 8));
+  }).catch(function() { cb([]); });
+}
+
+function renderSuggestions(items, q) {
+  var el = document.getElementById('recentList');
+  if (!el) return;
+  setRecentHeader('suggest');
+  _acItems = items; _acActive = -1;
+  if (!items.length) {
+    el.innerHTML = '<div class="recent-empty">추천이 없습니다. <kbd>Enter</kbd>로 바로 검색하세요.</div>';
+    return;
+  }
+  var ql = (q || '').toLowerCase();
+  el.innerHTML = items.map(function(name, i) {
+    var low = name.toLowerCase(), p = low.indexOf(ql), disp = esc(name);
+    if (p >= 0 && ql) disp = esc(name.slice(0, p)) + '<mark class="ac-hl">' + esc(name.slice(p, p + ql.length)) + '</mark>' + esc(name.slice(p + ql.length));
+    return '<button class="recent-item ac-item" data-idx="' + i + '" onmouseenter="acHover(' + i + ')" onclick="selectRecent(\'' + esc(name).replace(/'/g, "\\'") + '\')">'
+      + '<span class="recent-item-icon">💊</span>'
+      + '<span class="recent-item-text">' + disp + '</span>'
+      + '</button>';
+  }).join('');
+}
+function acHover(i) { _acActive = i; acHighlight(); }
+function acHighlight() {
+  var el = document.getElementById('recentList'); if (!el) return;
+  var items = el.querySelectorAll('.ac-item');
+  for (var i = 0; i < items.length; i++) items[i].classList.toggle('ac-active', i === _acActive);
+}
+
+function searchKeydown(e) {
   var dd = document.getElementById('recentDropdown');
+  var open = dd && dd.classList.contains('open');
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (!open || !_acItems.length) return;
+    e.preventDefault();
+    _acActive += (e.key === 'ArrowDown' ? 1 : -1);
+    if (_acActive < 0) _acActive = _acItems.length - 1;
+    if (_acActive >= _acItems.length) _acActive = 0;
+    acHighlight();
+  } else if (e.key === 'Enter') {
+    if (open && _acActive >= 0 && _acItems[_acActive]) selectRecent(_acItems[_acActive]);
+    else { closeRecent(); go(); }
+  } else if (e.key === 'Escape') {
+    closeRecent();
+  }
+}
+
+function openRecent() {
+  var v = (document.getElementById('q') || {}).value || '';
+  var dd = document.getElementById('recentDropdown');
+  if (v.trim()) { onSearchInput(v); return; }
+  setRecentHeader('recent');
+  _acItems = []; _acActive = -1;
+  renderRecentList('');
   if (dd) dd.classList.add('open');
 }
 
@@ -3412,13 +3571,23 @@ function closeRecent() {
 function onSearchInput(val) {
   var dd = document.getElementById('recentDropdown');
   if (!dd) return;
-  if (val.length > 0) {
-    renderRecentList(val);
-    dd.classList.add('open');
-  } else {
+  if (!val || !val.trim()) {
+    _acItems = []; _acActive = -1;
+    setRecentHeader('recent');
     renderRecentList('');
     dd.classList.add('open');
+    return;
   }
+  dd.classList.add('open');
+  if (_acTimer) clearTimeout(_acTimer);
+  var v = val;
+  _acTimer = setTimeout(function() {
+    buildSuggestions(v, _searchMode, function(items) {
+      var cur = document.getElementById('q');
+      if (cur && cur.value !== v) return;
+      renderSuggestions(items, v);
+    });
+  }, 110);
 }
 
 function selectRecent(q) {
@@ -3599,6 +3768,9 @@ function go() {
           + ' data-seller="' + esc(sellerNm) + '"'
           + ' data-form="' + getFormGroup(itemNm) + '"'
           + ' data-year="' + (drug.ITEM_PERMIT_DATE ? drug.ITEM_PERMIT_DATE.substring(0,4) : '0') + '"'
+          + ' data-bio="' + (isBio ? '1' : '0') + '"'
+          + ' data-price="' + (priceValue !== '' && priceValue != null ? priceValue : '') + '"'
+          + ' data-name="' + esc(itemNm) + '"'
           + ' data-export-index="' + exportIndex + '">'
 
           // ── 헤더: 약품명 + 제조사 + 뱃지
@@ -3692,15 +3864,16 @@ function go() {
       if (!seq) return Promise.resolve();
       return fetchDetail(seq).then(function(dtl) { if (dtl) details[i] = dtl; }).catch(function() {});
     })).then(function() {
-      // 그 사이 사용자가 적용한 필터 선택값 보존 (재렌더는 initFilters로 초기화하므로)
-      var ef = document.getElementById('filterEntp'), ff = document.getElementById('filterForm'),
-          df = document.getElementById('filterDate'), pf = document.getElementById('filterPayable');
-      var sv = { e: ef ? ef.value : '', f: ff ? ff.value : '', d: df ? df.value : '', p: (pf && pf.value) || '' };
+      // 그 사이 사용자가 적용한 필터·정렬 선택값 보존 (재렌더는 initFilters로 초기화하므로)
+      function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
+      function sv2(id,v){ var el=document.getElementById(id); if(el) el.value=v; }
+      var sv = { e: gv('filterEntp'), f: gv('filterForm'), d: gv('filterDate'), b: gv('filterBio'), s: gv('sortResults') };
       renderGrid();
-      if (sv.e || sv.f || sv.d || sv.p) {
-        if (ef) ef.value = sv.e; if (ff) ff.value = sv.f; if (df) df.value = sv.d; if (pf) pf.value = sv.p;
+      if (sv.e || sv.f || sv.d || sv.b) {
+        sv2('filterEntp', sv.e); sv2('filterForm', sv.f); sv2('filterDate', sv.d); sv2('filterBio', sv.b);
         if (typeof applyFilters === 'function') applyFilters();
       }
+      if (sv.s) { sv2('sortResults', sv.s); if (typeof sortResults === 'function') sortResults(); }
     });
   }).catch(function(e) {
     document.getElementById('result').innerHTML =
@@ -3741,6 +3914,8 @@ function initFilters() {
   document.getElementById('filterEntp').value = '';
   document.getElementById('filterForm').value = '';
   document.getElementById('filterDate').value = '';
+  var bioInit = document.getElementById('filterBio'); if (bioInit) bioInit.value = '';
+  var srtInit = document.getElementById('sortResults'); if (srtInit) srtInit.value = '';
   document.getElementById('filterCount').style.display = 'none';
   document.getElementById('filterResetBtn').style.color = 'var(--text3)';
 }
@@ -3749,8 +3924,9 @@ function applyFilters() {
   var entpVal = document.getElementById('filterEntp').value;
   var formVal = document.getElementById('filterForm').value;
   var dateVal = document.getElementById('filterDate').value;
+  var bioVal  = (document.getElementById('filterBio')||{}).value || '';
 
-  var isFiltered = entpVal || formVal || dateVal;
+  var isFiltered = entpVal || formVal || dateVal || bioVal;
   document.getElementById('filterResetBtn').style.color = isFiltered ? 'var(--primary)' : 'var(--text3)';
 
   var cards = document.querySelectorAll('#resultGrid .result-card');
@@ -3760,6 +3936,7 @@ function applyFilters() {
     var seller = card.dataset.seller || '';
     var form   = card.dataset.form   || '';
     var year   = parseInt(card.dataset.year) || 0;
+    var bio    = card.dataset.bio === '1';
 
     var ok = true;
 
@@ -3778,6 +3955,9 @@ function applyFilters() {
         if (year < threshold) ok = false;
       }
     }
+
+    // 생동성 필터
+    if (bioVal === 'bio' && !bio) ok = false;
 
     card.style.display = ok ? '' : 'none';
     if (ok) shown++;
@@ -3802,7 +3982,38 @@ function resetFilters() {
   document.getElementById('filterEntp').value = '';
   document.getElementById('filterForm').value = '';
   document.getElementById('filterDate').value = '';
+  var bio = document.getElementById('filterBio'); if (bio) bio.value = '';
+  var srt = document.getElementById('sortResults'); if (srt) srt.value = '';
   applyFilters();
+  sortResults();
+}
+
+// 검색 결과 정렬 — DOM 카드 재배치 (미등재 약가는 항상 뒤로)
+function sortResults() {
+  var sel = document.getElementById('sortResults');
+  var mode = sel ? sel.value : '';
+  var grid = document.getElementById('resultGrid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.result-card'));
+  if (!cards.length) return;
+  if (!mode) {
+    cards.sort(function(a, b) { return (parseInt(a.dataset.exportIndex) || 0) - (parseInt(b.dataset.exportIndex) || 0); });
+  } else if (mode === 'name') {
+    cards.sort(function(a, b) { return (a.dataset.name || '').localeCompare(b.dataset.name || '', 'ko'); });
+  } else if (mode === 'date_desc') {
+    cards.sort(function(a, b) { return (parseInt(b.dataset.year) || 0) - (parseInt(a.dataset.year) || 0); });
+  } else {
+    var dir = (mode === 'price_desc') ? -1 : 1;
+    cards.sort(function(a, b) {
+      var pa = a.dataset.price === '' ? null : parseFloat(a.dataset.price);
+      var pb = b.dataset.price === '' ? null : parseFloat(b.dataset.price);
+      if (pa === null && pb === null) return 0;
+      if (pa === null) return 1;
+      if (pb === null) return -1;
+      return dir * (pa - pb);
+    });
+  }
+  cards.forEach(function(c) { grid.appendChild(c); });
 }
 
 function exportSearchResults() {
