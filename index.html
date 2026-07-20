@@ -4986,14 +4986,34 @@ function fetchPharm(params,rows){var base=EP_PHARM+'?serviceKey='+KEY+'&numOfRow
 
 /* ===== 행정처분 ===== */
 var EP_ADMIN='/api/gov/1471000/MdcinExaathrService04/getMdcinExaathrList04';
+/* 최근 행정처분의 다수는 ITEM_NAME이 비어 품목명이 ADM_DISPS_NAME 본문에 들어 있음 → 추출 */
+function admItemName(it){
+  if (it && it.ITEM_NAME) return it.ITEM_NAME;
+  var t = (it && it.ADM_DISPS_NAME) || '';
+  var m = /\(\s*대상\s*품목\s*\)\s*[:：]?\s*([^\n\r]+)/.exec(t)
+       || /해당\s*품목\s*[:：]\s*([^\n\r]+)/.exec(t)
+       || /(?:업무정지|판매정지)[^:：\n\r]*[:：]\s*([^\n\r]+)/.exec(t);
+  if (!m) return '';
+  return m[1].split(/\(허가|\(제\d/)[0].trim();
+}
+/* 의약품안전나라 행정처분 원문 링크 — 업소명(항상 존재)으로 딥링크(searchYn=Y가 자동검색 트리거) */
+function admNedrugFooter(it){
+  var entp = (it && it.ENTP_NAME) ? String(it.ENTP_NAME).trim() : '';
+  var base = 'https://nedrug.mfds.go.kr/pbp/CCBAO01';
+  var url = entp ? base + '/getList?searchYn=Y&entpName=' + encodeURIComponent(entp) : base;
+  return '<div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">'
+    + '<span style="font-size:11px;color:var(--text3)">출처: 식약처 의약품안전나라 행정처분</span>'
+    + '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700">&#128279; 안전나라 원문 보기 &#8594;</a>'
+    + '</div>';
+}
 var adminItems=[],adminCurPg=1,ADMIN_PG_SZ=10;
 function fetchAdmin(params){var url=EP_ADMIN+'?serviceKey='+KEY+'&numOfRows=100&pageNo=1&type=json&order=Y';var pkeys=Object.keys(params||{});for(var i=0;i<pkeys.length;i++)if(params[pkeys[i]])url+='&'+pkeys[i]+'='+encodeURIComponent(params[pkeys[i]]);return fetch(url).then(function(r){return r.text();}).then(function(txt){var t=txt.trim();if(t.charAt(0)==='{')try{return parse1471JSON(JSON.parse(txt));}catch(e){}return parseGenXML(txt);}).catch(function(e){return{items:[],total:0,error:e.message};});}
-function renderAdminTable(){var start=(adminCurPg-1)*ADMIN_PG_SZ,end=Math.min(start+ADMIN_PG_SZ,adminItems.length),rows='';for(var i=start;i<end;i++){var it=adminItems[i];rows+='<tr style="cursor:pointer" onclick="showAdminDetail(adminItems['+i+'],this)"><td style="font-weight:600;max-width:200px">'+esc(it.ITEM_NAME||'-')+'</td><td style="font-size:12px;color:var(--primary)">'+esc(it.ENTP_NAME||'-')+'</td><td style="font-size:12px;color:#dc2626">'+esc(it.ADM_DISPS_NAME||'-')+'</td><td class="mono" style="font-size:12px">'+fmtDate(it.LAST_SETTLE_DATE||'')+'</td><td class="mono" style="font-size:12px">'+fmtDate(it.RLS_END_DATE||'')+'</td></tr>';}document.getElementById('adminTableBody').innerHTML=rows||'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">결과 없음</td></tr>';document.getElementById('adminPagination').innerHTML=mkPager(adminCurPg,Math.ceil(adminItems.length/ADMIN_PG_SZ),'goAdminPg',adminItems.length);}
+function renderAdminTable(){var start=(adminCurPg-1)*ADMIN_PG_SZ,end=Math.min(start+ADMIN_PG_SZ,adminItems.length),rows='';for(var i=start;i<end;i++){var it=adminItems[i];rows+='<tr style="cursor:pointer" onclick="showAdminDetail(adminItems['+i+'],this)"><td style="font-weight:600;max-width:200px">'+esc(admItemName(it)||'-')+'</td><td style="font-size:12px;color:var(--primary)">'+esc(it.ENTP_NAME||'-')+'</td><td style="font-size:12px;color:#dc2626">'+esc((it.ADM_DISPS_NAME||'-').length>70?(it.ADM_DISPS_NAME||'').slice(0,68)+'…':(it.ADM_DISPS_NAME||'-'))+'</td><td class="mono" style="font-size:12px">'+fmtDate(it.LAST_SETTLE_DATE||'')+'</td><td class="mono" style="font-size:12px">'+fmtDate(it.RLS_END_DATE||'')+'</td></tr>';}document.getElementById('adminTableBody').innerHTML=rows||'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">결과 없음</td></tr>';document.getElementById('adminPagination').innerHTML=mkPager(adminCurPg,Math.ceil(adminItems.length/ADMIN_PG_SZ),'goAdminPg',adminItems.length);}
 function goAdminPg(pg){if(pg<1||pg>Math.ceil(adminItems.length/ADMIN_PG_SZ))return;adminCurPg=pg;document.getElementById('adminDetail').style.display='none';renderAdminTable();}
 function loadAdminRecent(){document.getElementById('adminResultWrap').style.display='block';document.getElementById('adminTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:32px"><span class="spinner"></span></td></tr>';fetchAdmin({}).then(function(r){adminItems=r.items||[];adminCurPg=1;document.getElementById('adminResultTitle').textContent='최근 행정처분 목록';document.getElementById('adminResultSub').textContent=adminItems.length+'건';renderAdminTable();});}
 function searchAdmin(){var itemQ=document.getElementById('adminItemQ').value.trim(),entpQ=document.getElementById('adminEntpQ').value.trim();if(!itemQ&&!entpQ){alert('제품명 또는 업체명을 입력해주세요.');return;}var btn=document.getElementById('adminBtn');btn.disabled=true;btn.textContent='검색 중...';document.getElementById('adminDetail').style.display='none';document.getElementById('adminMsg').style.display='none';document.getElementById('adminResultWrap').style.display='block';document.getElementById('adminTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:32px"><span class="spinner"></span></td></tr>';var params={};if(itemQ)params.item_name=itemQ;if(entpQ)params.entp_name=entpQ;fetchAdmin(params).then(function(r){adminItems=r.items||[];adminCurPg=1;if(!adminItems.length){document.getElementById('adminTableBody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3)">결과 없음</td></tr>';}else{document.getElementById('adminResultTitle').textContent='"'+(itemQ||entpQ)+'" 행정처분';document.getElementById('adminResultSub').textContent=adminItems.length+'건';renderAdminTable();}btn.disabled=false;btn.textContent='검색';});}
 function clearAdminResult(){document.getElementById('adminResultWrap').style.display='none';document.getElementById('adminMsg').style.display='none';document.getElementById('adminItemQ').value='';document.getElementById('adminEntpQ').value='';adminItems=[];}
-function showAdminDetail(it,trEl){var trs=document.querySelectorAll('#adminTable tbody tr');for(var r=0;r<trs.length;r++)trs[r].style.background='';if(trEl)trEl.style.background='var(--hover)';function ar(l,v,red){if(!v||v==='-')return '';return '<div style="padding:10px 18px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:4px">'+l+'</div><div style="font-size:13px;font-weight:600;'+(red?'color:#dc2626':'')+';line-height:1.5">'+v+'</div></div>';}var html='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fef2f2;border-bottom:1px solid #fca5a5"><div><div style="font-size:15px;font-weight:700;color:#dc2626">&#9878;&#65039; '+esc(it.ITEM_NAME||'-')+'</div><div style="font-size:12px;color:#9a3412;margin-top:2px">'+esc(it.ENTP_NAME||'-')+'</div></div><button onclick="closeAdminPanel()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 8px">&#x2715;</button></div>'+ar('행정처분명',it.ADM_DISPS_NAME,true)+ar('처분일자',fmtDate(it.LAST_SETTLE_DATE||''))+ar('공개종료일',fmtDate(it.RLS_END_DATE||''))+ar('위반법명',it.BEF_APPLY_LAW)+ar('업소소재지',it.ADDR)+'<div style="padding:12px 18px;background:#fffbeb;border-top:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#d97706;margin-bottom:6px">위반내용</div><div style="font-size:13px;color:#7c2d12;line-height:1.7">'+esc(it.EXPOSE_CONT||'-')+'</div></div>';openSafetyPopup(html);}
+function showAdminDetail(it,trEl){var trs=document.querySelectorAll('#adminTable tbody tr');for(var r=0;r<trs.length;r++)trs[r].style.background='';if(trEl)trEl.style.background='var(--hover)';function ar(l,v,red){if(!v||v==='-')return '';return '<div style="padding:10px 18px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:4px">'+l+'</div><div style="font-size:13px;font-weight:600;'+(red?'color:#dc2626':'')+';line-height:1.5">'+v+'</div></div>';}var html='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fef2f2;border-bottom:1px solid #fca5a5"><div><div style="font-size:15px;font-weight:700;color:#dc2626">&#9878;&#65039; '+esc(admItemName(it)||it.ENTP_NAME||'-')+'</div><div style="font-size:12px;color:#9a3412;margin-top:2px">'+esc(it.ENTP_NAME||'-')+'</div></div><button onclick="closeAdminPanel()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 8px">&#x2715;</button></div>'+ar('행정처분명',it.ADM_DISPS_NAME,true)+ar('처분일자',fmtDate(it.LAST_SETTLE_DATE||''))+ar('공개종료일',fmtDate(it.RLS_END_DATE||''))+ar('위반법명',it.BEF_APPLY_LAW)+ar('업소소재지',it.ADDR)+'<div style="padding:12px 18px;background:#fffbeb;border-top:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#d97706;margin-bottom:6px">위반내용</div><div style="font-size:13px;color:#7c2d12;line-height:1.7">'+esc(it.EXPOSE_CONT||'-')+'</div></div>'+admNedrugFooter(it);openSafetyPopup(html);}
 function closeAdminPanel(){ closeSafetyPopup(); }
 
 /* ── 회수/행정처분 공통 팝업 ── */
@@ -7891,7 +7911,7 @@ function dashLoadSafety() {
       if (DASH_SAFETY_MODE === 'recall') dashRenderSafety();
     })
     .catch(function(){ DASH_SAFETY.recall = []; if (DASH_SAFETY_MODE === 'recall') dashRenderSafety(); });
-  fetch('/api/gov/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=x&type=json&numOfRows=10&pageNo=1', { cache:'default' })
+  fetch('/api/gov/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=x&type=json&numOfRows=10&pageNo=1&order=Y', { cache:'default' })
     .then(function(r){ return r.json(); })
     .then(function(j){
       var items = ((j||{}).body||{}).items || [];
@@ -7936,7 +7956,7 @@ function dashRenderSafety() {
         +   '</div>'
         + '</div>';
     } else {
-      var nm2 = it.ITEM_NAME || '';
+      var nm2 = admItemName(it) || '';
       var ent2 = it.ENTP_NAME || '';
       var dt2 = dashFmtDate(it.LAST_SETTLE_DATE || '');
       return ''
