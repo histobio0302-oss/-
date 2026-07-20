@@ -4996,11 +4996,15 @@ function admItemName(it){
   if (!m) return '';
   return m[1].split(/\(허가|\(제\d/)[0].trim();
 }
-/* 의약품안전나라 행정처분 원문 링크 — 업소명(항상 존재)으로 딥링크(searchYn=Y가 자동검색 트리거) */
+/* 의약품안전나라 행정처분 원문 링크 — 처분 고유번호(ADM_DISPS_SEQ=dispsApplySeq)로 해당 항목에 직접 링크.
+   ⚠️ 업소명 검색(getList?entpName=)은 정확일치·(주)·품목구분 필터 때문에 결과 0건이 나와 안 됨(실측). */
 function admNedrugFooter(it){
+  var seq  = (it && it.ADM_DISPS_SEQ) ? String(it.ADM_DISPS_SEQ).replace(/\D/g,'') : '';
   var entp = (it && it.ENTP_NAME) ? String(it.ENTP_NAME).trim() : '';
   var base = 'https://nedrug.mfds.go.kr/pbp/CCBAO01';
-  var url = entp ? base + '/getList?searchYn=Y&entpName=' + encodeURIComponent(entp) : base;
+  var url = seq ? base + '/getItem?dispsApplySeq=' + seq
+          : entp ? base + '/getList?searchYn=Y&entpName=' + encodeURIComponent(entp)
+          : base;
   return '<div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">'
     + '<span style="font-size:11px;color:var(--text3)">출처: 식약처 의약품안전나라 행정처분</span>'
     + '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;text-decoration:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700">&#128279; 안전나라 원문 보기 &#8594;</a>'
