@@ -3630,9 +3630,12 @@ document.addEventListener('click', function(e) {
 ══════════════════════════════════════════════ */
 var _searchMode = localStorage.getItem('searchMode') || 'name';
 
-function setSearchMode(mode) {
+function setSearchMode(mode, noSave) {
   _searchMode = mode;
-  localStorage.setItem('searchMode', mode);
+  /* noSave: 딥링크가 부를 때는 사용자 저장 설정을 건드리지 않는다 —
+     성분명 모드 사용자가 ?drug= 링크를 한 번 열면 제품명 모드로 영구 전환되던 문제 방지
+     (drug-portal 2026-07-31 수정분 이식) */
+  if (!noSave) localStorage.setItem('searchMode', mode);
 
   var nameBtn = document.getElementById('smodeNameBtn');
   var ingrBtn = document.getElementById('smodeIngrBtn');
@@ -8128,6 +8131,35 @@ function jusazipBtn(itemSeq, itemName, mode){
       }
     } catch(e){}
   });
+})();
+</script>
+
+<!-- ═══ URL 딥링크 (외부 링크 → 앱 자동검색) ═══ -->
+<script>
+/* 공지 아카이브 등 외부 페이지에서 ?drug= / ?ingr= 로 들어오면 해당 검색을 자동 실행한다.
+   drug-portal 구현 이식(2026-08-04). 이 버전에는 희귀질환·증상 탭이 없어 ingr/drug만 처리. */
+function handleDeepLink() {
+  var p; try { p = new URLSearchParams(window.location.search); } catch(e) { return; }
+  var ingr = p.get('ingr'), drug = p.get('drug');
+  if (!ingr && !drug) return;
+
+  try {
+    setTab('search');
+    setSubTab('search', 'single');
+    // 두 번째 인자 true = 사용자의 저장된 검색모드를 덮어쓰지 않음
+    if (typeof setSearchMode === 'function') setSearchMode(ingr ? 'ingr' : 'name', true);
+    var q = document.getElementById('q');
+    if (!q) return;
+    q.value = ingr || drug;
+    if (typeof closeRecent === 'function') closeRecent();
+    if (typeof go === 'function') go();
+  } catch(e) { /* 딥링크 실패가 앱 초기화를 막지 않도록 */ }
+}
+
+(function(){
+  function boot() { handleDeepLink(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 </script>
 
