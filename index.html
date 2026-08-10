@@ -579,12 +579,6 @@ header {
 #recentDropdown.open { display: block; }
 .ac-hl { background: transparent; color: var(--primary); font-weight: 800; }
 .recent-item.ac-active { background: var(--primary-lt); }
-#viewedSection:empty { display: none; }
-#viewedSection { border-bottom: 1px solid var(--border); }
-.viewed-head { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px 5px; font-size: 11px; font-weight: 700; color: var(--text3); }
-.viewed-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
-.viewed-chip { padding: 5px 11px; border-radius: 50px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
-.viewed-chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
 .recent-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px 8px;
@@ -755,28 +749,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── 약가 안내 차트 ─────────────────────────── */
-.price-stat-card {
-  flex: 1; min-width: 120px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 12px 16px;
-}
-.price-stat-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
-  text-transform: uppercase; color: var(--text3); margin-bottom: 4px;
-}
-.price-stat-value {
-  font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.2;
-}
-.price-stat-sub {
-  font-size: 11px; color: var(--text3); margin-top: 2px;
-}
-.price-stat-card.highlight {
-  border-color: var(--primary-md); background: var(--primary-lt);
-}
-.price-stat-card.highlight .price-stat-value { color: var(--primary); }
 
 /* ─── 약가이력 관리 (Admin) ───────────────────── */
 .admin-upload-modal {
@@ -2136,7 +2108,7 @@ body.mobile-forced .guide-link-btn .guide-link-label {
 <div class="admin-upload-modal" id="adminUploadModal">
   <div class="admin-upload-box">
     <div class="aum-title">📂 약가이력 데이터 업로드</div>
-    <div class="aum-sub">심평원 약제급여목록 Excel 파일을 업로드하면 약가 안내 차트에 반영됩니다.</div>
+    <div class="aum-sub">심평원 약제급여목록 Excel 파일을 업로드하면 약가 데이터에 반영됩니다.</div>
 
     <div class="aum-drop" id="aumDrop" onclick="document.getElementById('aumFile').click()">
       <div class="aum-drop-icon">📊</div>
@@ -2198,9 +2170,6 @@ body.mobile-forced .guide-link-btn .guide-link-label {
       <button class="detail-tab-btn" onclick="switchDetailTab('ingredients')" id="detailTabIngredients">
         <span style="margin-right:6px">🧬</span> 동일성분 의약품
       </button>
-      <button class="detail-tab-btn" onclick="switchDetailTab('pricechart')" id="detailTabPricechart">
-        <span style="margin-right:6px">📈</span> 약가 안내
-      </button>
     </div>
     
     <!-- 상세정보 탭 내용 -->
@@ -2208,33 +2177,6 @@ body.mobile-forced .guide-link-btn .guide-link-label {
       <div id="detailDrugInfo"></div>
     </div>
 
-    <!-- 약가 안내 탭 내용 -->
-    <div id="detailPricechartContent" class="detail-tab-content" style="display:none">
-      <div id="priceChartSummary" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px"></div>
-      <div style="position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px">
-        <canvas id="priceChartCanvas" style="max-height:280px"></canvas>
-        <div id="priceChartLoading" style="text-align:center;padding:40px;color:var(--text3);font-size:13px">
-          <span class="spinner"></span> 데이터 불러오는 중…
-        </div>
-      </div>
-      <div id="priceChartNote" style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center"></div>
-    </div>
-
-    <!-- 동일성분 의약품 탭 내용 -->
-    <div id="detailIngredientsContent" class="detail-tab-content" style="display:none">
-      <div style="margin-bottom:16px;padding:12px;background:var(--primary-lt);border-left:4px solid var(--primary);border-radius:var(--r-sm)">
-        <div style="font-size:13px;color:var(--text2);line-height:1.6">
-          <strong>동일성분 의약품</strong>이란 주성분이 같은 다른 제품들을 의미합니다.
-        </div>
-      </div>
-      <div id="sameIngredientsResult">
-        <div class="state">동일성분 검색 중...</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="wrap" id="mainApp">
 
   <!-- 탭 -->
   <div class="tab-row">
@@ -2325,21 +2267,10 @@ body.mobile-forced .guide-link-btn .guide-link-label {
           <input class="sinput" id="q" style="width:100%;"
             placeholder="제품명 입력  (예: 풀미큐어, 타이레놀, 아모잘탄정...)"
             onkeydown="searchKeydown(event)"
-            onfocus="openRecent()"
-            oninput="onSearchInput(this.value)"
             autocomplete="off">
           <span class="kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></span>
-          <!-- 최근 검색어 / 자동완성 드롭다운 -->
-          <div id="recentDropdown">
-            <div id="viewedSection"></div>
-            <div class="recent-header">
-              <span class="recent-header-title" id="recentHeaderTitle">🕐 최근 검색어</span>
-              <button class="recent-clear-btn" id="recentClearBtn" onclick="clearRecent()">전체 삭제</button>
-            </div>
-            <div id="recentList"></div>
-          </div>
         </div>
-        <button class="btn btn-primary" id="goBtn" onclick="closeRecent();go()">검색</button>
+        <button class="btn btn-primary" id="goBtn" onclick="go()">검색</button>
       </div>
     </div>
 
@@ -3281,224 +3212,9 @@ function fd(label, val, bio) {
   return '<div class="'+cls+'"><label>'+label+'</label><p>'+(val||'-')+'</p></div>';
 }
 
-/* ══════════════════════════════════════════════
-   최근 검색어 기능
-══════════════════════════════════════════════ */
-var RECENT_KEY = 'drugapp_recent';
-var RECENT_MAX = 5;
-
-function getRecent() {
-  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
-  catch(e) { return []; }
-}
-
-function saveRecent(q) {
-  if (!q || q.length < 1) return;
-  var list = getRecent().filter(function(x){ return x !== q; });
-  list.unshift(q);
-  if (list.length > RECENT_MAX) list = list.slice(0, RECENT_MAX);
-  try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch(e) {}
-}
-
-function renderRecentList(keyword) {
-  var list = getRecent();
-  var el = document.getElementById('recentList');
-  if (!el) return;
-
-  // 입력 중이면 해당 키워드로 필터
-  if (keyword) {
-    list = list.filter(function(x) {
-      return x.toLowerCase().indexOf(keyword.toLowerCase()) >= 0;
-    });
-  }
-
-  if (!list.length) {
-    el.innerHTML = '<div class="recent-empty">' + (keyword ? '일치하는 최근 검색어가 없습니다.' : '최근 검색어가 없습니다.') + '</div>';
-    return;
-  }
-
-  el.innerHTML = list.map(function(q) {
-    return '<button class="recent-item" onclick="selectRecent(\'' + esc(q).replace(/'/g, "\\'") + '\')">'
-      + '<span class="recent-item-icon">🕐</span>'
-      + '<span class="recent-item-text">' + esc(q) + '</span>'
-      + '<span class="recent-item-del" onclick="event.stopPropagation();deleteRecent(\'' + esc(q).replace(/'/g, "\\'") + '\')">✕</span>'
-      + '</button>';
-  }).join('');
-}
-
-// ── 자동완성 (로컬 색인 기반 — 입력 즉시 추천) ──
-var _acTimer = null, _acItems = [], _acActive = -1;
-
-function setRecentHeader(mode) {
-  var title = document.getElementById('recentHeaderTitle');
-  var clr = document.getElementById('recentClearBtn');
-  if (mode === 'suggest') { if (title) title.textContent = '💊 추천 검색어'; if (clr) clr.style.display = 'none'; }
-  else { if (title) title.textContent = '🕐 최근 검색어'; if (clr) clr.style.display = ''; }
-}
-
-// 한글 성분명 목록 — 색인 k는 영문이라 제품명 괄호 속 한글 성분(nameIngrSet)에서 1회 추출·빈도순 캐시
-var _korIngrList = null, _korIngrPending = null;
-function getKorIngrList() {
-  if (_korIngrList) return Promise.resolve(_korIngrList);
-  if (_korIngrPending) return _korIngrPending;
-  _korIngrPending = loadIngrIndex().then(function(idx) {
-    var s = idx.s || {}, freq = {};
-    for (var seq in s) {
-      if (!s.hasOwnProperty(seq)) continue;
-      var arr = nameIngrSet(s[seq][1] || '');
-      if (arr) for (var i = 0; i < arr.length; i++) {
-        var n = arr[i];
-        if (n && n.length >= 2) freq[n] = (freq[n] || 0) + 1;
-      }
-    }
-    _korIngrList = Object.keys(freq).sort(function(a, b) { return freq[b] - freq[a]; });
-    return _korIngrList;
-  }).catch(function() { _korIngrPending = null; return []; });
-  return _korIngrPending;
-}
-
-function buildSuggestions(val, mode, cb) {
-  var q = (val || '').trim().toLowerCase();
-  if (!q) { cb([]); return; }
-  var pq = prepQuery(val);
-  if (mode === 'ingr') {
-    getKorIngrList().then(function(list) {
-      var seen = {}, pre = [], mid = [];
-      for (var i = 0; i < list.length; i++) {
-        var name = list[i]; if (seen[name]) continue;
-        var p = matchPos(name, pq).pos;
-        if (p < 0) continue; seen[name] = 1;
-        (p === 0 ? pre : mid).push(name);
-      }
-      cb(pre.concat(mid).slice(0, 8));
-    }).catch(function() { cb([]); });
-    return;
-  }
-  loadIngrIndex().then(function(idx) {
-    var s = idx.s || {}, seen = {}, pre = [], mid = [];
-    for (var seq in s) {
-      if (!s.hasOwnProperty(seq)) continue;
-      var nm = s[seq][1] || ''; if (!nm || seen[nm]) continue;
-      var p = matchPos(nm, pq).pos;
-      if (p < 0) continue; seen[nm] = 1;
-      if (p === 0) { if (pre.length < 60) pre.push(nm); }
-      else { if (mid.length < 60) mid.push(nm); }
-      if (pre.length >= 60 && mid.length >= 60) break;
-    }
-    var byLen = function(a, b) { return a.length - b.length; };
-    pre.sort(byLen); mid.sort(byLen);
-    cb(pre.concat(mid).slice(0, 8));
-  }).catch(function() { cb([]); });
-}
-
-function renderSuggestions(items, q) {
-  var el = document.getElementById('recentList');
-  if (!el) return;
-  setRecentHeader('suggest');
-  _acItems = items; _acActive = -1;
-  if (!items.length) {
-    el.innerHTML = '<div class="recent-empty">추천이 없습니다. <kbd>Enter</kbd>로 바로 검색하세요.</div>';
-    return;
-  }
-  var ql = (q || '').toLowerCase();
-  el.innerHTML = items.map(function(name, i) {
-    var low = name.toLowerCase(), p = low.indexOf(ql), disp = esc(name);
-    if (p >= 0 && ql) disp = esc(name.slice(0, p)) + '<mark class="ac-hl">' + esc(name.slice(p, p + ql.length)) + '</mark>' + esc(name.slice(p + ql.length));
-    return '<button class="recent-item ac-item" data-idx="' + i + '" onmouseenter="acHover(' + i + ')" onclick="selectRecent(\'' + esc(name).replace(/'/g, "\\'") + '\')">'
-      + '<span class="recent-item-icon">💊</span>'
-      + '<span class="recent-item-text">' + disp + '</span>'
-      + '</button>';
-  }).join('');
-}
-function acHover(i) { _acActive = i; acHighlight(); }
-function acHighlight() {
-  var el = document.getElementById('recentList'); if (!el) return;
-  var items = el.querySelectorAll('.ac-item');
-  for (var i = 0; i < items.length; i++) items[i].classList.toggle('ac-active', i === _acActive);
-}
-
 function searchKeydown(e) {
-  var dd = document.getElementById('recentDropdown');
-  var open = dd && dd.classList.contains('open');
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    if (!open || !_acItems.length) return;
-    e.preventDefault();
-    _acActive += (e.key === 'ArrowDown' ? 1 : -1);
-    if (_acActive < 0) _acActive = _acItems.length - 1;
-    if (_acActive >= _acItems.length) _acActive = 0;
-    acHighlight();
-  } else if (e.key === 'Enter') {
-    if (open && _acActive >= 0 && _acItems[_acActive]) selectRecent(_acItems[_acActive]);
-    else { closeRecent(); go(); }
-  } else if (e.key === 'Escape') {
-    closeRecent();
-  }
+  if (e.key === 'Enter') { go(); }
 }
-
-function openRecent() {
-  var v = (document.getElementById('q') || {}).value || '';
-  var dd = document.getElementById('recentDropdown');
-  if (v.trim()) { onSearchInput(v); return; }
-  setRecentHeader('recent');
-  _acItems = []; _acActive = -1;
-  renderRecentViewed();
-  renderRecentList('');
-  if (dd) dd.classList.add('open');
-}
-
-function closeRecent() {
-  var dd = document.getElementById('recentDropdown');
-  if (dd) dd.classList.remove('open');
-}
-
-function onSearchInput(val) {
-  var dd = document.getElementById('recentDropdown');
-  if (!dd) return;
-  if (!val || !val.trim()) {
-    _acItems = []; _acActive = -1;
-    setRecentHeader('recent');
-    renderRecentViewed();
-    renderRecentList('');
-    dd.classList.add('open');
-    return;
-  }
-  var _vs = document.getElementById('viewedSection'); if (_vs) _vs.innerHTML = '';
-  dd.classList.add('open');
-  if (_acTimer) clearTimeout(_acTimer);
-  var v = val;
-  _acTimer = setTimeout(function() {
-    buildSuggestions(v, _searchMode, function(items) {
-      var cur = document.getElementById('q');
-      if (cur && cur.value !== v) return;
-      renderSuggestions(items, v);
-    });
-  }, 110);
-}
-
-function selectRecent(q) {
-  var input = document.getElementById('q');
-  if (input) input.value = q;
-  closeRecent();
-  go();
-}
-
-function deleteRecent(q) {
-  var list = getRecent().filter(function(x){ return x !== q; });
-  try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch(e) {}
-  renderRecentList(document.getElementById('q').value);
-}
-
-function clearRecent() {
-  try { localStorage.removeItem(RECENT_KEY); } catch(e) {}
-  renderRecentList('');
-  showToast('최근 검색어를 삭제했습니다.');
-}
-
-// 외부 클릭 시 드롭다운 닫기
-document.addEventListener('click', function(e) {
-  var wrap = document.querySelector('.recent-wrap');
-  if (wrap && !wrap.contains(e.target)) closeRecent();
-});
 
 /* ══════════════════════════════════════════════
    검색 모드 (제품명 / 성분명)
@@ -3536,7 +3252,6 @@ function setSearchMode(mode, noSave) {
 function go() {
   var q = document.getElementById('q').value.trim();
   if (!q) return;
-  saveRecent(q); // 최근 검색어 저장
   currentSearchKeyword = q;
   currentSearchExportRows = [];
   var btn = document.getElementById('goBtn');
@@ -5529,509 +5244,18 @@ function renderDrugImage(d) {
 function switchDetailTab(tabName) {
   document.querySelectorAll('.detail-tab-btn').forEach(function(t){ t.classList.remove('on'); });
 
-  var tabMap = { info:'Info', ingredients:'Ingredients', pricechart:'Pricechart' };
+  var tabMap = { info:'Info', ingredients:'Ingredients' };
   var btnEl = document.getElementById('detailTab' + tabMap[tabName]);
   if (btnEl) btnEl.classList.add('on');
 
   document.getElementById('detailInfoContent').style.display         = (tabName === 'info')        ? 'block' : 'none';
   document.getElementById('detailIngredientsContent').style.display  = (tabName === 'ingredients') ? 'block' : 'none';
-  document.getElementById('detailPricechartContent').style.display   = (tabName === 'pricechart')  ? 'block' : 'none';
 
   if (tabName === 'ingredients' && !currentDetailDrug.sameIngredientsLoaded) {
     fetchSameIngredients();
   }
-  if (tabName === 'pricechart' && !currentDetailDrug.priceChartLoaded) {
-    loadPriceChart();
-  }
 }
 
-/* ══════════════════════════════════════════════
-   보험가 변동 차트 — 심평원 약가기준정보 API + Firestore 보조
-   (mdsCd = 식약처 ITEM_SEQ 와 동일, chgBfMdsCd 체인 추적으로 timeline 재구성)
-══════════════════════════════════════════════ */
-var _priceChart = null;
-
-/* 약품명 정규화: "_(용량)" 접미사 제거 */
-function normDrugName(n) {
-  return (n || '').replace(/_\(.*/, '').replace(/\s+/g, ' ').trim();
-}
-
-/* ── 배치 시드 JSON 캐시 (선택) ───────────
-   public/price-timeline.json (seed-price-history.mjs 산출) 가 있으면
-   그걸 우선 사용. 한 번 로드 후 _priceTimelineCache 에 보관 */
-var _priceTimelineCache = null;       // 로드 완료 후 {timeline:{...}} 또는 'NONE'
-var _priceTimelinePending = null;     // 로딩 중 Promise
-function loadPriceTimelineOnce() {
-  if (_priceTimelineCache !== null) return Promise.resolve(_priceTimelineCache);
-  if (_priceTimelinePending) return _priceTimelinePending;
-  _priceTimelinePending = fetch('/price-timeline.json', {cache:'force-cache'})
-    .then(function(r){ if (!r.ok) throw new Error('no batch'); return r.json(); })
-    .then(function(j){ _priceTimelineCache = j; return j; })
-    .catch(function(){ _priceTimelineCache = 'NONE'; return 'NONE'; });
-  return _priceTimelinePending;
-}
-function lookupBatchTimeline(mdsCd) {
-  if (!mdsCd || !_priceTimelineCache || _priceTimelineCache === 'NONE') return [];
-  var arr = _priceTimelineCache.timeline && _priceTimelineCache.timeline[mdsCd];
-  return arr || [];
-}
-/* 배치 데이터로 chgBfMdsCd 체인 추적 — API 호출 없이 즉시 */
-function collectBatchRowsWithChain(startMdsCd) {
-  if (!_priceTimelineCache || _priceTimelineCache === 'NONE') return [];
-  var visited = {}, collected = [], queue = [startMdsCd];
-  while (queue.length && collected.length < 60) {
-    var c = queue.shift();
-    if (!c || visited[c]) continue;
-    visited[c] = 1;
-    var arr = lookupBatchTimeline(c);
-    arr.forEach(function(r){
-      // 배치 row 의 date 는 'YYYY-MM-DD' 형식이므로 adtStaDd 로 변환
-      var ad = (r.date||'').replace(/-/g,'');
-      collected.push({
-        adtStaDd: ad,
-        mxCprc: r.price != null ? String(r.price) : '',
-        mdsCd: c,
-        itmNm: r.itmNm || '',
-        gnlNmCd: r.gnlNmCd || '',
-        mnfEntpNm: r.mnfEntpNm || '',
-        chgBfMdsCd: r.chgBfMdsCd || ''
-      });
-      if (r.chgBfMdsCd && !visited[r.chgBfMdsCd]) queue.push(r.chgBfMdsCd);
-    });
-  }
-  return collected;
-}
-
-/* ── 심평원 약가기준 API 단건 호출 ─────────
-   gov-proxy 경유로 mdsCd 단건 조회 → 1개 row(현재 또는 과거 코드의 적용 시점) */
-function fetchDgamtByMdsCd(mdsCd) {
-  if (!mdsCd) return Promise.resolve(null);
-  var url = '/api/gov/B551182/dgamtCrtrInfoService1.2/getDgamtList?numOfRows=10&pageNo=1&mdsCd=' + encodeURIComponent(mdsCd);
-  return fetch(url).then(function(r){ return r.text(); }).then(function(txt){
-    var doc = (new DOMParser()).parseFromString(txt, 'application/xml');
-    var nodes = doc.getElementsByTagName('item');
-    if (!nodes.length) return null;
-    // 같은 mdsCd 로 여러 row 가 오는 경우 거의 없지만, 가장 최신(adtStaDd 큰 것) 선택
-    var rows = [];
-    for (var i=0;i<nodes.length;i++){
-      var obj = {};
-      var ch = nodes[i].childNodes;
-      for (var j=0;j<ch.length;j++) if (ch[j].nodeType===1) obj[ch[j].tagName] = (ch[j].textContent||'').trim();
-      rows.push(obj);
-    }
-    rows.sort(function(a,b){ return (b.adtStaDd||'').localeCompare(a.adtStaDd||''); });
-    return rows[0];
-  }).catch(function(){ return null; });
-}
-
-/* ── chgBfMdsCd 체인을 따라 timeline 재구성 ──
-   현재 코드 → 이전 코드 → 그 이전 코드 ... 최대 12단계 */
-function buildPriceTimelineByChain(startMdsCd) {
-  var MAX_HOPS = 12;
-  var visited = {};
-  var collected = [];
-  function hop(code){
-    if (!code || visited[code]) return Promise.resolve();
-    if (collected.length >= MAX_HOPS) return Promise.resolve();
-    visited[code] = 1;
-    return fetchDgamtByMdsCd(code).then(function(row){
-      if (!row) return;
-      collected.push(row);
-      var prev = row.chgBfMdsCd;
-      if (prev && prev !== code && !visited[prev]) return hop(prev);
-    });
-  }
-  return hop(startMdsCd).then(function(){ return collected; });
-}
-
-/* ── 로컬 PRICE_DB(현재가만) + 체인 API row → history 배열 ── */
-function composeHistory(rows, curVal) {
-  // rows = [{adtStaDd, mxCprc, mdsCd, itmNm, chgBfMdsCd, ...}, ...]
-  // 정렬: adtStaDd 오름차순 (오래된 → 최신)
-  var sorted = rows.slice().sort(function(a,b){ return (a.adtStaDd||'').localeCompare(b.adtStaDd||''); });
-  var hist = [];
-  var lastPrice = null;
-  sorted.forEach(function(r){
-    var raw = r.mxCprc;
-    var p = raw ? parseInt(raw,10) : null;
-    if (!p && lastPrice) p = lastPrice;            // 가격 없는 row(삭제 등)는 직전 가격 유지
-    if (p == null) return;
-    var d = r.adtStaDd || '';
-    if (d.length === 8) d = d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8);
-    hist.push({ date: d, price: p, label: d });
-    lastPrice = p;
-  });
-  // 마지막 row 의 가격이 PRICE_DB 현재가와 다르면 "오늘" 점 하나 추가
-  if (curVal && hist.length && hist[hist.length-1].price !== curVal) {
-    var t = new Date();
-    var iso = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
-    hist.push({ date: iso, price: curVal, label: iso + ' (현재)' });
-  } else if (!hist.length && curVal) {
-    var t2 = new Date();
-    var iso2 = t2.getFullYear() + '-' + String(t2.getMonth()+1).padStart(2,'0') + '-' + String(t2.getDate()).padStart(2,'0');
-    hist.push({ date: iso2, price: curVal, label: iso2 + ' (현재)' });
-  }
-  return hist;
-}
-
-function loadPriceChart() {
-  if (!currentDetailDrug) return;
-  currentDetailDrug.priceChartLoaded = true;
-
-  var mfdsSeq = String(currentDetailDrug.seq || '').trim();
-  var name    = currentDetailDrug.name || '';
-
-  var curPr  = lookupPrice(mfdsSeq, name);
-  var curVal = curPr ? curPr[0] : null;
-
-  var loadingEl = document.getElementById('priceChartLoading');
-  var canvasEl  = document.getElementById('priceChartCanvas');
-  var noteEl    = document.getElementById('priceChartNote');
-  var summaryEl = document.getElementById('priceChartSummary');
-
-  summaryEl.innerHTML =
-    '<div class="pstat-card hi">'
-    + '<div class="pstat-label">현재 보험상한가</div>'
-    + '<div class="pstat-value">' + (curVal ? curVal.toLocaleString('ko-KR') + '원' : '미등재') + '</div>'
-    + '<div class="pstat-sub">내장 약제급여목록 기준</div>'
-    + '</div>'
-    + '<div class="pstat-card">'
-    + '<div class="pstat-label" id="pcFirstLabel">현재가 적용일</div>'
-    + '<div class="pstat-value" id="pcFirstDate" style="font-size:14px">-</div>'
-    + '<div class="pstat-sub" id="pcFirstSub">심평원 adtStaDd</div>'
-    + '</div>'
-    + '<div class="pstat-card">'
-    + '<div class="pstat-label">변동 횟수</div>'
-    + '<div class="pstat-value" id="pcChangeCount" style="font-size:14px">-</div>'
-    + '<div class="pstat-sub">코드 변경 기준</div>'
-    + '</div>';
-
-  loadingEl.style.display = 'block';
-  loadingEl.innerHTML = '<span class="spinner"></span>&nbsp;심평원 약가기준정보 조회 중…';
-  canvasEl.style.display = 'none';
-  noteEl.textContent = '';
-
-  if (!mfdsSeq) {
-    loadingEl.innerHTML = '⚠️ 품목기준코드 없음 — 약가 이력을 조회할 수 없습니다.';
-    return;
-  }
-
-  /* 1단계: 배치 시드 JSON 우선 시도 → 없으면 API 체인 ─────── */
-  loadPriceTimelineOnce().then(function(){
-    // 배치 데이터에서 현재 mdsCd + 변경전 코드들의 history 합치기
-    var batchRows = collectBatchRowsWithChain(mfdsSeq);
-    if (batchRows.length >= 2) {
-      // 배치 데이터가 충분하면 API 호출 생략
-      return Promise.resolve(batchRows);
-    }
-    // 부족하면 API 호출로 보강
-    return buildPriceTimelineByChain(mfdsSeq).then(function(apiRows){
-      // 배치 + API 병합 (중복 제거: mdsCd+adtStaDd 기준)
-      var seen = {}; var merged = [];
-      batchRows.concat(apiRows).forEach(function(r){
-        var k = (r.mdsCd||'')+'|'+(r.adtStaDd||'');
-        if (!seen[k]) { seen[k]=1; merged.push(r); }
-      });
-      return merged;
-    });
-  }).then(function(rows){
-    var history = composeHistory(rows, curVal);
-
-    /* 2단계: legacy Firestore 스냅샷 보조 (이름 매핑으로 G-code 조회) */
-    if (typeof db === 'undefined' || !db.collection) {
-      finishRender(history, rows, []);
-      return;
-    }
-    Promise.all([
-      db.collection('drugMapping').doc('nameIndex_1').get(),
-      db.collection('drugMapping').doc('nameIndex_2').get()
-    ]).then(function(results) {
-      var nameMap = {};
-      results.forEach(function(docSnap) {
-        if (docSnap.exists) {
-          var d = docSnap.data();
-          if (d.namesJson) Object.assign(nameMap, JSON.parse(d.namesJson));
-        }
-      });
-      var normN = normDrugName(name);
-      var hiraSeq = nameMap[normN] || nameMap[name] || null;
-      if (!hiraSeq) { finishRender(history, rows, []); return; }
-      return db.collection('drugPriceSnaps').orderBy('date', 'asc').get()
-        .then(function(snap) {
-          var legacy = [];
-          snap.forEach(function(docSnap) {
-            var d = docSnap.data();
-            var prices = d.pricesJson ? JSON.parse(d.pricesJson) : (d.prices || {});
-            var price = prices[hiraSeq];
-            if (price) legacy.push({ date: d.date, price: price, label: d.label || d.date });
-          });
-          finishRender(history, rows, legacy);
-        });
-    }).catch(function(){ finishRender(history, rows, []); });
-  }).catch(function(e){
-    loadingEl.innerHTML = '❌ 조회 오류: ' + (e && e.message ? e.message : '알 수 없음');
-  });
-
-  function finishRender(history, apiRows, legacy) {
-    /* legacy + API 병합 (날짜순 sort, 중복 제거) */
-    var merged = legacy.concat(history).filter(function(h){ return h && h.date && h.price; });
-    merged.sort(function(a,b){ return a.date.localeCompare(b.date); });
-    var seen = {}; var unique = [];
-    merged.forEach(function(h){
-      var key = h.date + '|' + h.price;
-      if (!seen[key]) { seen[key]=1; unique.push(h); }
-    });
-
-    /* 요약 카드: 현재가 적용일 = 가장 최신 API row 의 adtStaDd */
-    var latest = apiRows.slice().sort(function(a,b){ return (b.adtStaDd||'').localeCompare(a.adtStaDd||''); })[0];
-    if (latest) {
-      var ad = latest.adtStaDd || '';
-      var fmt = ad.length===8 ? ad.slice(0,4)+'.'+ad.slice(4,6)+'.'+ad.slice(6,8) : ad;
-      var fdEl = document.getElementById('pcFirstDate'); if (fdEl) fdEl.textContent = fmt || '-';
-    }
-    var cntEl = document.getElementById('pcChangeCount');
-    if (cntEl) {
-      var cnt = Math.max(0, apiRows.length - 1) + (legacy.length>0?1:0);
-      cntEl.textContent = unique.length<=1 ? '단일' : (cnt + '회 (코드/약가 변경)');
-    }
-
-    if (!unique.length) {
-      loadingEl.innerHTML = '⚠️ 이 품목은 심평원 약가기준정보에 등록되어 있지 않습니다. (비급여/한약재/사전심사 등)';
-      return;
-    }
-    if (unique.length === 1) {
-      loadingEl.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:13px;color:var(--text2);margin-bottom:6px">📍 단일 데이터 — 약가 안내 기록 없음</div><div style="font-size:12px;color:var(--text3)">'+unique[0].label+' · '+unique[0].price.toLocaleString('ko-KR')+'원</div></div>';
-      return;
-    }
-    renderPriceChartCanvas(unique);
-    var src = (apiRows.length?'심평원 약가기준 API '+apiRows.length+'점':'') + (legacy.length?(apiRows.length?' + ':'')+'레거시 스냅샷 '+legacy.length+'점':'');
-    noteEl.textContent = '출처: ' + src;
-  }
-}
-
-/* ══════════════════════════════════════════════
-   관리자 약가 업로드
-══════════════════════════════════════════════ */
-var _aumParsed = null; /* parseExcelForPriceHistory 결과 캐시 */
-
-function openAdminUpload() {
-  document.getElementById('adminUploadModal').style.display = 'flex';
-  document.getElementById('aumResult').textContent = '';
-  document.getElementById('aumProgress').style.display = 'none';
-  document.getElementById('aumSubmitBtn').disabled = true;
-  document.getElementById('aumDropText').textContent = '클릭하거나 파일을 여기에 드래그하세요';
-  document.getElementById('aumDate').value = '';
-  document.getElementById('aumLabel').value = '';
-  _aumParsed = null;
-
-  /* 드래그앤드롭 */
-  var dz = document.getElementById('aumDrop');
-  dz.ondragover = function(e) { e.preventDefault(); dz.classList.add('dragover'); };
-  dz.ondragleave = function() { dz.classList.remove('dragover'); };
-  dz.ondrop = function(e) {
-    e.preventDefault(); dz.classList.remove('dragover');
-    var f = e.dataTransfer.files[0];
-    if (f) handleAumFile(f);
-  };
-}
-
-function closeAdminUpload() {
-  document.getElementById('adminUploadModal').style.display = 'none';
-}
-
-function onAumFileSelect(input) {
-  if (input.files && input.files[0]) handleAumFile(input.files[0]);
-}
-
-function handleAumFile(file) {
-  document.getElementById('aumDropText').textContent = '📊 ' + file.name;
-  document.getElementById('aumResult').textContent = '파싱 중…';
-  document.getElementById('aumProgress').style.display = 'block';
-  document.getElementById('aumProgressBar').style.width = '20%';
-
-  /* 파일명에서 날짜 자동 추출 (YYYYMMDD 또는 YYYY-MM-DD 패턴) */
-  var m = file.name.match(/(\d{4})[.\-_]?(\d{2})[.\-_]?(\d{2})/);
-  if (m && !document.getElementById('aumDate').value) {
-    document.getElementById('aumDate').value = m[1] + '-' + m[2] + '-' + m[3];
-  }
-
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('aumProgressBar').style.width = '60%';
-    try {
-      var result = parseExcelForPriceHistory(e.target.result);
-      _aumParsed = result;
-      document.getElementById('aumProgressBar').style.width = '100%';
-      document.getElementById('aumResult').textContent =
-        '✅ ' + result.count + '개 품목 파싱 완료 (형식: ' + result.fmt + ')';
-      document.getElementById('aumSubmitBtn').disabled = false;
-    } catch(err) {
-      document.getElementById('aumResult').textContent = '❌ 파싱 오류: ' + err.message;
-      document.getElementById('aumProgressBar').style.width = '0%';
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-/* Excel 파싱 → {count, fmt, prices:{코드:금액, ...}} */
-function parseExcelForPriceHistory(arrayBuffer) {
-  var wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-  var ws = wb.Sheets[wb.SheetNames[0]];
-  var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-
-  var prices = {};
-  var fmt = 'unknown';
-  var count = 0;
-
-  /* 2026+ 형식 감지: 9번째 열(idx8)이 숫자 형태 제품코드 */
-  var sampleRows = rows.slice(1, 6);
-  var is2026 = sampleRows.some(function(r) {
-    var v = String(r[8] || '').trim();
-    return /^\d{9,}$/.test(v);
-  });
-
-  if (is2026) {
-    fmt = '2026+';
-    for (var i = 1; i < rows.length; i++) {
-      var r = rows[i];
-      var code  = String(r[8]  || '').trim(); /* 9번째 열: 제품코드 */
-      var pName = String(r[3]  || '').trim(); /* 4번째 열: 제품명 */
-      var amt   = String(r[13] || '').trim(); /* 14번째 열: 상한금액 */
-      if (!code || !amt) continue;
-      var price = parseInt(amt.replace(/[^0-9]/g, ''), 10);
-      if (isNaN(price) || price <= 0) continue;
-      prices[code] = price;
-      count++;
-    }
-  } else {
-    /* 구형식(2008/2009): col4=G코드, col9=상한금액 */
-    fmt = '구형식';
-    for (var j = 0; j < rows.length; j++) {
-      var row = rows[j];
-      var gCode = String(row[4] || '').trim();
-      if (!/^G\d+/.test(gCode)) continue;
-      var pAmt  = String(row[9] || '').trim();
-      if (!pAmt) continue;
-      var pPrice = parseInt(pAmt.replace(/[^0-9]/g, ''), 10);
-      if (isNaN(pPrice) || pPrice <= 0) continue;
-      prices[gCode] = pPrice;
-      count++;
-    }
-  }
-
-  return { count: count, fmt: fmt, prices: prices };
-}
-
-/* Firestore에 스냅샷 저장 */
-function submitPriceSnap() {
-  if (!_aumParsed) return;
-  var dateVal  = document.getElementById('aumDate').value;
-  var labelVal = document.getElementById('aumLabel').value.trim();
-  if (!dateVal) { alert('적용일자를 입력하세요.'); return; }
-
-  document.getElementById('aumSubmitBtn').disabled = true;
-  document.getElementById('aumResult').textContent = '저장 중…';
-
-  var docId = dateVal; /* YYYY-MM-DD */
-  db.collection('drugPriceSnaps').doc(docId).set({
-    date:       dateVal,
-    label:      labelVal || dateVal,
-    count:      _aumParsed.count,
-    fmt:        _aumParsed.fmt,
-    pricesJson: JSON.stringify(_aumParsed.prices),
-    uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function() {
-    document.getElementById('aumResult').textContent =
-      '✅ 저장 완료! (' + _aumParsed.count + '개 품목 · ' + dateVal + ')';
-    _aumParsed = null;
-  }).catch(function(e) {
-    document.getElementById('aumResult').textContent = '❌ 저장 오류: ' + e.message;
-    document.getElementById('aumSubmitBtn').disabled = false;
-  });
-}
-
-function renderPriceChartCanvas(history) {
-  var labels = history.map(function(h){ return h.label || h.date; });
-  var values = history.map(function(h){ return h.price; });
-  var n      = history.length;
-
-  /* 요약 카드 업데이트 */
-  var firstEl = document.getElementById('pcFirstDate');
-  var cntEl   = document.getElementById('pcChangeCount');
-  var changeCnt = 0;
-  for (var i = 1; i < n; i++) { if (values[i] !== values[i-1]) changeCnt++; }
-  if (firstEl) firstEl.textContent = history[0].label || history[0].date;
-  if (cntEl)   cntEl.textContent   = changeCnt > 0 ? changeCnt + '회' : '변동 없음';
-
-  /* 최근 변동 방향에 따른 색상 */
-  var lastChange = n >= 2 ? values[n-1] - values[n-2] : 0;
-  var lineColor  = lastChange > 0 ? '#ef4444' : lastChange < 0 ? '#2563eb' : '#64748b';
-  var fillColor  = lastChange > 0 ? 'rgba(239,68,68,0.07)' : lastChange < 0 ? 'rgba(37,99,235,0.07)' : 'rgba(100,116,139,0.07)';
-
-  if (_priceChart) { _priceChart.destroy(); _priceChart = null; }
-
-  document.getElementById('priceChartLoading').style.display = 'none';
-  var canvas = document.getElementById('priceChartCanvas');
-  canvas.style.display = 'block';
-
-  _priceChart = new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: '보험상한가',
-        data: values,
-        borderColor: lineColor,
-        backgroundColor: fillColor,
-        fill: true,
-        tension: 0,
-        pointRadius: values.map(function(_,i){ return i === n-1 ? 7 : 5; }),
-        pointHoverRadius: 9,
-        pointBackgroundColor: values.map(function(_,i){ return i === n-1 ? lineColor : '#fff'; }),
-        pointBorderColor: lineColor,
-        pointBorderWidth: 2,
-        borderWidth: 2.5,
-        stepped: 'before'
-      }]
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              var v = ctx.parsed.y;
-              var prev = ctx.dataIndex > 0 ? values[ctx.dataIndex-1] : null;
-              var diff = prev !== null ? v - prev : 0;
-              var arrow = diff > 0 ? ' ▲+' + diff.toLocaleString('ko-KR') : diff < 0 ? ' ▼' + diff.toLocaleString('ko-KR') : '';
-              return '상한가: ' + v.toLocaleString('ko-KR') + '원' + arrow;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: false,
-          ticks: {
-            callback: function(v){ return v.toLocaleString('ko-KR') + '원'; },
-            maxTicksLimit: 6
-          },
-          grid: { color: 'rgba(0,0,0,0.05)' }
-        },
-        x: { grid: { display: false } }
-      }
-    }
-  });
-
-  document.getElementById('priceChartNote').innerHTML =
-    '※ 출처: 관리자 업로드 심평원 약제급여목록 스냅샷 ' + n + '건 | '
-    + '<a href="https://www.hira.or.kr" target="_blank" style="color:var(--primary)">심평원 홈페이지 ↗</a>';
-
-  // 통계 카드 주입
-  _injectPriceStats(history);
-}
 
 // 상세정보 렌더링
 function renderDetailInfo() {
@@ -6662,14 +5886,6 @@ function toggleDarkMode() {
   localStorage.setItem('darkMode', isDark ? 'on' : 'off');
   var icon = document.getElementById('darkIcon');
   if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-  // Chart.js 차트 색상 갱신
-  if (window._priceChart) {
-    window._priceChart.options.scales.x.ticks.color = isDark ? '#94a3b8' : '#64748b';
-    window._priceChart.options.scales.y.ticks.color = isDark ? '#94a3b8' : '#64748b';
-    window._priceChart.options.scales.x.grid.color  = isDark ? '#334155' : '#f1f5f9';
-    window._priceChart.options.scales.y.grid.color  = isDark ? '#334155' : '#f1f5f9';
-    window._priceChart.update();
-  }
 }
 
 /* ══════════════════════════════════════════════
@@ -6691,7 +5907,6 @@ document.addEventListener('keydown', function(e) {
     if (sp && sp.style.display !== 'none') { closeSafetyPopup(); return; }
     var dm = document.getElementById('detailModal');
     if (dm && dm.classList.contains('open')) { closeDetailModal(); return; }
-    closeRecent();
     return;
   }
 });
@@ -6798,42 +6013,12 @@ function openDetailModal(seq, name, seller, maker, pack, ingr, chart, apprDate, 
     pack:pack, ingr:ingr, chart:chart, apprDate:apprDate,
     mfgLabel:mfgLabel, bioStatus:bioStatus };
 
-  pushRecentViewed(currentDetailDrug);
   document.getElementById('detailModalTitle').textContent = '📄 ' + name;
   renderDetailInfo();
   switchDetailTab('info');
   document.getElementById('detailModal').classList.add('open');
 }
 
-/* ── 최근 본 약 (localStorage) ── */
-var RV_KEY = 'recentlyViewed_v1';
-function loadRecentViewed() { try { return JSON.parse(localStorage.getItem(RV_KEY) || '[]'); } catch(e) { return []; } }
-function pushRecentViewed(d) {
-  if (!d || !d.seq) return;
-  var list = loadRecentViewed().filter(function(x){ return x.seq !== d.seq; });
-  list.unshift({ seq:d.seq, name:d.name, seller:d.seller||'', maker:d.maker||'', pack:d.pack||'',
-    ingr:d.ingr||'', chart:d.chart||'', apprDate:d.apprDate||'', mfgLabel:d.mfgLabel||'', bioStatus:d.bioStatus||'' });
-  if (list.length > 12) list = list.slice(0, 12);
-  try { localStorage.setItem(RV_KEY, JSON.stringify(list)); } catch(e) {}
-}
-function openRecentViewedByIdx(i) {
-  var d = loadRecentViewed()[i]; if (!d) return;
-  closeRecent();
-  openDetailModal(d.seq, d.name, d.seller, d.maker, d.pack, d.ingr, d.chart, d.apprDate, d.mfgLabel, d.bioStatus);
-}
-function clearRecentViewed() { try { localStorage.removeItem(RV_KEY); } catch(e) {} renderRecentViewed(); }
-function renderRecentViewed() {
-  var el = document.getElementById('viewedSection'); if (!el) return;
-  var list = loadRecentViewed();
-  if (!list.length) { el.innerHTML = ''; return; }
-  var chips = list.slice(0, 10).map(function(d, i) {
-    var nm = (d.name || '').split('(')[0];
-    return '<button class="viewed-chip" onclick="openRecentViewedByIdx(' + i + ')" title="' + esc(d.name) + '">👁 ' + esc(nm) + '</button>';
-  }).join('');
-  el.innerHTML = '<div class="viewed-head"><span>👁 최근 본 약</span>'
-    + '<button class="recent-clear-btn" onclick="clearRecentViewed()">삭제</button></div>'
-    + '<div class="viewed-chips">' + chips + '</div>';
-}
 
 function closeDetailModal() {
   document.getElementById('detailModal').classList.remove('open');
@@ -6850,41 +6035,6 @@ function closePcSidebar() {
    약가 차트 통계 카드 주입
    ══════════════════════════════════════════════ */
 
-function _injectPriceStats(history) {
-  if (!history || history.length < 2) return;
-  var prices = history.map(function(h) { return h.price; });
-  var minPrice = Math.min.apply(null, prices);
-  var maxPrice = Math.max.apply(null, prices);
-  var nowPrice = prices[prices.length - 1];
-  var minEntry = history.find(function(h) { return h.price === minPrice; });
-  var maxEntry = history.find(function(h) { return h.price === maxPrice; });
-  var nowEntry = history[history.length - 1];
-
-  var statsHtml = '<div class="price-chart-stats">'
-    + '<div class="pcs-card pcs-min">'
-    +   '<div class="pcs-label">최저가</div>'
-    +   '<div class="pcs-value">' + minPrice.toLocaleString() + '원</div>'
-    +   '<div class="pcs-date">' + (minEntry ? minEntry.label || minEntry.date : '') + '</div>'
-    + '</div>'
-    + '<div class="pcs-card pcs-now">'
-    +   '<div class="pcs-label">현재가</div>'
-    +   '<div class="pcs-value">' + nowPrice.toLocaleString() + '원</div>'
-    +   '<div class="pcs-date">' + (nowEntry ? nowEntry.label || nowEntry.date : '') + '</div>'
-    + '</div>'
-    + '<div class="pcs-card pcs-max">'
-    +   '<div class="pcs-label">최고가</div>'
-    +   '<div class="pcs-value">' + maxPrice.toLocaleString() + '원</div>'
-    +   '<div class="pcs-date">' + (maxEntry ? maxEntry.label || maxEntry.date : '') + '</div>'
-    + '</div>'
-    + '</div>';
-
-  var chartContent = document.getElementById('detailPricechartContent');
-  if (chartContent) {
-    var existing = chartContent.querySelector('.price-chart-stats');
-    if (existing) existing.remove();
-    chartContent.insertAdjacentHTML('afterbegin', statsHtml);
-  }
-}
 
 </script>
 
@@ -6994,8 +6144,6 @@ setSubTab('info','insu');
     {d:'2026.07.13', i:'💊', t:'검색어 자동완성', s:'검색창에 몇 글자만 입력하면 일치하는 제품명·성분명이 즉시 추천됩니다. ↑↓ 방향키로 고르고 Enter로 바로 검색할 수 있습니다.'},
     {d:'2026.07.13', i:'🔡', t:'초성 검색 · 띄어쓰기 무시', s:'약 이름의 초성만 입력해도 찾을 수 있습니다. 예: ㅌㅇㄹㄴ→타이레놀. 띄어쓰기는 자동으로 무시됩니다.'},
     {d:'2026.07.13', i:'🔽', t:'검색 결과 정렬 · 생동성 필터', s:'검색 결과를 약가 낮은순·높은순·이름순·최신 허가순으로 정렬할 수 있고, 생동성인정 품목만 보는 필터도 추가됐습니다.'},
-    {d:'2026.07.13', i:'👁', t:'최근 본 약', s:'상세보기로 열어본 약이 검색창을 누르면 "👁 최근 본 약"으로 표시됩니다. 한 번에 상세정보로 이동할 수 있습니다.'},
-    {d:'2026.06.16', i:'📈', t:'약가 안내 — 심평원 약가기준정보 API 연동', s:'약품 상세의 📈 약가 안내 탭에서 심평원 약가기준정보(약가목록조회)를 실시간 조회합니다. 현재 상한가·적용시작일자를 모든 등재 품목에 표시하고, 제품코드 변경 이력(chgBfMdsCd 체인)을 자동 추적해 과거 가격 변동 점을 차트에 함께 표시합니다.'},
     {d:'2026.06.16', i:'🩺', t:'DUR 다중점검기 — 약품 여러 개 + 환자 정보로 한 번에 검사', s:"의약품정보 → 'DUR 점검기' 서브탭에서 최대 10개 약품을 입력해 병용금기·임부금기·노인주의·특정연령대금기·효능군중복 5종을 동시에 점검합니다. 입력 약품 간 페어 충돌을 별도로 강조하며, 나이·임신·65세+ 컨텍스트를 넣으면 해당 카테고리만 강조됩니다."},
     {d:'2026.06.16', i:'🛠️', t:"제형 분류 오류 수정 — 브랜드명 중간 '주'가 주사제로 잘못 분류되던 문제", s:"동일성분 필터의 '주사제/정제' 등 제형 분류가 브랜드명 중간의 '주' 글자(예: 아주스타정·아주리정)를 주사제로 잘못 분류하던 문제를 수정했습니다. 이제 제품명 끝의 형태명(정·캡슐·시럽·주사제·연고·점안액·좌제·질정 등)만으로 정확히 분류하며, 함량·포장 표기는 무시합니다."},
     {d:'2026.06.16', i:'🎯', t:'동일성분 — 심평원 주성분코드 기준으로 정밀화', s:'동일성분 의약품을 심평원 주성분코드(약학정보원과 동일 기준)로 묶습니다. 성분뿐 아니라 함량·제형·배합비까지 같은 제품만 정확히 표시합니다. 예: 아목클라네오시럽(14:1) → 14:1 제품만, 7:1 제외.'},
