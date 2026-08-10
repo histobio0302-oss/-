@@ -1465,47 +1465,6 @@ body.mobile-forced .sub-tab { padding: 7px 11px !important; font-size: 12px !imp
 
 
 
-/* ─── 비급여진료비 탭 ─────────────────────────── */
-.np-header { text-align:center; margin-bottom:24px; }
-.np-header h2 { font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:4px; }
-.np-header p { font-size:0.82rem; color:var(--text3); }
-.np-subtabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:12px; }
-.np-subtab-btn { padding:7px 14px; border:1.5px solid var(--border); border-radius:50px; background:var(--surface); font-size:0.8rem; cursor:pointer; color:var(--text2); transition:all .15s; font-family:inherit; }
-.np-subtab-btn:hover { border-color:var(--primary); color:var(--primary); }
-.np-subtab-btn.on { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:600; }
-.np-subtab-content { display:none; }
-.np-subtab-content.on { display:block; }
-.np-form { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
-.np-form-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-.np-form label { font-size:0.78rem; color:var(--text2); font-weight:600; min-width:55px; }
-.np-form input, .np-form select { flex:1; min-width:120px; padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--r); font-size:0.82rem; outline:none; background:var(--surface); color:var(--text); font-family:inherit; }
-.np-form input:focus, .np-form select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.08); }
-.np-search-btn { width:100%; padding:11px; background:var(--primary); color:#fff; border:none; border-radius:var(--r); font-size:0.9rem; font-weight:600; cursor:pointer; transition:background .15s; font-family:inherit; }
-.np-search-btn:hover { background:#1d4ed8; }
-.np-result { margin-top:8px; }
-.np-loading, .np-empty { text-align:center; padding:30px; color:var(--text3); font-size:0.88rem; }
-.np-error { text-align:center; padding:20px; color:var(--danger); font-size:0.88rem; }
-.np-total { font-size:0.78rem; color:var(--text3); margin-bottom:8px; }
-.np-table-wrap { overflow-x:auto; border-radius:var(--r); border:1px solid var(--border); }
-.np-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-.np-table thead { background:var(--primary); color:#fff; }
-.np-table th { padding:10px 12px; text-align:left; font-weight:600; white-space:nowrap; }
-.np-table td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text); }
-.np-table tr:last-child td { border-bottom:none; }
-.np-table tr:hover td { background:var(--hover); }
-.np-link { color:var(--primary); text-decoration:none; font-size:0.78rem; }
-.np-code-badge { background:var(--primary-lt); color:var(--primary); padding:2px 8px; border-radius:5px; font-weight:600; cursor:pointer; font-size:0.78rem; display:inline-block; }
-.np-code-badge:hover { background:var(--primary); color:#fff; }
-
-.np-pager { display:flex; align-items:center; gap:4px; margin-top:14px; flex-wrap:wrap; }
-.np-page-btn { min-width:34px; height:34px; padding:0 8px; border:1.5px solid var(--border); border-radius:var(--r-sm); background:var(--surface); color:var(--text2); cursor:pointer; font-size:0.82rem; font-family:inherit; transition:all .15s; }
-.np-page-btn:hover { border-color:var(--primary); color:var(--primary); }
-.np-page-btn.on { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:700; }
-.np-page-info { margin-left:8px; font-size:0.78rem; color:var(--text3); }
-
-.np-tip { font-size:0.75rem; color:var(--text3); margin-top:8px; text-align:center; }
-.np-subtitle { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:12px; }
-
 /* ════════════════════════════════════════════════
    모바일 최적화  (max-width: 600px)
 ════════════════════════════════════════════════ */
@@ -2283,7 +2242,6 @@ body.mobile-forced .guide-link-btn .guide-link-label {
     <button class="tab-btn" id="btnSafety" onclick="setTab('safety')"><span class="tab-icon">&#9888;&#65039;</span> 안전정보</button>
     <button class="tab-btn" id="btnMedical" onclick="setTab('medical')"><span class="tab-icon">&#127973;</span> 의료기관검색(병의원&amp;약국)</button>
     <button class="tab-btn" id="btnInfo" onclick="setTab('info')"><span class="tab-icon">&#128203;</span> 의약품 정보</button>
-    <button class="tab-btn" id="btnNonpay" onclick="setTab('nonpay')"><span class="tab-icon">&#128138;</span> 비급여진료비</button>
     <button class="tab-btn" id="btnFavorites" onclick="setTab('favorites')"><span class="tab-icon">⭐</span> 즐겨찾기<span id="favBadge" style="display:none;margin-left:5px;background:var(--primary);color:#fff;font-size:10px;padding:1px 6px;border-radius:50px;font-weight:700;"></span></button>
   </div>
 
@@ -2565,27 +2523,9 @@ body.mobile-forced .guide-link-btn .guide-link-label {
 
   <div class="tab" id="tab-info">
     <div class="sub-tab-bar">
-      <button class="sub-tab" data-parent="info" data-sub="license" onclick="setSubTab('info','license')">&#128196; 허가정보</button>
-      <button class="sub-tab" data-parent="info" data-sub="dur" onclick="setSubTab('info','dur')">&#9877;&#65039; DUR 안전정보</button>
       <button class="sub-tab" data-parent="info" data-sub="insu" onclick="setSubTab('info','insu')">&#128195; 보험인정기준</button>
       <button class="sub-tab" data-parent="info" data-sub="druglist" onclick="setSubTab('info','druglist')">&#128137; 약제기준목록표</button>
       </div>
-    <div class="sub-content" data-parent="info" data-sub="license" style="display:none">
-    <div class="recall-notice">
-      &#128203; <span><strong>의약품 정보</strong> — 의약품 허가정보, DUR 안전정보, 보험인정기준, 약제기준목록표를 조회합니다.</span>
-    </div>
-    <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">의약품 허가정보 조회</div></div>
-    <div class="search-card"><div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><div style="flex:1;min-width:160px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase">제품명</div><input class="sinput" id="licItemQ" placeholder="제품명 (예: 타이레놀)" onkeydown="if(event.key==='Enter')searchLicense()" style="height:44px"></div><div style="flex:1;min-width:160px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase">업체명</div><input class="sinput" id="licEntpQ" placeholder="업체명" onkeydown="if(event.key==='Enter')searchLicense()" style="height:44px"></div><button class="btn btn-primary" onclick="searchLicense()" id="licBtn" style="height:44px;padding:0 24px">검색</button></div></div>
-    <div id="licMsg" style="display:none;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px"></div>
-    <div id="licResultWrap" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div><div class="recent-title" id="licResultTitle">결과</div><div style="font-size:11px;color:var(--text3);margin-top:2px" id="licResultSub"></div></div><button class="btn btn-ghost btn-sm" onclick="clearLicResult()">&#8592; 검색창으로</button></div><div class="tbl-wrap-outer"><div class="tbl-scroll"><table id="licTable"><thead><tr><th>제품명</th><th style="width:150px">업체명</th><th style="width:80px">제형</th><th style="width:100px">허가(변경)일</th><th style="width:100px">품목기준코드</th></tr></thead><tbody id="licTableBody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3)">검색어를 입력하세요.</td></tr></tbody></table></div></div><div id="licPagination" style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:14px;flex-wrap:wrap"></div><div id="licDetail" style="display:none;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)"></div></div>
-    </div>
-    <div class="sub-content" data-parent="info" data-sub="dur" style="display:none">
-    <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">DUR 안전정보 조회</div></div>
-    <div class="search-card"><div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase">품목명</div><input class="sinput" id="durQ" placeholder="의약품명 (예: 타이레놀)" onkeydown="if(event.key==='Enter')searchDur()" style="height:44px"></div><div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase">검색 유형</div><select id="durType" style="height:44px;padding:0 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;color:var(--text);background:var(--surface);cursor:pointer;min-width:130px"><option value="all">전체 항목</option><option value="usjnt">병용금기</option><option value="pwnm">임부금기</option><option value="odsn">노인주의</option><option value="age">특정연령대금기</option><option value="efcy">효능군중복</option></select></div><button class="btn btn-primary" onclick="searchDur()" id="durBtn" style="height:44px;padding:0 24px">검색</button></div></div>
-    <div id="durMsg" style="display:none;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px"></div>
-    <div id="durResultWrap" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div><div class="recent-title" id="durResultTitle">결과</div><div style="font-size:11px;color:var(--text3);margin-top:2px" id="durResultSub"></div></div><button class="btn btn-ghost btn-sm" onclick="clearDurResult()">&#8592; 검색창으로</button></div><div id="durSections"></div></div>
-    </div>
-
     <div class="sub-content" data-parent="info" data-sub="insu" style="display:none">
     <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">&#128195; 보험인정기준</div></div><a href="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">&#128279; 새 탭에서 열기</a></div>
     <div style="position:relative;width:100%;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--surface)"><iframe id="insuframe" src="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" style="width:100%;height:720px;border:none;display:block" title="심평원 보험인정기준" onload="checkInsuFrame(this)" onerror="showInsuFallback()"></iframe><div id="insuLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);gap:16px;pointer-events:none"><span class="spinner"></span><div style="font-size:13px;color:var(--text3)">보험인정기준 로딩 중...</div></div><div id="insuFallback" style="display:none;height:420px;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px;text-align:center"><div style="font-size:48px">&#128195;</div><a href="https://www.hira.or.kr/rc/insu/insuadtcrtr/InsuAdtCrtrList.do?pgmid=HIRAA030069000400" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--primary);color:#fff;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none">&#128195; 보험인정기준 바로가기</a></div></div>
@@ -2610,67 +2550,6 @@ body.mobile-forced .guide-link-btn .guide-link-label {
     <div id="favList"></div>
   </div>
 
-  <div class="tab" id="tab-nonpay">
-    <!-- 비급여진료비 콘텐츠는 아래 JS에서 렌더링 -->
-    <div class="np-header">
-      <h2>💊 비급여진료비 정보 검색</h2>
-      <p>건강보험심사평가원 공공데이터 | 자기부담 진료비 비교</p>
-    </div>
-    <div class="np-subtabs">
-      <button class="np-subtab-btn on" id="npBtn-hosp" onclick="npTab('hosp',this)">🏥 병원명 검색</button>
-      <button class="np-subtab-btn" id="npBtn-region" onclick="npTab('region',this)">📍 지역별 비교</button>
-      <button class="np-subtab-btn" id="npBtn-code" onclick="npTab('code',this)">📋 항목코드 조회</button>
-    </div>
-
-    <!-- 서브탭 1: 병원명 검색 -->
-    <div id="np-hosp" class="np-subtab-content on">
-      <div class="np-form">
-        <div class="np-form-row">
-          <label>병원명</label>
-          <input id="np-hosp-name" type="text" placeholder="예) 서울대학교병원" />
-        </div>
-        <div class="np-form-row">
-          <label>지역</label>
-          <select id="np-sido1"></select>
-          <label>종별</label>
-          <select id="np-cl1"></select>
-        </div>
-        <button class="np-search-btn" onclick="npSearchHosp()">🔍 검색</button>
-      </div>
-      <div id="np-hosp-result" class="np-result"><p class="np-empty">병원명 또는 지역을 입력하고 검색하세요.</p></div>
-    </div>
-
-    <!-- 서브탭 2: 지역별 비교 -->
-    <div id="np-region" class="np-subtab-content">
-      <div class="np-form">
-        <div class="np-form-row">
-          <label>지역 *</label>
-          <select id="np-sido2"></select>
-          <label>종별</label>
-          <select id="np-cl2"></select>
-        </div>
-        <div class="np-form-row">
-          <label>항목코드 *</label>
-          <input id="np-itemcd" type="text" placeholder="예) A1100 (📋 항목코드 탭에서 확인)" />
-        </div>
-        <button class="np-search-btn" onclick="npSearchRegion()">🔍 지역별 비교</button>
-      </div>
-      <div id="np-region-result" class="np-result"><p class="np-empty">지역과 항목코드를 입력하고 검색하세요.</p></div>
-    </div>
-
-    <!-- 서브탭 3: 항목코드 조회 -->
-    <div id="np-code" class="np-subtab-content">
-      <div class="np-form">
-        <div class="np-form-row">
-          <label>검색어</label>
-          <input id="np-search-wrd" type="text" placeholder="예) 초음파, 1인실, 진단서 (빈칸=전체)" />
-        </div>
-        <button class="np-search-btn" onclick="npLoadCodes()">📋 항목코드 조회</button>
-      </div>
-      <div id="np-code-result" class="np-result"><p class="np-empty">검색어 입력 후 조회하거나 빈칸으로 전체 조회하세요.</p></div>
-    </div>
-
-  </div>
   </div><!-- /tab-nonpay -->
 
 </div><!-- /wrap -->
@@ -2693,10 +2572,6 @@ body.mobile-forced .guide-link-btn .guide-link-label {
   <button class="mnav-btn" id="mnav-info" onclick="setTab('info')">
     <span class="mnav-icon">📋</span>
     <span class="mnav-label">의약품정보</span>
-  </button>
-  <button class="mnav-btn" id="mnav-nonpay" onclick="setTab('nonpay')">
-    <span class="mnav-icon">💊</span>
-    <span class="mnav-label">비급여진료비</span>
   </button>
   <button class="mnav-btn" id="mnav-favorites" onclick="setTab('favorites')">
     <span class="mnav-icon">⭐</span>
@@ -2838,7 +2713,7 @@ function updateFavBadge() {
    모바일 하단 네비게이션 JS
 ══════════════════════════════════════════════ */
 function updateMobileNav(t) {
-  ['search','safety','medical','info','nonpay','favorites'].forEach(function(k) {
+  ['search','safety','medical','info','favorites'].forEach(function(k) {
     var el = document.getElementById('mnav-' + k);
     if (el) el.classList.toggle('on', k === t);
   });
@@ -3021,21 +2896,21 @@ function shareDrug(seq, name, seller, maker, pack, ingredient, form, apprDate, m
 }
 
 function setTab(t) {
-  ['btnSearch','btnSafety','btnMedical','btnInfo','btnNonpay','btnFavorites'].forEach(function(id,i){
+  ['btnSearch','btnSafety','btnMedical','btnInfo','btnFavorites'].forEach(function(id,i){
     var el=document.getElementById(id);
-    var key=['search','safety','medical','info','nonpay','favorites'][i];
+    var key=['search','safety','medical','info','favorites'][i];
     if(el) el.className='tab-btn'+(t===key?' on':'');
   });
-  ['tab-search','tab-safety','tab-medical','tab-info','tab-nonpay','tab-favorites'].forEach(function(id,i){
+  ['tab-search','tab-safety','tab-medical','tab-info','tab-favorites'].forEach(function(id,i){
     var el=document.getElementById(id);
-    var key=['search','safety','medical','info','nonpay','favorites'][i];
+    var key=['search','safety','medical','info','favorites'][i];
     if(el) el.className='tab'+(t===key?' on':'');
   });
   updateMobileNav(t); // 모바일 하단 네비 동기화
   if(t==='search'    && !document.querySelector('.sub-tab.on[data-parent="search"]'))  setSubTab('search','single');
   if(t==='safety'    && !document.querySelector('.sub-tab.on[data-parent="safety"]'))  setSubTab('safety','recall');
   if(t==='medical'   && !document.querySelector('.sub-tab.on[data-parent="medical"]')) setSubTab('medical','map');
-  if(t==='info'      && !document.querySelector('.sub-tab.on[data-parent="info"]'))    setSubTab('info','license');
+  if(t==='info'      && !document.querySelector('.sub-tab.on[data-parent="info"]'))    setSubTab('info','insu');
   if(t==='favorites') renderFavorites();
 }
 
@@ -5498,210 +5373,6 @@ if (!_initFirebase()) {
 
 
 
-/* ══════════════════════════════════════════════
-   비급여진료비 정보 검색 (건강보험심사평가원)
-   실제 필드명 기준 수정본 v3
-══════════════════════════════════════════════ */
-(function() {
-  var NP_KEY  = 'x';
-  var NP_BASE = '/api/gov/B551182/nonPaymentDamtInfoService';
-  var NP_ROWS = 10;
-
-  var SIDO=[{c:'',n:'전체'},{c:'110000',n:'서울'},{c:'210000',n:'부산'},{c:'220000',n:'대구'},{c:'230000',n:'인천'},{c:'240000',n:'광주'},{c:'250000',n:'대전'},{c:'260000',n:'울산'},{c:'290000',n:'세종'},{c:'310000',n:'경기'},{c:'320000',n:'강원'},{c:'330000',n:'충북'},{c:'340000',n:'충남'},{c:'350000',n:'전북'},{c:'360000',n:'전남'},{c:'370000',n:'경북'},{c:'380000',n:'경남'},{c:'390000',n:'제주'}];
-  var CL=[{c:'',n:'전체'},{c:'01',n:'상급종합'},{c:'11',n:'종합병원'},{c:'21',n:'병원'},{c:'28',n:'요양병원'},{c:'29',n:'정신병원'},{c:'31',n:'의원'},{c:'41',n:'치과병원'},{c:'51',n:'한방병원'},{c:'61',n:'보건소'}];
-
-  function initSelects(){
-    ['np-sido1','np-sido2'].forEach(function(id){var el=document.getElementById(id);if(!el)return;SIDO.forEach(function(s){var o=document.createElement('option');o.value=s.c;o.textContent=s.n;el.appendChild(o);});});
-    ['np-cl1','np-cl2'].forEach(function(id){var el=document.getElementById(id);if(!el)return;CL.forEach(function(s){var o=document.createElement('option');o.value=s.c;o.textContent=s.n;el.appendChild(o);});});
-  }
-
-  function parseXML(str){return (new DOMParser()).parseFromString(str,'text/xml');}
-  function gv(doc,tag){var e=doc.getElementsByTagName(tag);return e.length?e[0].textContent:'';}
-  function getItems(doc){return Array.from(doc.getElementsByTagName('item'));}
-  function gf(item,tag){var e=item.getElementsByTagName(tag);return e.length?e[0].textContent.trim():'';}
-  // 여러 필드명 시도 후 첫 번째 값 반환
-  function gfa(item,tags){for(var i=0;i<tags.length;i++){var v=gf(item,tags[i]);if(v)return v;}return '-';}
-  // 모든 자식 필드 출력 (디버그용)
-  function logFields(label,item){var f={};Array.from(item.children).forEach(function(c){if(c.textContent.trim())f[c.tagName]=c.textContent.trim().substring(0,40);});console.log('['+label+'] 필드:',Object.keys(f));console.log('['+label+'] 데이터:',f);}
-  function fmt(v){return v&&v!=='-'&&v!=='0'&&v!==''?Number(v).toLocaleString()+'원':'-';}
-  function fmtDate(v){return v&&v.length===8?v.slice(0,4)+'.'+v.slice(4,6)+'.'+v.slice(6):v||'-';}
-
-  async function callHira(op,params){
-    var url=new URL(NP_BASE+'/'+op,window.location.origin);
-    url.searchParams.set('ServiceKey',NP_KEY);
-    url.searchParams.set('numOfRows',params.numOfRows||NP_ROWS);
-    url.searchParams.set('pageNo',params.pageNo||1);
-    Object.entries(params).forEach(function(kv){if(kv[1]!==undefined&&kv[1]!==''&&kv[0]!=='numOfRows'&&kv[0]!=='pageNo')url.searchParams.set(kv[0],kv[1]);});
-    var res=await fetch(url.toString());
-    var text=await res.text();
-    var doc=parseXML(text);
-    var code=gv(doc,'resultCode');
-    if(code!=='00')throw new Error(gv(doc,'resultMsg')||'조회 실패('+code+')');
-    return doc;
-  }
-
-  function makePager(cur,total,rows,fn){
-    var pages=Math.ceil(total/rows);if(pages<=1)return '';
-    var gs=5,s=Math.floor((cur-1)/gs)*gs+1,e=Math.min(s+gs-1,pages);
-    var h='<div class="np-pager">';
-    if(s>1)h+='<button class="np-page-btn" onclick="'+fn+'('+(s-1)+')">&#10094;</button>';
-    for(var p=s;p<=e;p++)h+='<button class="np-page-btn'+(p===cur?' on':'')+'" onclick="'+fn+'('+p+')">'+p+'</button>';
-    if(e<pages)h+='<button class="np-page-btn" onclick="'+fn+'('+(e+1)+')">&#10095;</button>';
-    h+='<span class="np-page-info">'+cur+' / '+pages+'페이지</span></div>';
-    return h;
-  }
-
-  function loading(id){document.getElementById(id).innerHTML='<p class="np-loading">⏳ 조회 중...</p>';}
-  function showError(id,msg){document.getElementById(id).innerHTML='<p class="np-error">⚠️ '+msg+'</p>';}
-
-  window.npTab=function(name,btn){
-    document.querySelectorAll('.np-subtab-content').forEach(function(el){el.classList.remove('on');});
-    document.querySelectorAll('.np-subtab-btn').forEach(function(el){el.classList.remove('on');});
-    document.getElementById('np-'+name).classList.add('on');
-    btn.classList.add('on');
-  };
-
-  /* ══ 탭1: 병원명 검색
-     실제 필드: yadmNm, clCdNm, sidoCdNm, sgguCdNm,
-               npayKorNm, yadmNpayCdNm, curAmt, urlAddr
-  ══ */
-  var _hospP={};
-  window.npSearchHosp=async function(pageNo){
-    pageNo=pageNo||1;
-    if(pageNo===1){
-      var yadmNm=document.getElementById('np-hosp-name').value.trim();
-      var sidoCd=document.getElementById('np-sido1').value;
-      var clCd=document.getElementById('np-cl1').value;
-      if(!yadmNm&&!sidoCd){alert('병원명 또는 지역을 입력해주세요.');return;}
-      _hospP={yadmNm:yadmNm,sidoCd:sidoCd,clCd:clCd};
-    }
-    loading('np-hosp-result');
-    try{
-      var p=Object.assign({},_hospP,{numOfRows:NP_ROWS,pageNo:pageNo});
-      var doc=await callHira('getNonPaymentItemHospDtlList',p);
-      var items=getItems(doc);
-      var total=Number(gv(doc,'totalCount'))||0;
-      if(!items.length){document.getElementById('np-hosp-result').innerHTML='<p class="np-empty">검색 결과가 없습니다.</p>';return;}
-      if(pageNo===1)logFields('병원검색',items[0]);
-      var html='<p class="np-total">총 '+total.toLocaleString()+'건</p>'
-        +'<div class="np-table-wrap"><table class="np-table"><thead><tr>'
-        +'<th>병원명</th><th>지역</th><th>종별</th><th>비급여항목명</th><th>병원표기명</th><th>현재금액</th><th>적용기간</th><th>상세</th>'
-        +'</tr></thead><tbody>';
-      items.forEach(function(item){
-        var url=gf(item,'urlAddr');
-        var fr=fmtDate(gf(item,'adtFrDd'));
-        var to=gf(item,'adtEndDd')==='99991231'?'현재':fmtDate(gf(item,'adtEndDd'));
-        html+='<tr>'
-          +'<td>'+gfa(item,['yadmNm'])+'</td>'
-          +'<td>'+gfa(item,['sidoCdNm'])+' '+gfa(item,['sgguCdNm'])+'</td>'
-          +'<td>'+gfa(item,['clCdNm'])+'</td>'
-          +'<td>'+gfa(item,['npayKorNm'])+'</td>'
-          +'<td style="color:var(--text2);font-size:0.78rem">'+gfa(item,['yadmNpayCdNm'])+'</td>'
-          +'<td><strong>'+fmt(gf(item,'curAmt'))+'</strong></td>'
-          +'<td style="font-size:0.75rem;color:var(--text3)">'+fr+' ~ '+to+'</td>'
-          +'<td>'+(url?'<a class="np-link" href="'+url+'" target="_blank">바로가기</a>':'-')+'</td>'
-          +'</tr>';
-      });
-      html+='</tbody></table></div>'+makePager(pageNo,total,NP_ROWS,'npSearchHosp');
-      document.getElementById('np-hosp-result').innerHTML=html;
-    }catch(e){showError('np-hosp-result',e.message);}
-  };
-
-  /* ══ 탭2: 지역별 비교 ══ */
-  var _regionP={};
-  window.npSearchRegion=async function(pageNo){
-    pageNo=pageNo||1;
-    if(pageNo===1){
-      var sidoCd=document.getElementById('np-sido2').value;
-      var clCd=document.getElementById('np-cl2').value;
-      var itemCd=document.getElementById('np-itemcd').value.trim();
-      if(!sidoCd){alert('지역을 선택해주세요.');return;}
-      if(!itemCd){alert('항목코드를 입력해주세요. (예: A1100)');return;}
-      _regionP={sidoCd:sidoCd,clCd:clCd,itemCd:itemCd};
-    }
-    loading('np-region-result');
-    try{
-      var p=Object.assign({},_regionP,{numOfRows:NP_ROWS,pageNo:pageNo});
-      var doc=await callHira('getNonPaymentItemHospList2',p);
-      var items=getItems(doc);
-      var total=Number(gv(doc,'totalCount'))||0;
-      if(pageNo===1&&items.length)logFields('지역별비교',items[0]);
-      if(!items.length){document.getElementById('np-region-result').innerHTML='<p class="np-empty">검색 결과가 없습니다.</p>';return;}
-      var html='<p class="np-total">총 '+total.toLocaleString()+'건</p>'
-        +'<div class="np-table-wrap"><table class="np-table"><thead><tr>'
-        +'<th>병원명</th><th>종별</th><th>항목명</th><th>최소비용</th><th>최대비용</th><th>상세</th>'
-        +'</tr></thead><tbody>';
-      items.forEach(function(item){
-        var url=gfa(item,['url','urlAddr']);
-        var nm=gfa(item,['npayKorNm','itmCdNm','divCd2Nm']);
-        var pMin=gfa(item,['prcMin','itmPrcMin','curAmt']);
-        var pMax=gfa(item,['prcMax','itmPrcMax']);
-        html+='<tr>'
-          +'<td>'+gfa(item,['yadmNm'])+'</td>'
-          +'<td>'+gfa(item,['clCdNm'])+'</td>'
-          +'<td>'+nm+'</td>'
-          +'<td>'+fmt(pMin)+'</td>'
-          +'<td>'+fmt(pMax)+'</td>'
-          +'<td>'+(url&&url!=='-'?'<a class="np-link" href="'+url+'" target="_blank">바로가기</a>':'-')+'</td>'
-          +'</tr>';
-      });
-      html+='</tbody></table></div>'+makePager(pageNo,total,NP_ROWS,'npSearchRegion');
-      document.getElementById('np-region-result').innerHTML=html;
-    }catch(e){showError('np-region-result',e.message);}
-  };
-
-  /* ══ 탭3: 항목코드 조회
-     - 16.3이후: npayCd, npayKorNm 사용 추정
-     - 16.2이전: divCd1, divCd1Nm, divCd2, divCd2Nm 사용
-  ══ */
-  var _codeP={};
-  window.npLoadCodes=async function(pageNo){
-    pageNo=pageNo||1;
-    if(pageNo===1)_codeP={searchWrd:document.getElementById('np-search-wrd').value.trim()};
-    loading('np-code-result');
-    try{
-      var p=Object.assign({},_codeP,{numOfRows:NP_ROWS,pageNo:pageNo});
-      var doc=await callHira('getNonPaymentItemCodeList2',p);
-      var items=getItems(doc);
-      var total=Number(gv(doc,'totalCount'))||0;
-      if(pageNo===1&&items.length)logFields('항목코드',items[0]);
-      if(!items.length){document.getElementById('np-code-result').innerHTML='<p class="np-empty">검색 결과가 없습니다.</p>';return;}
-      var html='<p class="np-total">총 '+total.toLocaleString()+'건 | 코드 클릭 시 복사</p>'
-        +'<div class="np-table-wrap"><table class="np-table"><thead><tr>'
-        +'<th>분류</th><th>코드</th><th>항목명</th><th>설명</th>'
-        +'</tr></thead><tbody>';
-      items.forEach(function(item){
-        // 코드: npayCd 또는 divCd2
-        var code=gfa(item,['npayCd','divCd2']);
-        // 항목명: npayKorNm 또는 divCd2Nm
-        var nm=gfa(item,['npayKorNm','divCd2Nm']);
-        // 1차분류: divCd1Nm 또는 npayClsNm 또는 npayCatNm
-        var cat=gfa(item,['divCd1Nm','npayClsNm','npayCatNm','clsNm']);
-        // 설명: divCd2Dsc 또는 npayDsc
-        var descRaw=gfa(item,['divCd2Dsc','npayDsc','npayEngNm']);
-        var desc=descRaw!=='-'?descRaw.replace(/<[^>]+>/g,' ').substring(0,50):'';
-        html+='<tr>'
-          +'<td>'+cat+'</td>'
-          +'<td><span class="np-code-badge" onclick="npCopyCode(this,this.dataset.code)" data-code="'+code+'">'+code+'</span></td>'
-          +'<td>'+nm+'</td>'
-          +'<td style="color:var(--text2);max-width:160px;font-size:0.75rem">'+(desc?desc+'…':'')+'</td>'
-          +'</tr>';
-      });
-      html+='</tbody></table></div>'+makePager(pageNo,total,NP_ROWS,'npLoadCodes');
-      html+='<p class="np-tip">💡 코드 클릭 → 복사 → "지역별 비교" 탭에 붙여넣으세요</p>';
-      document.getElementById('np-code-result').innerHTML=html;
-    }catch(e){showError('np-code-result',e.message);}
-  };
-
-  window.npCopyCode=function(el,code){
-    var c=code||el.dataset.code||el.textContent;
-    navigator.clipboard.writeText(c);
-    var orig=el.textContent;el.textContent='✓ 복사됨';
-    setTimeout(function(){el.textContent=orig;},1200);
-  };
-
-  document.addEventListener('DOMContentLoaded',initSelects);
-})();
 
 /* ══════════════════════════════════════════════
    상세보기 모달 함수들
@@ -7227,7 +6898,7 @@ updateFavBadge();
 setSubTab('search','single');
 setSubTab('safety','recall');
 setSubTab('medical','map');
-setSubTab('info','license');
+setSubTab('info','insu');
 </script>
 
 <!-- ═══ 카카오 로그인 UI ═══ -->
@@ -7616,7 +7287,7 @@ setSubTab('info','license');
   }
 
   /* 탭 버튼 */
-  .tab-btn, .sub-tab, .np-subtab-btn {
+  .tab-btn, .sub-tab {
     font-size: 14.5px !important; padding: 11px 18px !important; min-height: 44px !important;
   }
 
